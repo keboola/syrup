@@ -17,8 +17,8 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
 	        new Syrup\CoreBundle\SyrupCoreBundle(),
             new Syrup\ComponentBundle\SyrupComponentBundle(),
-//            new Syrup\GoogleAnalyticsBundle\SyrupGoogleAnalyticsBundle(),
             new Syrup\SlevomatBundle\SyrupSlevomatBundle(),
+	        new Syrup\DbBundle\SyrupDbBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
