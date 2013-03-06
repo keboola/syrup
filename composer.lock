@@ -1058,22 +1058,22 @@
         },
         {
             "name": "syrup/component-bundle",
-            "version": "1.0.18",
+            "version": "1.0.21",
             "target-dir": "Syrup/ComponentBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/syrup-component-bundle.git",
-                "reference": "1.0.18"
+                "reference": "1.0.21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/syrup-component-bundle/zipball/1.0.18",
-                "reference": "1.0.18",
+                "url": "https://api.github.com/repos/keboola/syrup-component-bundle/zipball/1.0.21",
+                "reference": "1.0.21",
                 "shasum": ""
             },
             "require": {
                 "aws/aws-sdk-php": "2.*",
-                "guzzle/guzzle": "3.2.*",
+                "guzzle/guzzle": ">=3.0.0",
                 "keboola/csv": "1.0.*",
                 "keboola/storage-api-client": "2.6.*",
                 "php": ">=5.3.5"
@@ -1081,7 +1081,7 @@
             "require-dev": {
                 "syrup/development-bundle": "1.0.8"
             },
-            "time": "2013-03-01 13:28:41",
+            "time": "2013-03-01 14:25:48",
             "type": "symfony-bundle",
             "autoload": {
                 "psr-0": {
