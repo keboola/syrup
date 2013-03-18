@@ -33,15 +33,20 @@ class RegisterBundleCommand extends ContainerAwareCommand
 		//update Kernel
 		$kernelManipulator = new KernelManipulator($this->getContainer()->get('kernel'));
 
-
 		$nameArr = explode('/', $name);
 
-		$namespace = $nameArr[0];
-		$bundle = $nameArr[1];
-		$class = $nameArr[0] . $nameArr[1];
+		$bundle = array_pop($nameArr);;
+
+		$class = '';
+		$namespace = '';
+		foreach ($nameArr as $name) {
+			$class .= $name;
+			$namespace .= $name . '\\';
+		}
+		$class .= $bundle;
 
 		try {
-			$kernelManipulator->addBundle($namespace . '\\' . $bundle . '\\' . $class);
+			$kernelManipulator->addBundle($namespace . $bundle . '\\' . $class);
 		} catch (\RuntimeException $e) {
 			return array(
 				sprintf('Bundle <comment>%s</comment> is already defined in <comment>AppKernel::registerBundles()</comment>.', $namespace.'\\'.$bundle),
