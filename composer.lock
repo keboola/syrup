@@ -3,34 +3,41 @@
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "2.1.2",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "2.1.2"
+                "reference": "2.2.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2.1.2",
-                "reference": "2.1.2",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2.2.0",
+                "reference": "2.2.0",
                 "shasum": ""
             },
             "require": {
-                "guzzle/guzzle": ">=3.2,<3.3",
+                "guzzle/guzzle": ">=3.3,<3.4",
                 "php": ">=5.3.3"
             },
             "require-dev": {
                 "doctrine/common": "2.3.*",
                 "ext-apc": "*",
-                "monolog/monolog": "1.2.*",
+                "monolog/monolog": "1.4.*",
                 "phpunit/phpunit": "3.7.*",
-                "symfony/class-loader": "2.*"
+                "symfony/class-loader": "2.*",
+                "symfony/yaml": "2.*"
             },
-            "time": "2013-02-19 01:30:36",
+            "suggest": {
+                "doctrine/cache": "Adds support for caching of credentials and responses",
+                "ext-apc": "Allows service description opcode caching, request and response caching, and credentials caching",
+                "monolog/monolog": "Adds support for logging HTTP requests and responses",
+                "symfony/yaml": "Eases the ability to write manifests for creating jobs in AWS Import/Export"
+            },
+            "time": "2013-03-11 17:17:11",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.1.x-dev"
+                    "dev-master": "2.2.x-dev"
                 }
             },
             "autoload": {
@@ -332,16 +339,16 @@
         },
         {
             "name": "guzzle/guzzle",
-            "version": "v3.2.0",
+            "version": "v3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "v3.2.0"
+                "reference": "v3.3.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/v3.2.0",
-                "reference": "v3.2.0",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/v3.3.1",
+                "reference": "v3.3.1",
                 "shasum": ""
             },
             "require": {
@@ -364,6 +371,7 @@
                 "guzzle/plugin-cache": "self.version",
                 "guzzle/plugin-cookie": "self.version",
                 "guzzle/plugin-curlauth": "self.version",
+                "guzzle/plugin-error-response": "self.version",
                 "guzzle/plugin-history": "self.version",
                 "guzzle/plugin-log": "self.version",
                 "guzzle/plugin-md5": "self.version",
@@ -373,7 +381,7 @@
                 "guzzle/stream": "self.version"
             },
             "require-dev": {
-                "doctrine/common": "*",
+                "doctrine/cache": "*",
                 "monolog/monolog": "1.*",
                 "phpunit/phpunit": "3.7.*",
                 "symfony/class-loader": "*",
@@ -382,11 +390,11 @@
                 "zendframework/zend-cache": "2.0.*",
                 "zendframework/zend-log": "2.0.*"
             },
-            "time": "2013-02-15 01:33:10",
+            "time": "2013-03-10 23:05:38",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1-dev"
+                    "dev-master": "3.3-dev"
                 }
             },
             "autoload": {
@@ -495,22 +503,22 @@
         },
         {
             "name": "keboola/storage-api-client",
-            "version": "2.6.5",
+            "version": "2.6.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/storage-api-php-client.git",
-                "reference": "2.6.5"
+                "reference": "2.6.10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/storage-api-php-client/zipball/2.6.5",
-                "reference": "2.6.5",
+                "url": "https://api.github.com/repos/keboola/storage-api-php-client/zipball/2.6.10",
+                "reference": "2.6.10",
                 "shasum": ""
             },
             "require": {
                 "keboola/csv": "1.0.*"
             },
-            "time": "2013-02-20 09:45:23",
+            "time": "2013-03-14 00:00:02",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -1058,17 +1066,17 @@
         },
         {
             "name": "syrup/component-bundle",
-            "version": "1.0.21",
+            "version": "1.0.24",
             "target-dir": "Syrup/ComponentBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/syrup-component-bundle.git",
-                "reference": "1.0.21"
+                "reference": "1.0.24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/syrup-component-bundle/zipball/1.0.21",
-                "reference": "1.0.21",
+                "url": "https://api.github.com/repos/keboola/syrup-component-bundle/zipball/1.0.24",
+                "reference": "1.0.24",
                 "shasum": ""
             },
             "require": {
@@ -1079,10 +1087,15 @@
                 "php": ">=5.3.5"
             },
             "require-dev": {
-                "syrup/development-bundle": "1.0.8"
+                "syrup/development-bundle": ">=1.0.8"
             },
-            "time": "2013-03-01 14:25:48",
+            "time": "2013-03-14 15:05:25",
             "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.2-dev"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Syrup\\ComponentBundle": ""
@@ -1099,30 +1112,40 @@
         },
         {
             "name": "syrup/db-bundle",
-            "version": "1.0.2",
+            "version": "1.0.4",
             "target-dir": "Syrup/DbBundle",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:keboola/syrup-db-bundle.git",
-                "reference": "1.0.2"
+                "reference": "1.0.4"
             },
             "require": {
-                "php": ">=5.3.5",
-                "syrup/component-bundle": "1.0.*"
+                "php": ">=5.3.5"
             },
             "require-dev": {
-                "doctrine/doctrine-bundle": "1.0.*",
-                "doctrine/orm": ">=2.2.3,<2.4-dev",
-                "symfony/monolog-bundle": "2.1.*",
-                "symfony/symfony": "2.1.*",
-                "syrup/development-bundle": "1.0.*"
+                "syrup/component-bundle": "1.0.*",
+                "syrup/development-bundle": ">=1.0.8"
             },
-            "time": "2013-03-01 09:34:48",
+            "time": "2013-03-08 10:03:13",
             "type": "symfony-bundle",
+            "extra": {
+                "symfony-app-dir": "vendor/syrup/development-bundle/app",
+                "symfony-web-dir": "vendor/syrup/development-bundle/web"
+            },
             "autoload": {
                 "psr-0": {
                     "Syrup\\DbBundle": ""
                 }
+            },
+            "scripts": {
+                "post-install-cmd": [
+                    "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+                    "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache"
+                ],
+                "post-update-cmd": [
+                    "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+                    "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache"
+                ]
             },
             "authors": [
                 {
