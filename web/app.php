@@ -21,9 +21,6 @@ $kernel = new AppKernel('prod', false);
 $kernel->loadClassCache();
 //$kernel = new AppCache($kernel);
 
-// Register error handler
-Symfony\Component\HttpKernel\Debug\ErrorHandler::register();
-
 $request = Request::createFromGlobals();
 $response = $kernel->handle($request);
 $response->send();

@@ -27,9 +27,6 @@ require_once __DIR__.'/../app/AppKernel.php';
 $kernel = new AppKernel('prod', true);
 $kernel->loadClassCache();
 
-// Register error handler
-//Symfony\Component\HttpKernel\Debug\ErrorHandler::register();
-
 $request = Request::createFromGlobals();
 $response = $kernel->handle($request);
 $response->send();
