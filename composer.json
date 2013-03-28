@@ -12,6 +12,10 @@
 		{
 			"type": "vcs",
 			"url": "git@bitbucket.org:keboola/syrup-db-bundle.git"
+		},
+		{
+			"type": "vcs",
+			"url": "git@bitbucket.org:keboola/wr-gooddata-4.git"
 		}
 	],
     "require": {
@@ -26,7 +30,8 @@
         "sensio/generator-bundle": "2.2.*",
 	    "syrup/component-bundle": "1.0.*",
 	    "syrup/slevomat-bundle": "1.0.*",
-		"syrup/db-bundle": "1.0.*"
+		"syrup/db-bundle": "1.0.*",
+		"keboola/wr-gooddata-4": "4.0.*"
     },
     "scripts": {
         "post-install-cmd": [
