@@ -15,7 +15,18 @@
 		},
 		{
 			"type": "vcs",
-			"url": "git@bitbucket.org:keboola/wr-gooddata-4.git"
+			"url": "git@bitbucket.org:keboola/gooddata-writer.git"
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "gooddata/gooddata-cl",
+				"version": "1.2.67",
+				"dist": {
+					"url": "http://developer.gooddata.com/downloads/cl-tool/gooddata-cli.zip",
+					"type": "zip"
+				}
+			}
 		}
 	],
     "require": {
@@ -31,7 +42,7 @@
 	    "syrup/component-bundle": "1.0.*",
 	    "syrup/slevomat-bundle": "1.0.*",
 		"syrup/db-bundle": "1.0.*",
-		"keboola/wr-gooddata-4": "4.0.*"
+		"keboola/gooddata-writer": "4.1.*"
     },
     "scripts": {
         "post-install-cmd": [

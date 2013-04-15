@@ -20,7 +20,7 @@ class AppKernel extends Kernel
             new Syrup\ComponentBundle\SyrupComponentBundle(),
 			new Syrup\SlevomatBundle\SyrupSlevomatBundle(),
 	    	new Syrup\DbBundle\SyrupDbBundle(),
-			new Keboola\GoodDataWriterBundle\KeboolaGoodDataWriterBundle(),
+			new Keboola\GoodDataWriter\KeboolaGoodDataWriterBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
