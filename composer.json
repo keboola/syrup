@@ -12,6 +12,21 @@
 		{
 			"type": "vcs",
 			"url": "git@bitbucket.org:keboola/syrup-db-bundle.git"
+		},
+		{
+			"type": "vcs",
+			"url": "git@bitbucket.org:keboola/gooddata-writer.git"
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "gooddata/gooddata-cl",
+				"version": "1.2.67",
+				"dist": {
+					"url": "http://developer.gooddata.com/downloads/cl-tool/gooddata-cli.zip",
+					"type": "zip"
+				}
+			}
 		}
 	],
     "require": {
@@ -26,7 +41,8 @@
         "sensio/generator-bundle": "2.2.*",
 	    "syrup/component-bundle": "1.1.*",
 	    "syrup/slevomat-bundle": "1.0.*",
-		"syrup/db-bundle": "1.0.*"
+		"syrup/db-bundle": "1.0.*",
+		"keboola/gooddata-writer": "4.1.*"
     },
     "scripts": {
         "post-install-cmd": [
