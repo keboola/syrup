@@ -20,6 +20,6 @@ set  :use_sudo,         false
 set  :keep_releases,    3
 
 # Be more verbose by uncommenting the following line
-# logger.level = Logger::MAX_LEVEL
+logger.level = Logger::MAX_LEVEL
 
 after "deploy",         "deploy:cleanup"
