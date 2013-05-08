@@ -5,6 +5,10 @@
         "psr-0": { "": "src/" }
     },
 	"repositories": [
+                {
+                        "type": "vcs",
+                        "url": "git@bitbucket.org:keboola/keboola-pingdom-bundle.git"
+                },
 		{
 			"type": "vcs",
 			"url": "git@bitbucket.org:keboola/syrup-slevomat-bundle.git"
@@ -42,7 +46,8 @@
 	    "syrup/component-bundle": "1.1.*",
 	    "syrup/slevomat-bundle": "1.0.*",
 		"syrup/db-bundle": "1.0.*",
-		"keboola/gooddata-writer": "4.1.*"
+		"keboola/gooddata-writer": "4.1.*",
+        "keboola/pingdom-bundle": "1.0.*"
     },
     "scripts": {
         "post-install-cmd": [
