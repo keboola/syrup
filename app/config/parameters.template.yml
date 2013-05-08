@@ -1,0 +1,24 @@
+parameters:
+    app_name:          syrup
+
+    database_driver:   pdo_mysql
+    database_host:     localhost
+    database_port:     ~
+    database_name:     symfony
+    database_user:     root
+    database_password: ~
+
+    mailer_transport:  smtp
+    mailer_host:       localhost
+    mailer_user:       ~
+    mailer_password:   ~
+
+    locale:            en
+    secret:            ThisTokenIsNotSoSecretChangeIt
+
+    storageApi.test.token:
+    storageApi.url:         http://connection.keboola.com/
+
+    components:
+        ex-dummy:
+            class:  Syrup\ComponentBundle\Component\DummyExtractor
