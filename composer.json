@@ -46,7 +46,7 @@
 	    "syrup/component-bundle": "1.1.*",
 	    "syrup/slevomat-bundle": "1.0.*",
 		"syrup/db-bundle": "1.0.*",
-		"keboola/gooddata-writer": "4.1.*",
+		"keboola/gooddata-writer": "4.2.*",
         "keboola/pingdom-bundle": "1.0.*"
     },
     "scripts": {
