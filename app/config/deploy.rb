@@ -10,7 +10,7 @@ set :use_composer,      true
 set :update_vendors,    true
 
 set :scm,               :git
-set :repository,        "ssh://git@bitbucket.org/keboola/syrup.git"
+set :repository,        "ssh://git@github.com:keboola/syrup.git"
 
 role :web,              domain                         # Your HTTP server, Apache/etc
 role :app,              domain                         # This may be the same as your `Web` server
