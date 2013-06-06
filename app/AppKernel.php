@@ -2,6 +2,7 @@
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Yaml\Parser;
 
 class AppKernel extends Kernel
 {
@@ -15,12 +16,7 @@ class AppKernel extends Kernel
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
-			new Syrup\CoreBundle\SyrupCoreBundle(),
-            new Syrup\ComponentBundle\SyrupComponentBundle(),
-			new Syrup\SlevomatBundle\SyrupSlevomatBundle(),
-	    	new Syrup\DbBundle\SyrupDbBundle(),
-	        new Keboola\GoodDataWriter\KeboolaGoodDataWriterBundle(),
-            new Keboola\PingdomBundle\KeboolaPingdomBundle(),
+            new Syrup\ComponentBundle\SyrupComponentBundle()
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
@@ -29,6 +25,13 @@ class AppKernel extends Kernel
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
         }
 
+	    foreach ($this->getComponents() as $component) {
+		    if (isset($component['bundle'])) {
+			    $bundleClassName = $component['bundle'];
+			    $bundles[] = new $bundleClassName;
+		    }
+	    }
+
         return $bundles;
     }
 
@@ -36,4 +39,12 @@ class AppKernel extends Kernel
     {
         $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
     }
+
+	public function getComponents()
+	{
+		$yaml = new Parser();
+		$parameters = $yaml->parse(file_get_contents(__DIR__.'/config/parameters.yml'));
+
+		return $parameters['parameters']['components'];
+	}
 }

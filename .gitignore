@@ -8,3 +8,4 @@
 /.idea/
 /tmp/*
 composer.lock
+composer.json
