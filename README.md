@@ -1,4 +1,4 @@
-Syrup
+Syrup [![Build Status](https://travis-ci.org/keboola/syrup.png?branch=master)](https://travis-ci.org/keboola/syrup)
 ========================
 
 Syrup is a framework for rapid development of Keboola Connection components (i.e. extractors).
