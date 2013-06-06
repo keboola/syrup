@@ -21,7 +21,7 @@ class RegisterBundleCommand extends ContainerAwareCommand
 	{
 		$this
 			->setName('syrup:register-bundle')
-			->setDescription('Register your bundle to Syrup. This will create basic configuration for you and register bundle to app/AppKernel.php')
+			->setDescription('Register your bundle within Syrup. This command will register bundle to app/AppKernel.php')
 			->addArgument('name', InputArgument::REQUIRED, 'Name of your bundle i.e. Syrup/CoreBundle')
 		;
 	}
