@@ -16,7 +16,7 @@ parameters:
     locale:            en
     secret:            ThisTokenIsNotSoSecretChangeIt
 
-    storageApi.test.token:
+    storageApi.test.token:  yourStorageApiTestToken
     storageApi.url:         http://connection.keboola.com/
 
     components:
