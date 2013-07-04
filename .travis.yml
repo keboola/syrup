@@ -1,10 +1,8 @@
+---
 language: php
-
 php:
-  - 5.3.3
-  - 5.3
-  - 5.4
+ - 5.4
+before_install:
+ - cp composer.json.template composer.json
+ - composer install --prefer-source --no-interaction
 
-before_script: composer install
-
-script: phpunit -c app
