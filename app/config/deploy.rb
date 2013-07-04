@@ -4,7 +4,7 @@ set :deploy_to,         "/www/syrup"
 set :app_path,          "app"
 set :ssh_options,       {:forward_agent => true}
 
-set :shared_files,      ["app/config/parameters.yml"]
+set :shared_files,      ["app/config/parameters.yml","composer.json"]
 set :shared_children,   [app_path + "/logs", web_path + "/uploads"]
 set :use_composer,      true
 set :update_vendors,    true
