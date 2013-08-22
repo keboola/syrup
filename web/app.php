@@ -1,7 +1,7 @@
 <?php
 
 use Symfony\Component\ClassLoader\ApcClassLoader;
-use Symfony\Component\Debug\Debug;
+use Syrup\CoreBundle\Debug\Debug;
 use Symfony\Component\HttpFoundation\Request;
 
 define('ROOT_PATH', __DIR__.'/../');
@@ -15,7 +15,8 @@ $loader = require_once __DIR__.'/../app/bootstrap.php.cache';
 $loader = new ApcClassLoader('sf2', $loader);
 $loader->register(true);
 */
-Debug::enable();
+
+Debug::enable(null, false, 'prod');
 
 require_once __DIR__.'/../app/AppKernel.php';
 //require_once __DIR__.'/../app/AppCache.php';

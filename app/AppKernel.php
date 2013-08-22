@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Yaml\Parser;
@@ -16,6 +17,7 @@ class AppKernel extends Kernel
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
+	        new Syrup\CoreBundle\SyrupCoreBundle(),
             new Syrup\ComponentBundle\SyrupComponentBundle()
         );
 
@@ -43,8 +45,12 @@ class AppKernel extends Kernel
 	public function getComponents()
 	{
 		$yaml = new Parser();
-		$parameters = $yaml->parse(file_get_contents(__DIR__.'/config/parameters.yml'));
 
-		return $parameters['parameters']['components'];
+		try {
+			$parameters = $yaml->parse(file_get_contents(__DIR__.'/config/parameters.yml'));
+			return $parameters['parameters']['components'];
+		} catch (Exception $e) {
+			throw new \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException($e->getMessage());
+		}
 	}
 }
