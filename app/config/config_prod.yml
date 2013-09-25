@@ -6,5 +6,5 @@ monolog:
         syslog:
             ident: %app_name%
             type: syslog
-            level: info
+            level: warning
             formatter: syrup.monolog.json_formatter

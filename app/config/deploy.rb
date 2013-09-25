@@ -3,7 +3,7 @@ set :domain,            "ch-data.keboola.com"
 set :deploy_to,         "/www/syrup"
 set :app_path,          "app"
 set :ssh_options,       {:forward_agent => true}
-# set :user,              "deploy"
+set :user,              "deploy"
 
 set :shared_files,      ["app/config/parameters.yml","composer.json"]
 set :shared_children,   [app_path + "/logs", web_path + "/uploads"]
