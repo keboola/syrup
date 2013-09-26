@@ -2,6 +2,10 @@ syrup_index:
     path:      /
     defaults:  { _controller: SyrupCoreBundle:Index:index }
 
+syrup_core:
+    resource: .
+    type: component
+
 syrup_component:
     resource: "@SyrupComponentBundle/Resources/config/routing.yml"
     prefix:   /
