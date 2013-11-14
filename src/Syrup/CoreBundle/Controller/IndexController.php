@@ -9,17 +9,38 @@
 namespace Syrup\CoreBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class IndexController extends Controller
 {
-
+	/**
+	 * Displays Syrup components with their recent version
+	 *
+	 * @return JsonResponse
+	 */
 	public function indexAction()
 	{
-		$components = $this->container->getParameter('components');
+		$cmd = "php /usr/local/bin/composer show --working-dir " . ROOT_PATH .  " --installed | awk '{ print $1 \":\" $2 }'";
+
+		$output = array();
+		$return_var = null;
+		exec($cmd, $output, $return_var);
+
+		$syrupComponents = array();
+
+		foreach ($output as $row) {
+			$rArr = explode(":", $row);
+
+			$kArr = explode("/", $rArr[0]);
+
+			if ($kArr[0] == 'syrup' || $kArr[0] ==  'keboola') {
+				$syrupComponents[$rArr[0]] = $rArr[1];
+			}
+		}
 
 		return new JsonResponse(array(
-			"components"    => array_keys($components),
+			"components"    => $syrupComponents,
 			"documentation" => "http://documentation.keboola.com/syrup"
 		));
 	}
