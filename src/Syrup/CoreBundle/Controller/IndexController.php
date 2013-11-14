@@ -21,7 +21,7 @@ class IndexController extends Controller
 	 */
 	public function indexAction()
 	{
-		$cmd = "php /usr/local/bin/composer show --working-dir " . ROOT_PATH .  " --installed | awk '{ print $1 \":\" $2 }'";
+		$cmd = "cd " . ROOT_PATH .  "; ./composer.phar show --installed | awk '{ print $1 \":\" $2 }'";
 
 		$output = array();
 		$return_var = null;
@@ -40,6 +40,7 @@ class IndexController extends Controller
 		}
 
 		return new JsonResponse(array(
+			"host"          => $_SERVER["HTTP_HOST"],
 			"components"    => $syrupComponents,
 			"documentation" => "http://documentation.keboola.com/syrup"
 		));
