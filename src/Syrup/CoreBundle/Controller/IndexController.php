@@ -23,6 +23,8 @@ class IndexController extends Controller
 	{
 		$cmd = "cd " . ROOT_PATH .  "; ./composer.phar show --installed | awk '{ print $1 \":\" $2 }'";
 
+		$this->container->get('logger')->info("Executing command " . $cmd);
+
 		$output = array();
 		$return_var = null;
 		exec($cmd, $output, $return_var);
