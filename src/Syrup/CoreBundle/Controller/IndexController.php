@@ -8,6 +8,15 @@
 
 namespace Syrup\CoreBundle\Controller;
 
+use Composer\Config;
+use Composer\Factory;
+use Composer\IO\NullIO;
+use Composer\Json\JsonFile;
+use Composer\Package\Locker;
+use Composer\Package\Package;
+use Composer\Repository\ComposerRepository;
+use Composer\Repository\FilesystemRepository;
+use Composer\Repository\InstalledFilesystemRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,28 +30,25 @@ class IndexController extends Controller
 	 */
 	public function indexAction()
 	{
-		$cmd = "cd " . ROOT_PATH .  "; ./composer.phar show --installed | awk '{ print $1 \":\" $2 }'";
+		$rootPath = str_replace('web/../', '', ROOT_PATH);
 
-		$this->container->get('logger')->info("Executing command " . $cmd);
-
-		$output = array();
-		$return_var = null;
-		exec($cmd, $output, $return_var);
+		$installedJson = new JsonFile($rootPath . '/vendor/composer/installed.json');
+		$repo = new FilesystemRepository($installedJson);
 
 		$syrupComponents = array();
 
-		foreach ($output as $row) {
-			$rArr = explode(":", $row);
+		/** @var Package $package */
+		foreach ($repo->getPackages() as $package) {
 
-			$kArr = explode("/", $rArr[0]);
+			$nameArr = explode("/", $package->getPrettyName());
 
-			if ($kArr[0] == 'syrup' || $kArr[0] ==  'keboola') {
-				$syrupComponents[$rArr[0]] = $rArr[1];
+			if ($nameArr[0] == 'syrup' || $nameArr[0] == 'keboola') {
+				$syrupComponents[$package->getPrettyName()] = $package->getPrettyVersion();
 			}
 		}
 
 		return new JsonResponse(array(
-			"host"          => $_SERVER["HTTP_HOST"],
+			"host"          => gethostname(),
 			"components"    => $syrupComponents,
 			"documentation" => "http://documentation.keboola.com/syrup"
 		));
