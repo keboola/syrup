@@ -4,6 +4,8 @@ use Symfony\Component\ClassLoader\ApcClassLoader;
 use Syrup\CoreBundle\Debug\Debug;
 use Symfony\Component\HttpFoundation\Request;
 
+umask(0002);
+
 define('ROOT_PATH', __DIR__.'/../');
 
 $loader = require_once __DIR__.'/../app/bootstrap.php.cache';
