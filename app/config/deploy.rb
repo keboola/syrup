@@ -9,7 +9,7 @@ set :shared_files,      ["app/config/parameters.yml","composer.json"]
 set :shared_children,   [app_path + "/logs", web_path + "/uploads"]
 set :use_composer,      true
 set :update_vendors,    true
-set :composer_options,  "--no-scripts --no-dev --verbose --prefer-dist"
+# set :composer_options,  "--no-scripts --no-dev --verbose --prefer-dist"
 
 set :scm,               :git
 set :repository,        "git@github.com:keboola/syrup.git"
