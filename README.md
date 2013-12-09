@@ -1,4 +1,4 @@
-Syrup [![Build Status](https://travis-ci.org/keboola/syrup.png?branch=master)](https://travis-ci.org/keboola/syrup)
+Syrup
 ========================
 
 Syrup is a framework for rapid development of Keboola Connection components (i.e. extractors).
@@ -13,39 +13,38 @@ following options.
 - Clone from BitBucket (*recommended*)
 - Download an Archive File
 
-Create app/config/parameters.yml file.
+Create app/config/parameters.yml from paramters.yml.dist file.
 
-Remove unwanted bundles from composer.json and app/AppKernel.php.
+Run "composer install" from command line.
 
-Run "composer update" from command line.
+Setup virtual host.
 
 
-2) Checking your System Configuration
+2) Deployment
 -------------------------------------
 
-Before starting coding, make sure that your local system is properly
-configured for Symfony.
+Deployment to production is server is managed by Capifony.
 
-Execute the `check.php` script from the command line:
+There are 2 stages:
 
-    php app/check.php
+- Local
+- Production
 
-Access the `config.php` script from a browser:
+To deploy to production server run:
 
-    http://localhost/path/to/symfony/app/web/config.php
+	"cap production deploy"
 
-If you get any warnings or recommendations, fix them before moving on.
+This will install the newset release and create a symlink "latest".
 
+You can test this newest release on the url:
 
-3) Getting started with Syrup
--------------------------------
+	"https://syrup-latest.keboola.com" (https://syrup-latest-a-02.keboola.com or https://syrup-latest-b-02.keboola.com respectively)
 
-TBD
+When everything is working fine, simply run:
 
-What's inside?
----------------
+	"cap production deploy:create_symlink"
 
-TBD
+To let the "current" symlink point to the latest realease.
 
 Enjoy!
 
