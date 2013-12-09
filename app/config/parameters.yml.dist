@@ -16,8 +16,14 @@ parameters:
     locale:            en
     secret:            ThisTokenIsNotSoSecretChangeIt
 
-    storageApi.test.token:  yourStorageApiTestToken
-    storageApi.url:         http://connection.keboola.com/
+    # deprecated
+    storageApi.test.token:
+    storageApi.url:         'https://connection.keboola.com'
+
+    storage_api.url:        'https://connection.keboola.com'
+    storage_api.test.url:
+    storage_api.test.token:
+    shared_sapi.token:
 
     components:
         ex-dummy:
