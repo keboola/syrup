@@ -32,17 +32,17 @@ There are 2 stages:
 
 To deploy to production server run:
 
-	"cap production deploy"
+	cap production deploy
 
 This will install the newset release and create a symlink "latest".
 
 You can test this newest release on the url:
 
-	"https://syrup-latest.keboola.com" (https://syrup-latest-a-02.keboola.com or https://syrup-latest-b-02.keboola.com respectively)
+https://syrup-latest.keboola.com (https://syrup-latest-a-02.keboola.com or https://syrup-latest-b-02.keboola.com respectively)
 
 When everything is working fine, simply run:
 
-	"cap production deploy:create_symlink"
+	cap production deploy:create_symlink
 
 To let the "current" symlink point to the latest realease.
 
