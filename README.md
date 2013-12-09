@@ -36,7 +36,7 @@ To deploy to production server run:
 
 This will install the newset release and create a symlink "latest".
 
-You can test this newest release on the url:
+You can test this latest release on the url:
 
 https://syrup-latest.keboola.com (https://syrup-latest-a-02.keboola.com or https://syrup-latest-b-02.keboola.com respectively)
 
