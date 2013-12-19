@@ -41,12 +41,16 @@ This will install the newset release and create a symlink "latest" that points t
 
 You can test this latest release on the url:
 
-Production:
+Production
+
 	Latest: https://syrup-latest.keboola.com (https://syrup-latest-a-02.keboola.com or https://syrup-latest-b-02.keboola.com respectively)
 	Current: https://syrup.keboola.com (https://syrup-a-02.keboola.com or https://syrup-b-02.keboola.com)
+
 Devel:
+
 	Latest: http://syrup-testing.kbc-devel-02.keboola.com
 	Current: http://syrup-current.kbc-devel-02.keboola.com
+
 
 When everything is working fine, run:
 
