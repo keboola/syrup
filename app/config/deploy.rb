@@ -15,7 +15,7 @@ set :deploy_via,        :remote_cache
 set :writable_dirs,     ["app/cache", "app/logs"]
 set :webserver_user,    "apache"
 
-set :shared_files,      ["app/config/parameters.yml","composer.json"]
+set :shared_files,      ["composer.json"]
 set :shared_children,   [app_path + "/logs", web_path + "/uploads"]
 set :use_composer,      true
 set :update_vendors,    true
@@ -30,9 +30,26 @@ set :repository,        "git@github.com:keboola/syrup.git"
 set  :use_sudo,         false
 set  :keep_releases,    5
 
-before 'symfony:composer:update', 'symfony:copy_vendors'
+#default_run_options[:pty] = true
+
+before  'symfony:composer:update',  'symfony:copy_vendors'
+before  'deploy:share_childs',      'symfony:copy_parameters'
+after   'deploy:create_symlink',    'deploy:restart'
 
 namespace :symfony do
+	desc "Copy parameters.yml"
+	task :copy_parameters, :except => { :no_release => true } do
+		origin_file = shared_path + "/app/config/parameters.yml"
+		destination_file = latest_release + "/app/config/parameters.yml"
+
+		if File.exists?(destination_file)
+			run "rm -f #{destination_file}"
+		end
+
+		run "cp #{origin_file} #{destination_file}"
+		capifony_puts_ok
+	end
+
 	desc "Copy vendors from previous release"
 	task :copy_vendors, :except => { :no_release => true } do
 		capifony_pretty_print "--> Copying vendors from previous release"
@@ -66,6 +83,16 @@ namespace :deploy do
         capifony_pretty_print "--> Symlink to latest release"
 
         run "rm -f #{deploy_to}/#{latest_path} && ln -s #{release_path} #{deploy_to}/#{latest_path}"
+        capifony_puts_ok
+    end
+
+    # Apache needs to be restarted to make sure that the APC cache is cleared.
+    # This overwrites the :restart task in the parent config which is empty.
+    desc "Restart Apache"
+    task :restart, :except => { :no_release => true }, :roles => :app do
+        capifony_pretty_print "--> Restarting Apache"
+
+        run "sudo /etc/init.d/httpd graceful"
         capifony_puts_ok
     end
 end

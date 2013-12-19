@@ -30,17 +30,20 @@ There are 2 stages:
 - Local
 - Production
 
+Local stage is used to deploy Syrup to devel server.
+Production is used to deploy to 2 production servers - syrup-a and syrup-b.
+
 To deploy to production server run:
 
 	cap production deploy
 
-This will install the newset release and create a symlink "latest".
+This will install the newset release and create a symlink "latest" that points to this release.
 
 You can test this latest release on the url:
 
 https://syrup-latest.keboola.com (https://syrup-latest-a-02.keboola.com or https://syrup-latest-b-02.keboola.com respectively)
 
-When everything is working fine, simply run:
+When everything is working fine, run:
 
 	cap production deploy:create_symlink
 
