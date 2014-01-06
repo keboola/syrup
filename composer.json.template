@@ -7,15 +7,16 @@
 	"repositories": [],
     "require": {
         "php": ">=5.3.3",
-        "symfony/symfony": "2.2.*",
-		"doctrine/orm": "~2.2,>=2.2.3",
-	    "doctrine/doctrine-bundle": "1.2.*",
-	    "symfony/assetic-bundle": "2.3.*",
-        "symfony/monolog-bundle": "2.2.*",
-        "sensio/distribution-bundle": "2.2.*",
-        "sensio/framework-extra-bundle": "2.2.*",
-        "sensio/generator-bundle": "2.2.*",
-	    "syrup/component-bundle": "1.1.*"
+        "composer/composer": "~1.0.0@alpha",
+        "symfony/symfony": "2.3.*",
+        "doctrine/orm": ">=2.2.3,<2.4-dev",
+        "doctrine/doctrine-bundle": "1.2.*",
+        "symfony/assetic-bundle": "2.3.*",
+        "symfony/monolog-bundle": "2.3.*",
+        "sensio/distribution-bundle": "2.3.*",
+        "sensio/framework-extra-bundle": "2.3.*",
+        "sensio/generator-bundle": "2.3.*",
+        "incenteev/composer-parameter-handler": "~2.0",
     },
     "scripts": {
         "post-install-cmd": [
@@ -38,8 +39,12 @@
     "extra": {
         "symfony-app-dir": "app",
         "symfony-web-dir": "web",
+        "incenteev-parameters": {
+            "keep-outdated": true,
+            "file": "app/config/parameters.yml"
+        },
 		"branch-alias": {
-            "dev-master": "2.2-dev"
+            "dev-master": "2.3-dev"
         }
     }
 }
