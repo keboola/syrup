@@ -28,11 +28,11 @@ set :repository,        "git@github.com:keboola/syrup.git"
 #role :db,               "syrup-a-01.keboola.com", "syrup-b-01.keboola.com", :primary => true       # This is where Symfony2 migrations will run
 
 set  :use_sudo,         false
-set  :keep_releases,    5
+set  :keep_releases,    15
 
 #default_run_options[:pty] = true
 
-before  'symfony:composer:update',  'symfony:copy_vendors'
+#before  'symfony:composer:update',  'symfony:copy_vendors'
 before  'deploy:share_childs',      'symfony:copy_parameters'
 after   'deploy:create_symlink',    'deploy:restart'
 
@@ -62,7 +62,7 @@ end
 namespace :deploy do
 	# overwrite railsless-deploy task using old symlink task
 	desc <<-DESC
-	    Copiers your project and updates the symlink. It does this in a \
+	    Copies your project and updates the symlink. It does this in a \
 	    transaction, so that if either `update_code' or `symlink' fail, all \
 	    changes made to the remote servers will be rolled back, leaving your \
 	    system in the same state it was in before `update' was invoked. Usually, \
