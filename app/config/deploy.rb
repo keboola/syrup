@@ -32,7 +32,7 @@ set  :keep_releases,    15
 
 #default_run_options[:pty] = true
 
-#before  'symfony:composer:update',  'symfony:copy_vendors'
+before  'symfony:composer:update',  'symfony:copy_vendors'
 before  'deploy:share_childs',      'symfony:copy_parameters'
 after   'deploy:create_symlink',    'deploy:restart'
 
