@@ -30,6 +30,8 @@ set :repository,        "git@github.com:keboola/syrup.git"
 set  :use_sudo,         false
 set  :keep_releases,    15
 
+set :branch, "1.1.x"
+
 #default_run_options[:pty] = true
 
 before  'symfony:composer:update',  'symfony:copy_vendors'
