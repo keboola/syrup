@@ -28,7 +28,7 @@ set :repository,        "git@github.com:keboola/syrup.git"
 #role :db,               "syrup-a-01.keboola.com", "syrup-b-01.keboola.com", :primary => true       # This is where Symfony2 migrations will run
 
 set  :use_sudo,         false
-set  :keep_releases,    15
+set  :keep_releases,    10
 
 set :branch, "1.1.x"
 
