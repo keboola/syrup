@@ -9,7 +9,6 @@
     "repositories": [],
     "require": {
         "php": ">=5.3.3",
-	    "composer/composer": "~1.0.0@alpha",
 		"symfony/symfony": "2.3.*",
         "doctrine/orm": ">=2.2.3,<2.4-dev",
         "doctrine/doctrine-bundle": "1.2.*",
@@ -29,7 +28,7 @@
     "config": {
         "bin-dir": "bin"
     },
-    "minimum-stability": "alpha",
+    "minimum-stability": "stable",
     "extra": {
         "symfony-app-dir": "app",
         "symfony-web-dir": "web"
