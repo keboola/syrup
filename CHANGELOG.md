@@ -1,3 +1,40 @@
+## 1.2.4
+ * [fix]    - swiftmailer added to config.yml
+
+## 1.2.3
+ * [fix]    - removed Slevomat DB dependency
+
+## 1.2.2
+ * [Refactor]   - Index action - list of components - is no longer using composer package
+
+## 1.2.1
+ * [fix]    - composer.json cleanup
+
+## 1.2.0
+ * [Refactor]   - composer.json added to git
+ * [Refactor]   - deploy keep only 10 latest releases
+ * [Refactor]   - app/autoload.php path changed
+ * [Refactor]   - app/console is no longer using Syrup\ComponentBundle\Console\Application using Listener to catch Exceptions from commands
+ * [fix]        - travis
+
+
+## =====================================================================
+
+## 1.1.19
+ * [Refactor] - deploy fixed to branch 1.1.x
+
+## 1.1.18
+ * [Feature] - Swiftmailer bundle
+ * [Fix] - added proper favicon
+ * [Fix] - paramters.yml.dist
+
+## 1.1.17
+ * [Fix] - enabled form in config
+ * [Feature] - copy vendors from previous release to speed up deploy
+
+## 1.1.16
+ * [Feature] - updated composer.json.template
+
 ## 1.1.15
  * [Feature] - Debug Exception Handler now logs into syslog
 
