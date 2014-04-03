@@ -27,6 +27,13 @@ parameters:
     shared_sapi.url:
     shared_sapi.token:
 
+    uploader:
+	    aws-access-key:
+	    aws-secret-key:
+	    s3-upload-path:
+	    bitly-login:
+	    bitly-api-key:
+
     components:
         ex-dummy:
             class:  Syrup\ComponentBundle\Component\DummyExtractor
