@@ -6,7 +6,20 @@
     "autoload": {
         "psr-0": { "": "src/" }
     },
-    "repositories": [],
+    "repositories": [
+	    {
+		    "type": "vcs",
+		    "url": "git@bitbucket.org:keboola/google-client-bundle.git"
+	    },
+	    {
+		    "type": "vcs",
+		    "url": "git@bitbucket.org:keboola/google-analytics-bundle.git"
+	    },
+	    {
+		    "type": "vcs",
+		    "url": "git@bitbucket.org:keboola/google-drive-bundle.git"
+	    }
+    ],
     "require": {
         "php": ">=5.3.3",
 		"symfony/symfony": "2.3.*",
@@ -19,7 +32,10 @@
         "sensio/generator-bundle": "2.3.*",
         "incenteev/composer-parameter-handler": "~2.0",
 	    "symfony/swiftmailer-bundle": "~2.3.5",
-	    "syrup/component-bundle": "~1.4.0"
+	    "syrup/component-bundle": "~1.4.0",
+	    "keboola/google-client-bundle": "1.1.*",
+	    "keboola/google-analytics-bundle": "1.0.*",
+	    "keboola/google-drive-bundle": "1.0.*"
     },
     "scripts": {
         "post-install-cmd": [],

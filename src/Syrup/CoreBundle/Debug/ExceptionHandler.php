@@ -65,7 +65,7 @@ class ExceptionHandler extends BaseExceptionHandler
 		}
 
 		// log to syslog
-		syslog(LOG_ERR, $exception->getMessage());
+		syslog(LOG_ERR, $exception->getMessage() . PHP_EOL . $exception->getTrace());
 
 		return new JsonResponse($response, $exception->getStatusCode(), $exception->getHeaders());
 	}
