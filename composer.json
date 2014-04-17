@@ -19,7 +19,7 @@
         "sensio/generator-bundle": "2.3.*",
         "incenteev/composer-parameter-handler": "~2.0",
 	    "symfony/swiftmailer-bundle": "~2.3.5",
-	    "syrup/component-bundle": "~1.4.0"
+	    "syrup/component-bundle": "~1.5.0"
     },
     "scripts": {
         "post-install-cmd": [],
