@@ -4,10 +4,18 @@ parameters:
     database_driver:   pdo_mysql
     database_host:     localhost
     database_port:     ~
-    database_name:     symfony
-    database_user:     root
-    database_password: ~
+    database_name:
+    database_user:
+    database_password:
 
+    # Session PDO handler table
+    pdo.db_options:
+        db_table:    session
+        db_id_col:   id
+        db_data_col: value
+        db_time_col: time
+
+	# Mailer
     mailer_transport:  smtp
     mailer_host:       localhost
     mailer_user:       ~
@@ -16,17 +24,16 @@ parameters:
     locale:            en
     secret:            ThisTokenIsNotSoSecretChangeIt
 
-    # deprecated
-    storageApi.test.token:
-    storageApi.url:         'https://connection.keboola.com'
-
+	# SAPI
     storage_api.url:        'https://connection.keboola.com'
     storage_api.test.url:
     storage_api.test.token:
 
+	# Shared SAPI
     shared_sapi.url:
     shared_sapi.token:
 
+	# AWS
     uploader:
 	    aws-access-key:
 	    aws-secret-key:
@@ -34,6 +41,7 @@ parameters:
 	    bitly-login:
 	    bitly-api-key:
 
+	# Components
     components:
         ex-dummy:
             class:  Syrup\ComponentBundle\Component\DummyExtractor
