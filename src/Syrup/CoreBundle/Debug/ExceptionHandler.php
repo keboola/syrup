@@ -64,8 +64,13 @@ class ExceptionHandler extends BaseExceptionHandler
 			$response['exception'] = $exception->toArray();
 		}
 
+		$exceptionJson = json_encode(array(
+			'message'   => $exception->getMessage(),
+			'trace'     => $exception->getTrace()
+		));
+
 		// log to syslog
-		syslog(LOG_ERR, $exception->getMessage() . PHP_EOL . $exception->getTrace());
+		syslog(LOG_ERR, $exceptionJson);
 
 		return new JsonResponse($response, $exception->getStatusCode(), $exception->getHeaders());
 	}
