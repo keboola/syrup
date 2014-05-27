@@ -1,21 +1,44 @@
+## 1.4.1
+ * [Fix]        - debug handler stack trace
+ * [Feature]    - updated to Symfony 2.4. 
+ 
+## 1.4.0
+ * [BC break]    - Session DB handler
+
+## =====================================================================
+ 
+## 1.3.0
+ * [BC break]   - uses Syrup Component Bundle 1.5.0
+
+## =====================================================================
+ 
+## 1.2.7
+ * [Fix]        - autoload.php and composer.json
+ 
+## 1.2.6
+ * [Feature]    - log fatal error trace to syslog
+
+## 1.2.5
+ * [Fix]        - added uploader config to parameters.yml.dist
+ 
 ## 1.2.4
- * [fix]    - swiftmailer added to config.yml
+ * [Fix]        - swiftmailer added to config.yml
 
 ## 1.2.3
- * [fix]    - removed Slevomat DB dependency
+ * [Fix]        - removed Slevomat DB dependency
 
 ## 1.2.2
  * [Refactor]   - Index action - list of components - is no longer using composer package
 
 ## 1.2.1
- * [fix]    - composer.json cleanup
+ * [Fix]        - composer.json cleanup
 
 ## 1.2.0
  * [Refactor]   - composer.json added to git
  * [Refactor]   - deploy keep only 10 latest releases
  * [Refactor]   - app/autoload.php path changed
  * [Refactor]   - app/console is no longer using Syrup\ComponentBundle\Console\Application using Listener to catch Exceptions from commands
- * [fix]        - travis
+ * [Fix]        - travis
 
 
 ## =====================================================================
