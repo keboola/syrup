@@ -18,8 +18,7 @@ class AppKernel extends Kernel
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
 	        new Syrup\CoreBundle\SyrupCoreBundle(),
-            new Syrup\ComponentBundle\SyrupComponentBundle(),
-			new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
+            new Syrup\ComponentBundle\SyrupComponentBundle()
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
@@ -28,10 +27,13 @@ class AppKernel extends Kernel
             $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
         }
 
-	    foreach ($this->getComponents() as $component) {
-		    if (isset($component['bundle'])) {
-			    $bundleClassName = $component['bundle'];
-			    $bundles[] = new $bundleClassName;
+	    $components = $this->getComponents();
+	    if (count($components)) {
+		    foreach ($components as $component) {
+			    if (isset($component['bundle'])) {
+				    $bundleClassName = $component['bundle'];
+				    $bundles[] = new $bundleClassName;
+			    }
 		    }
 	    }
 
@@ -47,11 +49,14 @@ class AppKernel extends Kernel
 	{
 		$yaml = new Parser();
 
+		$components = null;
 		try {
 			$parameters = $yaml->parse(file_get_contents(__DIR__.'/config/parameters.yml'));
-			return $parameters['parameters']['components'];
+			$components = $parameters['parameters']['components'];
 		} catch (Exception $e) {
 			throw new \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException($e->getMessage());
 		}
+
+		return $components;
 	}
 }
