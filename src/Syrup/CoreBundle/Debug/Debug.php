@@ -8,7 +8,7 @@
 
 namespace Syrup\CoreBundle\Debug;
 
-use Symfony\Component\ClassLoader\DebugClassLoader;
+use Symfony\Component\Debug\DebugClassLoader;
 use Symfony\Component\Debug\Debug as BaseDebug;
 use Symfony\Component\Debug\ErrorHandler;
 
@@ -46,8 +46,6 @@ class Debug extends BaseDebug
 			ini_set('display_errors', 1);
 		}
 
-		if (class_exists('Symfony\Component\ClassLoader\DebugClassLoader')) {
-			DebugClassLoader::enable();
-		}
+		DebugClassLoader::enable();
 	}
 }
