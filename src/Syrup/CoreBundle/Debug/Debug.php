@@ -10,7 +10,6 @@ namespace Syrup\CoreBundle\Debug;
 
 use Symfony\Component\ClassLoader\DebugClassLoader;
 use Symfony\Component\Debug\Debug as BaseDebug;
-use Symfony\Component\Debug\ErrorHandler;
 
 class Debug extends BaseDebug
 {
