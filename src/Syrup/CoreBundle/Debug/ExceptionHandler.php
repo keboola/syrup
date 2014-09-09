@@ -54,6 +54,21 @@ class ExceptionHandler extends BaseExceptionHandler
 			$exception = FlattenException::create($exception);
 		}
 
+		$logData = array(
+			'message'   => $exception->getMessage(),
+			'level'     => $exception->getCode(),
+			'channel'   => 'app',
+			'datetime'  => array(
+				'date'  => date('Y-m-d H:i:s')
+			),
+			'app'       => 'syrup',
+			'priority'  => 'CRITICAL',
+			'file'      => $exception->getFile(),
+		);
+
+		// log to syslog
+		syslog(LOG_ERR, json_encode($logData));
+
 		$response = array(
 			"status"    => "error",
 			'message'   => 'An error occured. Please contact support@keboola.com'
@@ -61,16 +76,7 @@ class ExceptionHandler extends BaseExceptionHandler
 
 		if (in_array($this->env, array('dev','test'))) {
 			$response['message'] = $exception->getMessage();
-			$response['exception'] = $exception->toArray();
 		}
-
-		$exceptionJson = json_encode(array(
-			'message'   => $exception->getMessage(),
-			'trace'     => $exception->getTrace()
-		));
-
-		// log to syslog
-		syslog(LOG_ERR, $exceptionJson);
 
 		return new JsonResponse($response, $exception->getStatusCode(), $exception->getHeaders());
 	}

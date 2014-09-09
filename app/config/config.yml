@@ -25,9 +25,18 @@ doctrine:
             default:
                 driver:   %database_driver%
                 host:     %database_host%
+                port:     %database_port%
                 dbname:   %database_name%
                 user:     %database_user%
                 password: %database_password%
+                charset:  UTF8
+            lock:
+                driver:   %locks_db.driver%
+                host:     %locks_db.host%
+                port:     %locks_db.port%
+                dbname:   %locks_db.name%
+                user:     %locks_db.user%
+                password: %locks_db.pasword%
                 charset:  UTF8
 
 swiftmailer:
