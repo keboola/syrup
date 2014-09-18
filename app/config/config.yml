@@ -36,7 +36,7 @@ doctrine:
                 port:     %locks_db.port%
                 dbname:   %locks_db.name%
                 user:     %locks_db.user%
-                password: %locks_db.pasword%
+                password: %locks_db.password%
                 charset:  UTF8
 
 swiftmailer:
