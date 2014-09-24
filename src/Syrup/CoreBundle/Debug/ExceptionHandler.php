@@ -86,6 +86,6 @@ class ExceptionHandler extends BaseExceptionHandler
 			$response['message'] = $exception->getMessage();
 		}
 
-		return new JsonResponse($response, $exception->getStatusCode(), $exception->getHeaders());
+		return new JsonResponse($response, $exception->getCode(), $exception->getHeaders());
 	}
 }
