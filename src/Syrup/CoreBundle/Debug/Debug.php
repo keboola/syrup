@@ -46,8 +46,6 @@ class Debug extends BaseDebug
 			ini_set('display_errors', 1);
 		}
 
-		if (class_exists('Symfony\Component\ClassLoader\DebugClassLoader')) {
-			DebugClassLoader::enable();
-		}
+		DebugClassLoader::enable();
 	}
 }

@@ -12,6 +12,7 @@ namespace Syrup\CoreBundle\Debug;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\ExceptionHandler as BaseExceptionHandler;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Yaml\Parser;
 
 class ExceptionHandler extends BaseExceptionHandler
 {
@@ -54,16 +55,22 @@ class ExceptionHandler extends BaseExceptionHandler
 			$exception = FlattenException::create($exception);
 		}
 
+		$yaml = new Parser();
+		$parameters = $yaml->parse(file_get_contents(__DIR__.'/../../../../app/config/parameters.yml'));
+
+		$appName = $parameters['parameters']['app_name'];
+		$exceptionId = $appName . '-' . md5(microtime());
+
 		$logData = array(
-			'message'   => $exception->getMessage(),
-			'level'     => $exception->getCode(),
-			'channel'   => 'app',
-			'datetime'  => array(
-				'date'  => date('Y-m-d H:i:s')
-			),
-			'app'       => 'syrup',
-			'priority'  => 'CRITICAL',
-			'file'      => $exception->getFile(),
+			'message'       => $exception->getMessage(),
+			'level'         => $exception->getCode(),
+			'channel'       => 'app',
+			'datetime'      => array('date' => date('Y-m-d H:i:s')),
+			'app'           => $appName,
+			'priority'      => 'CRITICAL',
+			'file'          => $exception->getFile(),
+			'pid'           => getmypid(),
+			'exceptionId'   => $exceptionId
 		);
 
 		// log to syslog
@@ -71,7 +78,8 @@ class ExceptionHandler extends BaseExceptionHandler
 
 		$response = array(
 			"status"    => "error",
-			'message'   => 'An error occured. Please contact support@keboola.com'
+			'message'   => 'An error occured. Please contact support@keboola.com',
+			'exceptionId'   => $exceptionId
 		);
 
 		if (in_array($this->env, array('dev','test'))) {
