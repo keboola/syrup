@@ -25,7 +25,7 @@ class ScriptHandler
 				}
 				$asked = true;
 
-				$paramsFile = $io->ask('<comment>Path to "shared_parameters.yml" to use for the development env:</comment> ', $paramsFile);
+				$paramsFile = $io->ask('<comment>Path to "parameters_shared.yml" to use for the development env:</comment> ', $paramsFile);
 			}
 
 			copy($paramsFile, self::SHARED_PARAMETERS_PATH);
