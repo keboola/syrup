@@ -9,4 +9,5 @@
 /tmp/*
 composer.lock
 composer.phar
-
+.kdev4
+*.kdev4
