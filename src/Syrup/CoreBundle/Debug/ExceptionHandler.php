@@ -86,6 +86,8 @@ class ExceptionHandler extends BaseExceptionHandler
 			$response['message'] = $exception->getMessage();
 		}
 
-		return new JsonResponse($response, $exception->getCode(), $exception->getHeaders());
+		$code = ($exception->getCode() >= 200 && $exception->getCode() < 600)?$exception->getCode():500;
+
+		return new JsonResponse($response, $code, $exception->getHeaders());
 	}
 }
