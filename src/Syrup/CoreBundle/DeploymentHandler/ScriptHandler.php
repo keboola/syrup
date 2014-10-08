@@ -19,9 +19,13 @@ class ScriptHandler
 
 			$paramsFile = './parameters_shared.yml';
 			if (!file_exists($paramsFile)) {
-				$io->write("<error>File <options=bold;fg=yellow>{$paramsFile}</options=bold;fg=yellow> not found!</error>");
+				if (file_exists('../../shared/parameters_shared.yml')) {
+					$paramsFile = '../../shared/parameters_shared.yml';
+				} else {
+					$io->write("<error>File <options=bold;fg=yellow>{$paramsFile}</options=bold;fg=yellow> not found!</error>");
 
-				$paramsFile = $io->ask('<comment>Path to "parameters_shared.yml" to use for the development env:</comment> ', $paramsFile);
+					$paramsFile = $io->ask('<comment>Path to "parameters_shared.yml" to use for the development env:</comment> ', $paramsFile);
+				}
 			}
 
 			copy($paramsFile, self::SHARED_PARAMETERS_PATH);
