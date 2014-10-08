@@ -18,12 +18,8 @@ class ScriptHandler
 			$io = $event->getIO();
 
 			$paramsFile = './parameters_shared.yml';
-			$asked = false;
-			while (!file_exists($paramsFile)) {
-				if ($asked) {
-					$io->write("<error>File <options=bold;fg=yellow>{$paramsFile}</options=bold;fg=yellow> not found!</error>");
-				}
-				$asked = true;
+			if (!file_exists($paramsFile)) {
+				$io->write("<error>File <options=bold;fg=yellow>{$paramsFile}</options=bold;fg=yellow> not found!</error>");
 
 				$paramsFile = $io->ask('<comment>Path to "parameters_shared.yml" to use for the development env:</comment> ', $paramsFile);
 			}
