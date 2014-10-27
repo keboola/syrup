@@ -89,12 +89,13 @@ class ScriptHandler
 	 */
 	protected static function getFromS3(IOInterface $io, $key, $path, $dev = false)
 	{
+		$bucket = (bool) $dev ? 'keboola-configs-testing' : 'keboola-configs';
 		$client = S3Client::factory();
 		$client->getObject(array(
-			'Bucket' => (bool) $dev ? 'keboola-configs-testing' : 'keboola-configs',
+			'Bucket' => $bucket,
 			'Key'	=> $key,
 			'SaveAs' => $path
 		));
-		$io->write("<info>File <comment>{$path}</comment> downloaded from S3</info>");
+		$io->write("<info>File <comment>{$path}</comment> downloaded from S3 ({$bucket})</info>");
 	}
 }
