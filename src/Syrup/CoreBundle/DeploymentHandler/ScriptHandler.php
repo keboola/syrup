@@ -36,12 +36,12 @@ class ScriptHandler
 			if ($event->getIO()->isInteractive()
 				&& !$event->getIO()->askConfirmation("<comment>Get <question>{$filename}</question> from development S3 bucket? [<options=bold>y</options=bold>/n]: </comment>", true)
 			) {
-				self::getFromIO($event, $filename);
+				self::getFromIO($event->getIO(), $filename);
 			} else {
-				self::getFromS3($s3key, self::PARAMETERS_DIR . $filename, true);
+				self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, true);
 			}
 		} else {
-			self::getFromS3($s3key, self::PARAMETERS_DIR . $filename);
+			self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename);
 		}
 	}
 
@@ -53,10 +53,9 @@ class ScriptHandler
 	 * @param string $pathname file to look for before asking in IO
 	 * @return void
 	 */
-	protected static function getFromIO(Event $event, $filename, $pathname = "")
+	protected static function getFromIO(IOInterface $io, $filename, $pathname = "")
 	{
 		if (!file_exists($pathname)) {
-			$io = $event->getIO();
 			if ($io->isInteractive()) {
 				$try = 0;
 				while (!file_exists($pathname)) {
@@ -77,7 +76,7 @@ class ScriptHandler
 
 		$dest = self::PARAMETERS_DIR . $filename;
 		copy($pathname, $dest);
-		$event->getIO()->write("<info>File {$pathname} copied to {$dest}</info>");
+		$io->write("<info>File {$pathname} copied to {$dest}</info>");
 	}
 
 	/**
@@ -88,7 +87,7 @@ class ScriptHandler
 	 * @param bool $dev Development environment
 	 * @return void
 	 */
-	protected static function getFromS3($key, $path, $dev = false)
+	protected static function getFromS3(IOInterface $io, $key, $path, $dev = false)
 	{
 		$client = S3Client::factory();
 		$client->getObject(array(
@@ -96,5 +95,6 @@ class ScriptHandler
 			'Key'	=> $key,
 			'SaveAs' => $path
 		));
+		$io->write("<info>File <comment>{$path}</comment> downloaded from S3</info>");
 	}
 }
