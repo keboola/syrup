@@ -33,10 +33,29 @@ class ScriptHandler
 	protected static function getFile(Event $event, $filename, $s3key)
 	{
 		if ($event->isDevMode()) {
-			if ($event->getIO()->isInteractive()
-				&& !$event->getIO()->askConfirmation("<comment>Get <question>{$filename}</question> from development S3 bucket? [<options=bold>y</options=bold>/n]: </comment>", true)
-			) {
-				self::getFromIO($event->getIO(), $filename);
+			if ($event->getIO()->isInteractive()) {
+				$event->getIO()->askAndValidate(
+					"<comment>Get <question>{$filename}</question> from development S3 bucket? [<options=bold>y</options=bold>/n/s]:
+					y - yes <info>(default)</info>
+					n - no <info>(input file manually)</info>
+					s - skip <info>(keep current file)</info>
+					</comment>",
+					function ($answer) use($event, $s3key, $filename) {
+						switch ($answer) {
+							case "y":
+								self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, true);
+								break;
+							case "n":
+								self::getFromIO($event->getIO(), $filename);
+								break;
+							case "s":
+								break;
+							default:
+								throw new \InvalidArgumentException("Invalid option! Please choose either y, n or s");
+						}
+					},
+					3,
+					"y");
 			} else {
 				self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, true);
 			}
@@ -89,12 +108,13 @@ class ScriptHandler
 	 */
 	protected static function getFromS3(IOInterface $io, $key, $path, $dev = false)
 	{
+		$bucket = (bool) $dev ? 'keboola-configs-testing' : 'keboola-configs';
 		$client = S3Client::factory();
 		$client->getObject(array(
-			'Bucket' => (bool) $dev ? 'keboola-configs-testing' : 'keboola-configs',
+			'Bucket' => $bucket,
 			'Key'	=> $key,
 			'SaveAs' => $path
 		));
-		$io->write("<info>File <comment>{$path}</comment> downloaded from S3</info>");
+		$io->write("<info>File <comment>{$path}</comment> downloaded from S3 ({$bucket})</info>");
 	}
 }
