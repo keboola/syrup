@@ -36,10 +36,10 @@ class ScriptHandler
 			if ($event->getIO()->isInteractive()) {
 				$event->getIO()->askAndValidate(
 					"<comment>Get <question>{$filename}</question> from development S3 bucket? [<options=bold>y</options=bold>/n/s]:
-					y - yes <info>(default)</info>
-					n - no <info>(input file manually)</info>
-					s - skip <info>(keep current file)</info>
-					</comment>",
+y - yes <info>(default)</info>
+n - no <info>(input file manually)</info>
+s - skip <info>(keep current file)</info>
+</comment>",
 					function ($answer) use($event, $s3key, $filename) {
 						switch ($answer) {
 							case "y":
