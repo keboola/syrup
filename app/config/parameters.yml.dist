@@ -1,7 +1,7 @@
 parameters:
     app_name:          syrup
 
-	# Components
+    # Components
     components:
         ex-dummy:
             class:  Syrup\ComponentBundle\Component\DummyExtractor
