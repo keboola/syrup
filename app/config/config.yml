@@ -55,7 +55,9 @@ doctrine:
                 connection: default
                 mappings:
                     default:
+                        type: ~
                         dir: %kernel.root_dir%/../../../../Entity
+                        prefix: ~
             syrup:
                 connection: syrup
             lock:
