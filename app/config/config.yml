@@ -53,6 +53,13 @@ doctrine:
         entity_managers:
             default:
                 connection: default
+                mappings:
+                    default:
+                        dir: %kernel.root_dir%/../../../../Entity
+            syrup:
+                connection: syrup
+            lock:
+                connection: lock
 
 
 swiftmailer:
