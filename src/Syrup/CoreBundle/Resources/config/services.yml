@@ -2,9 +2,9 @@ services:
     pdo:
         class: PDO
         arguments:
-            - "mysql:host=%database_host%;dbname=%database_name%"
-            - "%database_user%"
-            - "%database_password%"
+            - "mysql:host=%syrup.host%;dbname=%syrup.name%"
+            - "%syrup.user%"
+            - "%syrup.password%"
         calls:
             - [setAttribute, [3,2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
 

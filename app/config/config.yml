@@ -22,6 +22,7 @@ framework:
 
 doctrine:
     dbal:
+        default_connection: default
         connections:
             default:
                 driver:   %database_driver%
@@ -31,6 +32,14 @@ doctrine:
                 user:     %database_user%
                 password: %database_password%
                 charset:  UTF8
+            syrup:
+                driver:   %syrup.driver%
+                host:     %syrup.host%
+                port:     %syrup.port%
+                dbname:   %syrup.name%
+                user:     %syrup.user%
+                password: %syrup.password%
+                charset:  UTF8
             lock:
                 driver:   %locks_db.driver%
                 host:     %locks_db.host%
@@ -39,6 +48,12 @@ doctrine:
                 user:     %locks_db.user%
                 password: %locks_db.password%
                 charset:  UTF8
+    orm:
+        default_entity_manager: default
+        entity_managers:
+            default:
+                connection: default
+
 
 swiftmailer:
     transport: %mailer_transport%
