@@ -56,6 +56,11 @@ s - skip <info>(keep current file)</info>
 					},
 					3,
 					"y");
+			} elseif (
+				file_exists("./{$filename}")
+				&& $event->getIO()->askConfirmation("Use './{$filename}'? [<options=bold>y</options=bold>/n]", true)
+			) {
+				$this->getFromIO($event->getIO(), $filename, "./{$filename}");
 			} else {
 				self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, true);
 			}
