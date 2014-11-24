@@ -48,6 +48,12 @@ doctrine:
                 user:     %locks_db.user%
                 password: %locks_db.password%
                 charset:  UTF8
+    orm:
+        default_entity_manager: ~
+        entity_managers:
+            default:
+                connection: default
+                auto_mapping: true
 
 swiftmailer:
     transport: %mailer_transport%
