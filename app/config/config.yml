@@ -48,21 +48,6 @@ doctrine:
                 user:     %locks_db.user%
                 password: %locks_db.password%
                 charset:  UTF8
-    orm:
-        default_entity_manager: default
-        entity_managers:
-            default:
-                connection: default
-                mappings:
-                    default:
-                        type: ~
-                        dir: %kernel.root_dir%/../../../../Entity
-                        prefix: ~
-            syrup:
-                connection: syrup
-            lock:
-                connection: lock
-
 
 swiftmailer:
     transport: %mailer_transport%
