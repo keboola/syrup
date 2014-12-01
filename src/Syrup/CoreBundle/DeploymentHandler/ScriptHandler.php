@@ -91,7 +91,7 @@ s - skip <info>(keep current file)</info>
 					}
 
 					$try++;
-					$pathname = $io->ask("<comment>Path to '{$filename}':</comment> ", $pathname);
+					$pathname = $io->ask("<comment>Path to folder containing '{$filename}':</comment> ", $pathname);
 				}
 			} else {
 				throw new \Exception("Failed to retrieve {$filename} from IO: Input is not interactive");
