@@ -100,7 +100,7 @@ s - skip <info>(keep current file)</info>
 
 		$dest = self::PARAMETERS_DIR . $filename;
 		copy($pathname . '/' . $filename, $dest);
-		$io->write("<info>File {$pathname} copied to {$dest}</info>");
+		$io->write("<info>File {$pathname}/{$filename} copied to {$dest}</info>");
 	}
 
 	/**
