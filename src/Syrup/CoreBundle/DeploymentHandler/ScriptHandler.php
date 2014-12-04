@@ -60,7 +60,7 @@ s - skip <info>(keep current file)</info>
 				file_exists("./{$filename}")
 				&& $event->getIO()->askConfirmation("Use './{$filename}'? [<options=bold>y</options=bold>/n]", true)
 			) {
-				self::getFromIO($event->getIO(), $filename, "./{$filename}");
+				self::getFromIO($event->getIO(), $filename, ".");
 			} else {
 				self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, true);
 			}
@@ -79,7 +79,7 @@ s - skip <info>(keep current file)</info>
 	 */
 	protected static function getFromIO(IOInterface $io, $filename, $pathname = "")
 	{
-		if (!file_exists($pathname)) {
+		if (!file_exists($pathname . "/" . $filename)) {
 			if ($io->isInteractive()) {
 				$try = 0;
 				while (!file_exists($pathname . '/' . $filename)) {
