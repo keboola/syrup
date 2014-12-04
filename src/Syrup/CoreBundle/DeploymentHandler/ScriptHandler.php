@@ -37,7 +37,7 @@ class ScriptHandler
 				$event->getIO()->askAndValidate(
 					"<comment>Get <question>{$filename}</question> from development S3 bucket? [<options=bold>y</options=bold>/n/s]:
 y - yes <info>(default)</info>
-n - no <info>(input file manually)</info>
+n - no <info>(manually input folder containing the file)</info>
 s - skip <info>(keep current file)</info>
 </comment>",
 					function ($answer) use($event, $s3key, $filename) {
@@ -82,16 +82,16 @@ s - skip <info>(keep current file)</info>
 		if (!file_exists($pathname)) {
 			if ($io->isInteractive()) {
 				$try = 0;
-				while (!file_exists($pathname)) {
+				while (!file_exists($pathname . '/' . $filename)) {
 					if ($try >= 3) {
 						throw new \InvalidArgumentException("3 attempts exhausted, {$filename} not found!");
 					}
 					if ($try > 0) {
-						$io->write("<error>File<options=bold;fg=yellow> {$pathname} </options=bold;fg=yellow>does not exist!</error>");
+						$io->write("<error>File <options=bold;fg=yellow>{$pathname}/{$filename}</options=bold;fg=yellow> does not exist!</error>");
 					}
 
 					$try++;
-					$pathname = $io->ask("<comment>Path to '{$filename}':</comment> ", $pathname);
+					$pathname = $io->ask("<comment>Path to folder containing '{$filename}':</comment> ", $pathname);
 				}
 			} else {
 				throw new \Exception("Failed to retrieve {$filename} from IO: Input is not interactive");
@@ -99,7 +99,7 @@ s - skip <info>(keep current file)</info>
 		}
 
 		$dest = self::PARAMETERS_DIR . $filename;
-		copy($pathname, $dest);
+		copy($pathname . '/' . $filename, $dest);
 		$io->write("<info>File {$pathname} copied to {$dest}</info>");
 	}
 
