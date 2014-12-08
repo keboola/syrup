@@ -32,6 +32,7 @@ doctrine:
                 user:     %database_user%
                 password: %database_password%
                 charset:  UTF8
+                logging: false
             syrup:
                 driver:   %syrup.driver%
                 host:     %syrup.host%
@@ -40,6 +41,7 @@ doctrine:
                 user:     %syrup.user%
                 password: %syrup.password%
                 charset:  UTF8
+                logging: false
             lock:
                 driver:   %locks_db.driver%
                 host:     %locks_db.host%
@@ -48,6 +50,7 @@ doctrine:
                 user:     %locks_db.user%
                 password: %locks_db.password%
                 charset:  UTF8
+                logging: false
     orm:
         default_entity_manager: ~
         entity_managers:
