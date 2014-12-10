@@ -54,10 +54,10 @@ y - yes <info>(default)</info>
 n - no <info>(manually input folder containing the file)</info>
 s - skip <info>(keep current file)</info>
 </comment>",
-					function ($answer) use($event, $s3key, $filename) {
+					function ($answer) use($event, $s3key, $filename, $env) {
 						switch ($answer) {
 							case "y":
-								self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, true);
+								self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, $env);
 								break;
 							case "n":
 								self::getFromIO($event->getIO(), $filename);
