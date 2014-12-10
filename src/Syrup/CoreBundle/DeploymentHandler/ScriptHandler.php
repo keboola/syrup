@@ -21,18 +21,32 @@ class ScriptHandler
 		if (empty($extra['syrup-app-name'])) {
 			// interactive if $event->getIO()->isInteractive() ?
 			throw new \Exception('The app name (ie "ex-dummy") has to be set in composer.json "extra": {"syrup-app-name": "ex-dummy"}');
-		} else {
-			$appName = $extra['syrup-app-name'];
 		}
 
-		$appName = $event->getComposer()->getPackage()->getExtra()['syrup-app-name'];
+		$appName = $extra['syrup-app-name'];
 
 		self::getFile($event, "parameters.yml", "syrup/{$appName}/parameters.yml");
 	}
 
+	/**
+	 * @param Event $event
+	 * @param       $filename
+	 * @param       $s3key
+	 * @throws \Exception
+	 */
 	protected static function getFile(Event $event, $filename, $s3key)
 	{
-		if ($event->isDevMode()) {
+		$env = getenv('SYRUP_ENV');
+
+		if (!$env) {
+			$env = $event->isDevMode()?'dev':'prod';
+		}
+
+		if (!in_array($env, ['dev', 'test', 'prod'])) {
+			throw new \Exception('SYRUP_ENV only accepts value "dev", "test" or "prod"');
+		}
+
+		if ($env == 'dev') {
 			if ($event->getIO()->isInteractive()) {
 				$event->getIO()->askAndValidate(
 					"<comment>Get <question>{$filename}</question> from development S3 bucket? [<options=bold>y</options=bold>/n/s]:
@@ -62,20 +76,20 @@ s - skip <info>(keep current file)</info>
 			) {
 				self::getFromIO($event->getIO(), $filename, ".");
 			} else {
-				self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, true);
+				self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, $env);
 			}
 		} else {
-			self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename);
+			self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, $env);
 		}
 	}
 
 	/**
 	 * @brief Ask for a path to a file
-	 *
-	 * @param Event $event
-	 * @param string $filename parameters.yml or parameters_shared.yml
-	 * @param string $pathname file to look for before asking in IO
-	 * @return void
+	 * @param IOInterface $io
+	 * @param string      $filename parameters.yml or parameters_shared.yml
+	 * @param string      $pathname file to look for before asking in IO
+	 * @throws \Exception
+	 * @internal param Event $event
 	 */
 	protected static function getFromIO(IOInterface $io, $filename, $pathname = "")
 	{
@@ -108,12 +122,18 @@ s - skip <info>(keep current file)</info>
 	 *
 	 * @param string $key "path" to a file on S3
 	 * @param string $path Local path to save the file within app
-	 * @param bool $dev Development environment
+	 * @param string $env environment variable, one of 'dev', 'test' or 'prod'
 	 * @return void
 	 */
-	protected static function getFromS3(IOInterface $io, $key, $path, $dev = false)
+	protected static function getFromS3(IOInterface $io, $key, $path, $env)
 	{
-		$bucket = (bool) $dev ? 'keboola-configs-testing' : 'keboola-configs';
+		$bucket = 'keboola-configs';
+		if ($env == 'test') {
+			$bucket = 'keboola-configs-testing';
+		} elseif ($env == 'dev') {
+			$bucket = 'keboola-configs-devel';
+		}
+
 		$client = S3Client::factory();
 		$client->getObject(array(
 			'Bucket' => $bucket,
