@@ -30,7 +30,6 @@ class ExceptionHandler extends BaseExceptionHandler
 	 * @param Boolean $debug
 	 *
 	 * @param string $env
-	 * @internal param string $charser
 	 * @return ExceptionHandler The registered exception handler
 	 */
 	public static function register($debug = true, $env = 'dev')
