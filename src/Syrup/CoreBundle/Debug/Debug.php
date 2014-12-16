@@ -39,13 +39,7 @@ class Debug extends BaseDebug
 		error_reporting(-1);
 
 		ErrorHandler::register($errorReportingLevel, $displayErrors);
-		if ('cli' !== php_sapi_name()) {
-			ExceptionHandler::register(true, $environment);
-			// CLI - display errors only if they're not already logged to STDERR
-		} elseif ($displayErrors && (!ini_get('log_errors') || ini_get('error_log'))) {
-			ini_set('display_errors', 1);
-		}
-
+		ExceptionHandler::register(true, $environment);
 		DebugClassLoader::enable();
 	}
 }

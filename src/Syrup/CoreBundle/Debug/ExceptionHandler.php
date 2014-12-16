@@ -12,6 +12,7 @@ namespace Syrup\CoreBundle\Debug;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\ExceptionHandler as BaseExceptionHandler;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Parser;
 
 class ExceptionHandler extends BaseExceptionHandler
@@ -86,6 +87,17 @@ class ExceptionHandler extends BaseExceptionHandler
 		}
 
 		$code = ($exception->getCode() >= 200 && $exception->getCode() < 600)?$exception->getCode():500;
+
+		// nicely format for console - @todo create ConsoleExceptionHandler
+		if (php_sapi_name() == 'cli') {
+			$resString = PHP_EOL;
+			foreach ($response as $k => $v) {
+				$resString .= $k . ': ' . $v . PHP_EOL;
+			}
+			$resString .= PHP_EOL;
+
+			return new Response($resString, $code, $exception->getHeaders());
+		}
 
 		return new JsonResponse($response, $code, $exception->getHeaders());
 	}
