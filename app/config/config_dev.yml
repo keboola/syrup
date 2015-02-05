@@ -11,10 +11,15 @@ web_profiler:
 
 monolog:
     handlers:
-        syslog:
-            ident: %app_name%
+        syrup_syslog:
             type: syslog
+            ident: %app_name%
             level: debug
-            bubble: false
-            formatter: syrup.monolog.json_formatter
-
+            channels: ["!request", "!event", "!doctrine"]
+            formatter: syrup.monolog.formatter
+        storage_api:
+            type: service
+            id: syrup.monolog.sapi_handler
+            ident: %app_name%
+            level: info
+            channels: ["!request", "!event", "!doctrine"]
