@@ -11,16 +11,3 @@ services:
     session.handler.pdo:
         class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         arguments: [@pdo, %pdo.db_options%]
-
-    syrup.monolog.log_processor:
-        class: Syrup\CoreBundle\Monolog\Processor\LogProcessor
-        arguments: [%app_name%, @storage_api]
-        tags:
-            - { name: monolog.processor, method: processRecord }
-
-    syrup.monolog.handler:
-        class: Syrup\CoreBundle\Monolog\Handler\SyslogHandler
-        arguments: [%app_name%, @syrup.monolog.s3_uploader, @storage_api]
-
-    syrup.monolog.formatter:
-        class: Monolog\Formatter\JsonFormatter
