@@ -18,13 +18,13 @@ class SyrupControllerListenerTest extends WebTestCase
 {
 
     /**
-     * @covers Syrup\ComponentBundle\Listener\SyrupControllerListener::onKernelController
+     * @covers Keboola\Syrup\Listener\SyrupControllerListener::onKernelController
      */
     public function testListener()
     {
         $client = static::createClient();
 
-        $request = Request::create('/syrup-component-bundle/run', 'POST');
+        $request = Request::create('/syrup/run', 'POST');
         $request->headers->set('X-StorageApi-Token', SYRUP_SAPI_TEST_TOKEN);
         $client->getContainer()->enterScope('request');
         $client->getContainer()->set('request', $request);

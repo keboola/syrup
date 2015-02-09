@@ -53,7 +53,7 @@ class SyrupExceptionListenerTest extends KernelTestCase
     }
 
     /**
-     * @covers Syrup\ComponentBundle\Listener\SyrupExceptionListener::onConsoleException
+     * @covers Keboola\Syrup\Listener\SyrupExceptionListener::onConsoleException
      */
     public function testConsoleException()
     {
@@ -98,15 +98,15 @@ class SyrupExceptionListenerTest extends KernelTestCase
         $record = array_pop($records);
         $this->assertArrayHasKey('exception', $record);
         $this->assertArrayHasKey('class', $record['exception']);
-        $this->assertEquals('Syrup\ComponentBundle\Exception\UserException', $record['exception']['class']);
+        $this->assertEquals('Keboola\Syrup\Exception\UserException', $record['exception']['class']);
     }
 
     /**
-     * @covers Syrup\ComponentBundle\Listener\SyrupExceptionListener::onKernelException
+     * @covers Keboola\Syrup\Listener\SyrupExceptionListener::onKernelException
      */
     public function testKernelException()
     {
-        $request = Request::create('/syrup-component-bundle/run', 'POST');
+        $request = Request::create('/syrup/run', 'POST');
         $request->headers->set('X-StorageApi-Token', SYRUP_SAPI_TEST_TOKEN);
 
         $message = uniqid();
@@ -119,7 +119,7 @@ class SyrupExceptionListenerTest extends KernelTestCase
         $this->assertEquals('ERROR', $record['priority']);
         $this->assertArrayHasKey('exception', $record);
         $this->assertArrayHasKey('class', $record['exception']);
-        $this->assertEquals('Syrup\ComponentBundle\Exception\UserException', $record['exception']['class']);
+        $this->assertEquals('Keboola\Syrup\Exception\UserException', $record['exception']['class']);
         $response = $event->getResponse();
         $this->assertEquals(400, $response->getStatusCode());
         $jsonResponse = json_decode($response->getContent(), true);

@@ -14,11 +14,14 @@
         }
     ],
     "autoload": {
-        "psr-0": { "": "src/" }
+        "psr-4": { "": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "": "tests/" }
     },
     "repositories": [],
     "require": {
-        "php": ">=5.5.0",
+        "php": ">=5.4.4",
         "aws/aws-sdk-php": "2.6.*",
         "elasticsearch/elasticsearch": "~1.0",
         "symfony/assetic-bundle": "~2.3",

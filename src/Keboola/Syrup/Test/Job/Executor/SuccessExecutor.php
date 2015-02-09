@@ -1,18 +1,18 @@
 <?php
-namespace Keboola\Syrup\Tests\Job;
+namespace Keboola\Syrup\Test\Job\Executor;
 
 use Keboola\Syrup\Exception\JobException;
 use Keboola\Syrup\Job\Metadata\Job;
 
-class WarningExecutor extends \Keboola\Syrup\Job\Executor
+class SuccessExecutor extends \Keboola\Syrup\Job\Executor
 {
     public function execute(Job $job)
     {
         parent::execute($job);
 
-        $e = new JobException(400, 'One of orchestration tasks failed');
+        $e = new JobException(200, 'All done');
         $e
-            ->setStatus(Job::STATUS_WARNING)
+            ->setStatus(Job::STATUS_SUCCESS)
             ->setResult(array('testing' => 'value'));
 
         throw $e;

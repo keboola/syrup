@@ -1,5 +1,5 @@
 <?php
-namespace Keboola\Syrup\Tests\Job;
+namespace Keboola\Syrup\Test\Job\Executor;
 
 use Keboola\Syrup\Exception\JobException;
 use Keboola\Syrup\Job\Metadata\Job;

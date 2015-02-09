@@ -29,7 +29,7 @@ class ApiControllerTest extends WebTestCase
         self::$client = static::createClient();
         $container = static::$client->getContainer();
 
-        $request = Request::create('/syrup-component-bundle/run', 'POST');
+        $request = Request::create('/syrup/run', 'POST');
         $request->headers->set('X-StorageApi-Token', $container->getParameter('storage_api.test.token'));
 
         $container->enterScope('request');
@@ -51,7 +51,7 @@ class ApiControllerTest extends WebTestCase
     public function testGetSharedSapi()
     {
         $sharedSapi = $this->invokeMethod($this->controller, 'getSharedSapi');
-        $this->assertInstanceOf('Syrup\ComponentBundle\Service\SharedSapi\SharedSapiService', $sharedSapi);
+        $this->assertInstanceOf('Keboola\Syrup\Service\SharedSapi\SharedSapiService', $sharedSapi);
     }
 
     public function testNonExistingBundle()
@@ -78,7 +78,7 @@ class ApiControllerTest extends WebTestCase
     {
         static::$client->request(
             'POST',
-            '/syrup-component-bundle/' . uniqid(),
+            '/syrup/' . uniqid(),
             [],
             [],
             ['HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token')],
@@ -97,7 +97,7 @@ class ApiControllerTest extends WebTestCase
         $clientWithoutToken = static::createClient();
         $clientWithoutToken->request(
             'POST',
-            '/syrup-component-bundle/run',
+            '/syrup/run',
             [],
             [],
             [],
@@ -118,7 +118,7 @@ class ApiControllerTest extends WebTestCase
     {
         static::$client->request(
             'POST',
-            '/syrup-component-bundle/run',
+            '/syrup/run',
             [],
             [],
             ['HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token')],
@@ -138,7 +138,7 @@ class ApiControllerTest extends WebTestCase
         try {
             static::$client->request(
                 'POST',
-                '/syrup-component-bundle/run',
+                '/syrup/run',
                 [],
                 [],
                 ['HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token')],

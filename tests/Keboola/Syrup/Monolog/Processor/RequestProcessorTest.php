@@ -17,8 +17,8 @@ class RequestProcessorTest extends TestCase
 {
 
     /**
-     * @covers Syrup\ComponentBundle\Monolog\Processor\RequestProcessor::__invoke
-     * @covers Syrup\ComponentBundle\Monolog\Processor\RequestProcessor::processRecord
+     * @covers Keboola\Syrup\Monolog\Processor\RequestProcessor::__invoke
+     * @covers Keboola\Syrup\Monolog\Processor\RequestProcessor::processRecord
      */
     public function testProcessor()
     {

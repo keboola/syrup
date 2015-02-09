@@ -15,7 +15,7 @@ class JsonFormatterTest extends TestCase
 {
 
     /**
-     * @covers Syrup\ComponentBundle\Monolog\Formatter\JsonFormatter::format
+     * @covers Keboola\Syrup\Monolog\Formatter\JsonFormatter::format
      */
     public function testFormat()
     {
@@ -31,8 +31,8 @@ class JsonFormatterTest extends TestCase
     }
 
     /**
-     * @covers Syrup\ComponentBundle\Monolog\Formatter\JsonFormatter::formatBatch
-     * @covers Syrup\ComponentBundle\Monolog\Formatter\JsonFormatter::formatBatchJson
+     * @covers Keboola\Syrup\Monolog\Formatter\JsonFormatter::formatBatch
+     * @covers Keboola\Syrup\Monolog\Formatter\JsonFormatter::formatBatchJson
      */
     public function testFormatBatch()
     {

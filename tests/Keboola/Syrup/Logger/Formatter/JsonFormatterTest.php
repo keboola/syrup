@@ -15,7 +15,7 @@ use Keboola\Syrup\Monolog\Formatter\SyrupJsonFormatter;
 
 class JsonFormatterTest extends WebTestCase
 {
-    protected $appName = 'syrup-component-bundle';
+    protected $appName = 'syrup';
 
     protected function assertRecord(array $record)
     {
@@ -36,7 +36,7 @@ class JsonFormatterTest extends WebTestCase
     public function testFormatter()
     {
         $attachmentUrl = 'http://neco';
-        $s3uploader = $this->getMockBuilder('Syrup\ComponentBundle\Monolog\Uploader\SyrupS3Uploader')
+        $s3uploader = $this->getMockBuilder('Keboola\Syrup\Monolog\Uploader\SyrupS3Uploader')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -44,7 +44,7 @@ class JsonFormatterTest extends WebTestCase
             ->method('uploadString')
             ->will($this->returnValue($attachmentUrl));
 
-        $storageApiService = $this->getMockBuilder('Syrup\ComponentBundle\Service\StorageApi\StorageApiService')
+        $storageApiService = $this->getMockBuilder('Keboola\Syrup\Service\StorageApi\StorageApiService')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -72,7 +72,7 @@ class JsonFormatterTest extends WebTestCase
                 'description'   => 'test',
                 'token'         => '12345-test-token'
             ],
-            'component' => 'syrup-component-bundle',
+            'component' => 'syrup',
             'command'   => 'test',
             'params'    => [],
             'process'   => [

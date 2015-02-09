@@ -29,7 +29,7 @@ class BaseControllerTest extends WebTestCase
     {
         $this->invokeMethod($this->controller, 'initTemp');
         $temp = static::readAttribute($this->controller, 'temp');
-        $this->assertInstanceOf('Syrup\ComponentBundle\Filesystem\Temp', $temp);
+        $this->assertInstanceOf('Keboola\Syrup\Filesystem\Temp', $temp);
         /** @var \Syrup\ComponentBundle\Filesystem\Temp $temp */
         $this->assertStringStartsWith(sys_get_temp_dir(), $temp->getTmpFolder());
     }

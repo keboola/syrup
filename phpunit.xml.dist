@@ -9,25 +9,25 @@
          processIsolation="false"
          stopOnFailure="true"
          stopOnError="true"
-         syntaxCheck="false"
+         syntaxCheck="true"
          bootstrap="tests/bootstrap.php">
     <php>
         <server name="KERNEL_DIR" value="app/" />
         <ini name="date.timezone" value="Europe/Prague"/>
     </php>
     <testsuites>
-        <testsuite name="Syrup Component Bundle Tests">
-            <directory>tests/Command</directory>
-            <directory>tests/Controller</directory>
-            <directory>tests/Filesystem</directory>
-            <directory>tests/Job</directory>
-            <directory>tests/Logger</directory>
-            <directory>tests/Service</directory>
-        </testsuite>
         <testsuite name="unit">
-            <directory>tests/Aws</directory>
-            <directory>tests/Listener</directory>
-            <directory>tests/Monolog</directory>
+            <directory>tests/Keboola/Syrup/Aws</directory>
+            <directory>tests/Keboola/Syrup/Listener</directory>
+            <directory>tests/Keboola/Syrup/Monolog</directory>
+        </testsuite>
+        <testsuite name="syrup">
+            <directory>tests/Keboola/Syrup/Command</directory>
+            <directory>tests/Keboola/Syrup/Controller</directory>
+            <directory>tests/Keboola/Syrup/Filesystem</directory>
+            <directory>tests/Keboola/Syrup/Job</directory>
+            <directory>tests/Keboola/Syrup/Logger</directory>
+            <directory>tests/Keboola/Syrup/Service</directory>
         </testsuite>
     </testsuites>
     <filter>

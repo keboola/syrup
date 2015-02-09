@@ -6,34 +6,29 @@
  */
 namespace Keboola\Syrup\Tests\Command;
 
-use Keboola\StorageApi\Client as SapiClient;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Keboola\Syrup\Test\Job\Executor\ErrorExecutor;
+use Keboola\Syrup\Test\Job\Executor\HookExecutor;
+use Keboola\Syrup\Test\Job\Executor\SuccessExecutor;
+use Keboola\Syrup\Test\Job\Executor\WarningExecutor;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Keboola\Syrup\Test\WebTestCase;
 use Keboola\Syrup\Command\JobCommand;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobManager;
 use Keboola\Syrup\Tests\Job as TestExecutor;
 
-class JobCommandTest extends KernelTestCase
+class JobCommandTest extends WebTestCase
 {
     /**
      * @var Application
      */
     protected $application;
-
-    /** @var SapiClient */
-    protected $storageApiClient;
-
+    
     protected function setUp()
     {
         $this->createKernel();
-        $this->bootKernel();
-
-        $this->storageApiClient = new SapiClient([
-            'token' => self::$kernel->getContainer()->getParameter('storage_api.test.token'),
-            'userAgent' => 'Syrup Component Bundle TEST'
-        ]);
+        self::$kernel->boot();
 
         $this->application = new Application(self::$kernel);
         $this->application->add(new JobCommand());
@@ -63,7 +58,7 @@ class JobCommandTest extends KernelTestCase
         $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
 
         // replace executor with warning executor
-        self::$kernel->getContainer()->set('syrup.job_executor', new TestExecutor\WarningExecutor());
+        self::$kernel->getContainer()->set('syrup.job_executor', new WarningExecutor());
 
         $jobId = $jobManager->indexJob($this->createJob($encryptedToken));
 
@@ -82,7 +77,7 @@ class JobCommandTest extends KernelTestCase
         $this->assertEquals($job->getStatus(), Job::STATUS_WARNING);
 
         // replace executor with success executor
-        self::$kernel->getContainer()->set('syrup.job_executor', new TestExecutor\SuccessExecutor());
+        self::$kernel->getContainer()->set('syrup.job_executor', new SuccessExecutor());
 
         $jobId = $jobManager->indexJob($this->createJob($encryptedToken));
 
@@ -101,7 +96,7 @@ class JobCommandTest extends KernelTestCase
         $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
 
         // replace executor with error executor
-        self::$kernel->getContainer()->set('syrup.job_executor', new TestExecutor\ErrorExecutor());
+        self::$kernel->getContainer()->set('syrup.job_executor', new ErrorExecutor());
 
         $jobId = $jobManager->indexJob($this->createJob($encryptedToken));
 
@@ -126,7 +121,7 @@ class JobCommandTest extends KernelTestCase
         $jobManager = self::$kernel->getContainer()->get('syrup.job_manager');
         $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')->encrypt(self::$kernel->getContainer()->getParameter('storage_api.test.token'));
 
-        self::$kernel->getContainer()->set('syrup.job_executor', new TestExecutor\HookExecutor($jobManager));
+        self::$kernel->getContainer()->set('syrup.job_executor', new HookExecutor($jobManager));
 
         // job execution test
         $jobId = $jobManager->indexJob($this->createJob($encryptedToken));
@@ -146,33 +141,33 @@ class JobCommandTest extends KernelTestCase
         $result = $job->getResult();
 
         $this->assertArrayHasKey('testing', $result);
-        $this->assertArrayHasKey(TestExecutor\HookExecutor::HOOK_RESULT_KEY, $result);
-        $this->assertEquals(TestExecutor\HookExecutor::HOOK_RESULT_VALUE, $result[TestExecutor\HookExecutor::HOOK_RESULT_KEY]);
+        $this->assertArrayHasKey(HookExecutor::HOOK_RESULT_KEY, $result);
+        $this->assertEquals(HookExecutor::HOOK_RESULT_VALUE, $result[HookExecutor::HOOK_RESULT_KEY]);
         $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
     }
 
     protected function createJob($token)
     {
         return new Job([
-            'id'    => $this->storageApiClient->generateId(),
-            'runId'     => $this->storageApiClient->generateId(),
-            'project'   => [
-                'id'        => '123',
-                'name'      => 'Syrup Component Bundle TEST'
+            'id' => rand(0, 128),
+            'runId' => rand(0, 128),
+            'project' => [
+                'id' => '123',
+                'name' => 'Syrup TEST'
             ],
-            'token'     => [
-                'id'            => '123',
-                'description'   => 'fake token',
-                'token'         => $token
+            'token' => [
+                'id' => '123',
+                'description' => 'fake token',
+                'token' => $token
             ],
             'component' => 'syrup',
-            'command'   => 'run',
-            'params'    => [],
-            'process'   => [
-                'host'  => gethostname(),
-                'pid'   => getmypid()
+            'command' => 'run',
+            'params' => [],
+            'process' => [
+                'host' => gethostname(),
+                'pid' => getmypid()
             ],
-            'createdTime'   => date('c')
+            'createdTime' => date('c')
         ]);
     }
 }
