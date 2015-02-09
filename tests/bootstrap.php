@@ -95,4 +95,4 @@ $db->insert('queues', [
 passthru('php vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php '
     . 'app vendor');
 passthru(sprintf('php "%s/../app/console" cache:clear --env=test', __DIR__));
-passthru(sprintf('php "%s/../app/console" syrup:create-index -d', __DIR__));
+passthru(sprintf('php "%s/../app/console" syrup:create-index -d  --env=test', __DIR__));

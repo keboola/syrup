@@ -35,14 +35,13 @@ class CreateIndexCommand extends ContainerAwareCommand
 
         if (!$input->getOption('no-mapping')) {
 
-            $mappingsPath = '../Resources/views/Elasticsearch/';
-            $mappingsPathAbsolute = realpath(__DIR__ . '/' . $mappingsPath);
+            $mappingsPath = realpath(__DIR__ . '/../Resources/views/Elasticsearch/');
 
-            if (!is_dir($mappingsPathAbsolute)) {
+            if (!is_dir($mappingsPath)) {
                 throw new ApplicationException("Unable to access directory 'Resources/views/Elasticsearch'");
             }
 
-            $this->getContainer()->get('twig.loader')->addPath($mappingsPathAbsolute, $namespace = '__main__');
+            $this->getContainer()->get('twig.loader')->addPath($mappingsPath, $namespace = '__main__');
 
             /** @var TwigEngine $templating */
             $templating = $this->getContainer()->get('templating');

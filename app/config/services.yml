@@ -13,14 +13,14 @@ services:
         arguments: [@pdo, %pdo.db_options%]
 
 
-    keboola.syrup.listener.exception:
+    syrup.listener.exception:
         class: Keboola\Syrup\Listener\SyrupExceptionListener
-        arguments: [%app_name%, @storage_api, @logger]
+        arguments: [%app_name%, @syrup.storage_api, @logger]
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
             - { name: kernel.event_listener, event: console.exception, method: onConsoleException }
 
-    keboola.syrup.listener.controller:
+    syrup.listener.controller:
         class: Keboola\Syrup\Listener\SyrupControllerListener
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
@@ -33,7 +33,7 @@ services:
 #   deprecated
     syrup.monolog.json_formatter:
         class: Keboola\Syrup\Monolog\Formatter\SyrupJsonFormatter
-        arguments: [%app_name%, @syrup.monolog.s3_uploader, @storage_api]
+        arguments: [%app_name%, @syrup.monolog.s3_uploader, @syrup.storage_api]
 
 
     syrup.s3_uploader:
@@ -42,10 +42,10 @@ services:
 
     syrup.monolog.sapi_handler:
         class: Keboola\Syrup\Monolog\Handler\StorageApiHandler
-        arguments: [%app_name%, @storage_api]
+        arguments: [%app_name%, @syrup.storage_api]
     syrup.monolog.syslog_processor:
         class: Keboola\Syrup\Monolog\Processor\SyslogProcessor
-        arguments: [%app_name%, @storage_api, @syrup.s3_uploader]
+        arguments: [%app_name%, @syrup.storage_api, @syrup.s3_uploader]
         tags:
             - { name: monolog.processor, method: processRecord, handler: syrup_syslog }
     syrup.monolog.request_processor:
@@ -70,7 +70,7 @@ services:
         class: Keboola\Syrup\Filesystem\Temp
         arguments: [%app_name%]
 
-    storage_api:
+    syrup.storage_api:
         class: Keboola\Syrup\Service\StorageApi\StorageApiService
         arguments: [%storage_api.url%]
         calls:

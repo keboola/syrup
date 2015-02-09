@@ -23,7 +23,7 @@ class ApiController extends BaseController
 
     protected function initStorageApi()
     {
-        $this->storageApi = $this->container->get('storage_api')->getClient();
+        $this->storageApi = $this->container->get('syrup.storage_api')->getClient();
     }
 
     public function preExecute(Request $request)

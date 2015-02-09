@@ -78,15 +78,15 @@ class JobCommand extends ContainerAwareCommand
             'userAgent' => $this->job->getComponent(),
         ]);
         $this->sapiClient->setRunId($this->job->getRunId());
-        /** @var \Syrup\ComponentBundle\Service\StorageApi\StorageApiService $storageApiService */
-        $storageApiService = $this->getContainer()->get('storage_api');
+        /** @var \Keboola\Syrup\Service\StorageApi\StorageApiService $storageApiService */
+        $storageApiService = $this->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient($this->sapiClient);
 
-        /** @var \Syrup\ComponentBundle\Monolog\Processor\JobProcessor $logProcessor */
+        /** @var \Keboola\Syrup\Monolog\Processor\JobProcessor $logProcessor */
         $logProcessor = $this->getContainer()->get('syrup.monolog.job_processor');
         $logProcessor->setJob($this->job);
 
-        /** @var \Syrup\ComponentBundle\Monolog\Processor\SyslogProcessor $logProcessor */
+        /** @var \Keboola\Syrup\Monolog\Processor\SyslogProcessor $logProcessor */
         $logProcessor = $this->getContainer()->get('syrup.monolog.syslog_processor');
         $logProcessor->setRunId($this->job->getRunId());
         $logProcessor->setTokenData($this->sapiClient->getLogData());

@@ -57,7 +57,7 @@ class CreateJobCommand extends ContainerAwareCommand
             'userAgent' => $this->componentName
         ]);
         /** @var StorageApiService $storageApiService */
-        $storageApiService = $this->getContainer()->get('storage_api');
+        $storageApiService = $this->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient($this->storageApi);
 
         $this->encryptor = $this->getContainer()->get('syrup.encryptor');

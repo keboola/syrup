@@ -24,7 +24,7 @@ class StorageApiServiceTest extends WebTestCase
         $container->set('request', $request);
 
         /** @var StorageApiService $storageApiService */
-        $storageApiService = $container->get('storage_api');
+        $storageApiService = $container->get('syrup.storage_api');
 
         $sapiClient = $storageApiService->getClient();
 

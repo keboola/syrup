@@ -1,11 +1,19 @@
-syrup_index:
+keboola_syrup_index:
     path:      /
     defaults:  { _controller: SyrupBundle:Index:index }
 
-syrup_core:
+keboola_syrup_core:
     resource: .
     type: component
 
-syrup_component:
-    resource: "@SyrupBundle/Resources/config/routing.yml"
-    prefix:   /
+keboola_syrup_api_options:
+    path:     /{params}
+    defaults: { _controller: SyrupBundle:Api:options, params: 0, _format: json }
+    methods:  [OPTIONS]
+    requirements:
+        params: ".+"
+
+keboola_syrup_api_run:
+    path:     /{componentName}/run
+    defaults: { _controller: SyrupBundle:Api:run, _format: json }
+    methods:  [POST]
