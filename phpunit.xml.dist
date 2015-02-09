@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="true"
+         stopOnError="true"
+         syntaxCheck="false"
+         bootstrap="tests/bootstrap.php">
+    <php>
+        <server name="KERNEL_DIR" value="app/" />
+        <ini name="date.timezone" value="Europe/Prague"/>
+    </php>
+    <testsuites>
+        <testsuite name="Syrup Component Bundle Tests">
+            <directory>tests/Command</directory>
+            <directory>tests/Controller</directory>
+            <directory>tests/Filesystem</directory>
+            <directory>tests/Job</directory>
+            <directory>tests/Logger</directory>
+            <directory>tests/Service</directory>
+        </testsuite>
+        <testsuite name="unit">
+            <directory>tests/Aws</directory>
+            <directory>tests/Listener</directory>
+            <directory>tests/Monolog</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <blacklist>
+            <directory>vendor</directory>
+        </blacklist>
+    </filter>
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
+</phpunit>

@@ -5,9 +5,11 @@
 /vendor/
 /bin/
 /app/config/parameters.yml
+/app/config/parameters_shared.yml
 /.idea/
 /tmp/*
 composer.lock
 composer.phar
 .kdev4
 *.kdev4
+build

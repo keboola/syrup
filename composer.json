@@ -2,23 +2,46 @@
     "name": "keboola/syrup",
     "license": "MIT",
     "type": "project",
-    "description": "Syrup - Concentrated extract(or)s",
+    "description": "Syrup",
+    "authors": [
+        {
+            "name": "Miroslav Čillík",
+            "email": "miro@keboola.com"
+        },
+        {
+            "name": "Jakub Matějka",
+            "email": "jakub@keboola.com"
+        }
+    ],
     "autoload": {
         "psr-0": { "": "src/" }
     },
     "repositories": [],
     "require": {
-        "php": ">=5.3.3",
-		"symfony/symfony": "2.5.*",
-        "doctrine/orm": "~2.2,>=2.2.3",
-        "doctrine/doctrine-bundle": "~1.2",
+        "php": ">=5.5.0",
+        "aws/aws-sdk-php": "2.6.*",
+        "elasticsearch/elasticsearch": "~1.0",
         "symfony/assetic-bundle": "~2.3",
-	    "symfony/swiftmailer-bundle": "~2.3",
         "symfony/monolog-bundle": "~2.4",
+        "symfony/swiftmailer-bundle": "~2.3",
+        "symfony/symfony": "2.5.*",
         "sensio/distribution-bundle": "~3.0",
         "sensio/framework-extra-bundle": "~3.0",
+        "sensio/generator-bundle": "~2.3",
+        "doctrine/orm": "~2.2,>=2.2.3",
+        "doctrine/doctrine-bundle": "~1.2",
         "incenteev/composer-parameter-handler": "~2.0",
-	    "sensio/generator-bundle": "~2.3"
+        "keboola/storage-api-client": "~2.11.0",
+        "keboola/csv": "1.1.*",
+        "keboola/php-encryption": "~0.2.0",
+        "pimple/pimple": "2.0.*",
+        "keboola/php-temp": ">=0.1.0"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "~2.6",
+        "phpunit/phpunit": "~4.5",
+        "squizlabs/php_codesniffer": "2.*",
+        "codeclimate/php-test-reporter": "dev-master"
     },
     "scripts": {
         "post-install-cmd": [],

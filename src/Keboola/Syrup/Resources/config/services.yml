@@ -1,0 +1,105 @@
+services:
+    pdo:
+        class: PDO
+        arguments:
+            - "mysql:host=%syrup.host%;dbname=%syrup.name%"
+            - "%syrup.user%"
+            - "%syrup.password%"
+        calls:
+            - [setAttribute, [3,2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
+
+    session.handler.pdo:
+        class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        arguments: [@pdo, %pdo.db_options%]
+
+
+    keboola.syrup.listener.exception:
+        class: Keboola\Syrup\Listener\SyrupExceptionListener
+        arguments: [%app_name%, @storage_api, @logger]
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+            - { name: kernel.event_listener, event: console.exception, method: onConsoleException }
+
+    keboola.syrup.listener.controller:
+        class: Keboola\Syrup\Listener\SyrupControllerListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+#   deprecated
+    syrup.monolog.s3_uploader:
+        class: Keboola\Syrup\Monolog\Uploader\SyrupS3Uploader
+        arguments: [%uploader%]
+
+#   deprecated
+    syrup.monolog.json_formatter:
+        class: Keboola\Syrup\Monolog\Formatter\SyrupJsonFormatter
+        arguments: [%app_name%, @syrup.monolog.s3_uploader, @storage_api]
+
+
+    syrup.s3_uploader:
+            class: Keboola\Syrup\Aws\S3\Uploader
+            arguments: [%uploader%]
+
+    syrup.monolog.sapi_handler:
+        class: Keboola\Syrup\Monolog\Handler\StorageApiHandler
+        arguments: [%app_name%, @storage_api]
+    syrup.monolog.syslog_processor:
+        class: Keboola\Syrup\Monolog\Processor\SyslogProcessor
+        arguments: [%app_name%, @storage_api, @syrup.s3_uploader]
+        tags:
+            - { name: monolog.processor, method: processRecord, handler: syrup_syslog }
+    syrup.monolog.request_processor:
+        class: Keboola\Syrup\Monolog\Processor\RequestProcessor
+        arguments: [@request_stack, @syrup.s3_uploader]
+        tags:
+            - { name: monolog.processor, method: processRecord }
+    syrup.monolog.job_processor:
+        class: Keboola\Syrup\Monolog\Processor\JobProcessor
+        tags:
+            - { name: monolog.processor, method: processRecord }
+    syrup.monolog.formatter:
+        class: Keboola\Syrup\Monolog\Formatter\JsonFormatter
+
+    syrup.routing_loader:
+        class: Keboola\Syrup\Routing\Loader
+        arguments: [%components%]
+        tags:
+            - { name: routing.loader }
+
+    syrup.temp:
+        class: Keboola\Syrup\Filesystem\Temp
+        arguments: [%app_name%]
+
+    storage_api:
+        class: Keboola\Syrup\Service\StorageApi\StorageApiService
+        arguments: [%storage_api.url%]
+        calls:
+            - [setRequest, ['@?request=']]
+
+    syrup.shared_sapi_client:
+        class: Keboola\StorageApi\Client
+        arguments: [%shared_sapi%]
+
+    syrup.shared_sapi:
+        class: Keboola\Syrup\Service\SharedSapi\SharedSapiService
+        arguments: [@syrup.shared_sapi_client]
+
+    syrup.encryptor:
+        class: Keboola\Syrup\Encryption\Encryptor
+        arguments: [%encryption_key%]
+
+    syrup.elasticsearch:
+        class: Elasticsearch\Client
+        arguments: [%elasticsearch%]
+
+    syrup.queue_factory:
+        class: Keboola\Syrup\Service\Queue\QueueFactory
+        arguments: [@doctrine.dbal.syrup_connection, %queue%]
+
+    syrup.job_manager:
+        class: Keboola\Syrup\Job\Metadata\JobManager
+        arguments: [@syrup.elasticsearch, %job_manager%, %app_name%]
+
+    syrup.job_executor:
+        class: Keboola\Syrup\Job\Executor
+

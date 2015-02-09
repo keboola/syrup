@@ -12,21 +12,14 @@ require_once __DIR__.'/AppKernel.php';
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
-use Syrup\CoreBundle\Debug\Debug;
-//use Symfony\Component\Debug\Debug;
+use Keboola\Syrup\Debug\Debug;
 
 $input = new ArgvInput();
 $env = $input->getParameterOption(array('--env', '-e'), getenv('SYMFONY_ENV') ?: 'dev');
 
 $debug = getenv('SYMFONY_DEBUG') !== '0' && !$input->hasParameterOption(array('--no-debug', '')) && $env !== 'prod';
 
-// Syrup\CoreBundle\Debug\Debug.php
 Debug::enable(null, true, $env);
-
-// Orig Symfony Debug
-//if ($debug) {
-//	Debug::enable();
-//}
 
 $kernel = new AppKernel($env, $debug);
 $application = new Application($kernel);

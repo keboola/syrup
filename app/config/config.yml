@@ -82,4 +82,4 @@ swiftmailer:
 
 twig:
     paths:
-        "%kernel.root_dir%/../../../../Resources/views/Elasticsearch": elasticsearch
+        "%kernel.root_dir%/../src/Keboola/Syrup/Resources/views/Elasticsearch": elasticsearch
