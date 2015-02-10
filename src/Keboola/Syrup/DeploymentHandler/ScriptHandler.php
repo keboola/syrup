@@ -2,8 +2,8 @@
 
 namespace Keboola\Syrup\DeploymentHandler;
 
-use Composer\Script\Event,
-    Composer\IO\IOInterface;
+use Composer\Script\Event;
+use Composer\IO\IOInterface;
 use Aws\S3\S3Client;
 
 class ScriptHandler
@@ -71,10 +71,8 @@ s - skip <info>(keep current file)</info>
                     3,
                     "y"
                 );
-            } elseif (
-                file_exists("./{$filename}")
-                && $event->getIO()->askConfirmation("Use './{$filename}'? [<options=bold>y</options=bold>/n]", true)
-            ) {
+            } elseif (file_exists("./{$filename}")
+                && $event->getIO()->askConfirmation("Use './{$filename}'? [<options=bold>y</options=bold>/n]", true)) {
                 self::getFromIO($event->getIO(), $filename, ".");
             } else {
                 self::getFromS3($event->getIO(), $s3key, self::PARAMETERS_DIR . $filename, $env);

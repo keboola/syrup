@@ -27,8 +27,7 @@ class JobCommandTest extends WebTestCase
     
     protected function setUp()
     {
-        $this->createKernel();
-        self::$kernel->boot();
+        $this->bootKernel();
 
         $this->application = new Application(self::$kernel);
         $this->application->add(new JobCommand());
@@ -119,7 +118,8 @@ class JobCommandTest extends WebTestCase
     {
         /** @var JobManager $jobManager */
         $jobManager = self::$kernel->getContainer()->get('syrup.job_manager');
-        $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')->encrypt(self::$kernel->getContainer()->getParameter('storage_api.test.token'));
+        $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')
+            ->encrypt(self::$kernel->getContainer()->getParameter('storage_api.test.token'));
 
         self::$kernel->getContainer()->set('syrup.job_executor', new HookExecutor($jobManager));
 

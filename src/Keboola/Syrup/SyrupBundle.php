@@ -11,5 +11,4 @@ class SyrupBundle extends Bundle
     {
         return new Extension();
     }
-
 }

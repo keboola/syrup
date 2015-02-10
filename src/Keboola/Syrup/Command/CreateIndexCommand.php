@@ -34,7 +34,6 @@ class CreateIndexCommand extends ContainerAwareCommand
         $mappings = null;
 
         if (!$input->getOption('no-mapping')) {
-
             $mappingsPath = realpath(__DIR__ . '/../Resources/views/Elasticsearch/');
 
             if (!is_dir($mappingsPath)) {

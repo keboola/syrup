@@ -20,6 +20,7 @@ $loader->register(true);
 Debug::enable(null, true, 'prod');
 
 require_once __DIR__.'/../app/AppKernel.php';
+//require_once __DIR__.'/../app/AppCache.php';
 
 $kernel = new AppKernel('prod', false);
 $kernel->loadClassCache();
