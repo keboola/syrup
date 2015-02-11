@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
-class Extension extends \Symfony\Component\HttpKernel\DependencyInjection\Extension
+class SyrupExtension extends \Symfony\Component\HttpKernel\DependencyInjection\Extension
 {
     /**
      * {@inheritDoc}
