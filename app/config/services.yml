@@ -67,7 +67,7 @@ services:
             - { name: routing.loader }
 
     syrup.temp:
-        class: Keboola\Syrup\Filesystem\Temp
+        class: Keboola\Temp\Temp
         arguments: [%app_name%]
 
     syrup.storage_api:
