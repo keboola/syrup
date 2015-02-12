@@ -49,10 +49,6 @@ $paramsYaml = \Symfony\Component\Yaml\Yaml::dump([
         'storage_api.url' => 'https://connection.keboola.com/',
         'storage_api.test.url' => 'https://connection.keboola.com/',
         'storage_api.test.token' => SYRUP_SAPI_TEST_TOKEN,
-        'shared_sapi' => [
-            'url' => 'https://connection.keboola.com/',
-            'token' => SYRUP_SAPI_TEST_TOKEN
-        ],
         'elasticsearch' => [
             'hosts' => [SYRUP_ELASTICSEARCH_HOST]
         ],

@@ -48,12 +48,6 @@ class ApiControllerTest extends WebTestCase
         $this->assertInstanceOf('Keboola\StorageApi\Client', $sapiClient);
     }
 
-    public function testGetSharedSapi()
-    {
-        $sharedSapi = $this->invokeMethod($this->controller, 'getSharedSapi');
-        $this->assertInstanceOf('Keboola\Syrup\Service\SharedSapi\SharedSapiService', $sharedSapi);
-    }
-
     public function testNonExistingBundle()
     {
         static::$client->request(

@@ -13,8 +13,6 @@ use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobInterface;
 use Keboola\Syrup\Job\Metadata\JobManager;
 use Keboola\Syrup\Service\Queue\QueueService;
-use Keboola\Syrup\Service\SharedSapi\JobEvent;
-use Keboola\Syrup\Service\SharedSapi\SharedSapiService;
 
 class ApiController extends BaseController
 {
@@ -217,49 +215,6 @@ class ApiController extends BaseController
         $sapiEvent->setType($type);
 
         $this->storageApi->createEvent($sapiEvent);
-    }
-
-    /**
-     * @param String $actionName
-     * @param String $status
-     * @param Int $startTime
-     * @param Int $endTime
-     * @param String $params
-     */
-    protected function logToSharedSapi($actionName, $status, $startTime, $endTime, $params)
-    {
-        $logData = $this->storageApi->getLogData();
-
-        $ssEvent = new JobEvent([
-            'component' => $this->componentName,
-            'action'    => $actionName,
-            'url'       => $this->container->get('request')->getUri(),
-            'projectId' => $logData['owner']['id'],
-            'projectName'    => $logData['owner']['name'],
-            'tokenId'   => $logData['id'],
-            'tokenDesc' => $logData['description'],
-            'status'    => $status,
-            'startTime' => $startTime,
-            'endTime'   => $endTime,
-            'request'   => $params
-        ]);
-
-        try {
-            $this->getSharedSapi()->log($ssEvent);
-        } catch (\Exception $e) {
-            $this->logger->warning("Error while logging into Shared SAPI", [
-                "message"   => $e->getMessage(),
-                "exception" => $e->getTraceAsString()
-            ]);
-        }
-    }
-
-    /**
-     * @return SharedSapiService
-     */
-    protected function getSharedSapi()
-    {
-        return $this->container->get('syrup.shared_sapi');
     }
 
     public function camelize($value)

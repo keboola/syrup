@@ -76,14 +76,6 @@ services:
         calls:
             - [setRequest, ['@?request=']]
 
-    syrup.shared_sapi_client:
-        class: Keboola\StorageApi\Client
-        arguments: [%shared_sapi%]
-
-    syrup.shared_sapi:
-        class: Keboola\Syrup\Service\SharedSapi\SharedSapiService
-        arguments: [@syrup.shared_sapi_client]
-
     syrup.encryptor:
         class: Keboola\Syrup\Encryption\Encryptor
         arguments: [%encryption_key%]
