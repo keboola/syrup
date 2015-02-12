@@ -24,7 +24,6 @@ use Keboola\Syrup\Job\ExecutorInterface;
 use Keboola\Syrup\Job\HookExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobManager;
-use Keboola\Syrup\Monolog\Formatter\SyrupJsonFormatter;
 use Keboola\Syrup\Service\Db\Lock;
 
 class JobCommand extends ContainerAwareCommand
@@ -91,12 +90,6 @@ class JobCommand extends ContainerAwareCommand
         $logProcessor->setRunId($this->job->getRunId());
         $logProcessor->setTokenData($this->sapiClient->getLogData());
 
-        //@TODO DEPRECATED
-        /** @var SyrupJsonFormatter $logFormatter */
-        $logFormatter = $this->getContainer()->get('syrup.monolog.json_formatter');
-        $logFormatter->setStorageApiClient($this->sapiClient);
-        $logFormatter->setJob($this->job);
-        //@TODO DEPRECATED
 
         // Lock DB
         /** @var Connection $conn */

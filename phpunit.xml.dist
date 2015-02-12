@@ -25,7 +25,6 @@
             <directory>tests/Keboola/Syrup/Command</directory>
             <directory>tests/Keboola/Syrup/Controller</directory>
             <directory>tests/Keboola/Syrup/Job</directory>
-            <directory>tests/Keboola/Syrup/Logger</directory>
             <directory>tests/Keboola/Syrup/Service</directory>
         </testsuite>
     </testsuites>

@@ -25,20 +25,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
-#   deprecated
-    syrup.monolog.s3_uploader:
-        class: Keboola\Syrup\Monolog\Uploader\SyrupS3Uploader
-        arguments: [%uploader%]
-
-#   deprecated
-    syrup.monolog.json_formatter:
-        class: Keboola\Syrup\Monolog\Formatter\SyrupJsonFormatter
-        arguments: [%app_name%, @syrup.monolog.s3_uploader, @syrup.storage_api]
-
 
     syrup.s3_uploader:
-            class: Keboola\Syrup\Aws\S3\Uploader
-            arguments: [%uploader%]
+        class: Keboola\Syrup\Aws\S3\Uploader
+        arguments: [%uploader%]
 
     syrup.monolog.sapi_handler:
         class: Keboola\Syrup\Monolog\Handler\StorageApiHandler

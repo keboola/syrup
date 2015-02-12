@@ -9,8 +9,6 @@ defined('SYRUP_DATABASE_PASSWORD') || define('SYRUP_DATABASE_PASSWORD', getenv('
 defined('SYRUP_DATABASE_NAME') || define('SYRUP_DATABASE_NAME', getenv('SYRUP_DATABASE_NAME')? getenv('SYRUP_DATABASE_NAME') : 'syrup');
 defined('SYRUP_AWS_KEY') || define('SYRUP_AWS_KEY', getenv('SYRUP_AWS_KEY')? getenv('SYRUP_AWS_KEY') : null);
 defined('SYRUP_AWS_SECRET') || define('SYRUP_AWS_SECRET', getenv('SYRUP_AWS_SECRET')? getenv('SYRUP_AWS_SECRET') : null);
-defined('SYRUP_BITLY_LOGIN') || define('SYRUP_BITLY_LOGIN', getenv('SYRUP_BITLY_LOGIN')? getenv('SYRUP_BITLY_LOGIN') : null);
-defined('SYRUP_BITLY_KEY') || define('SYRUP_BITLY_KEY', getenv('SYRUP_BITLY_KEY')? getenv('SYRUP_BITLY_KEY') : null);
 defined('SYRUP_SAPI_TEST_TOKEN') || define('SYRUP_SAPI_TEST_TOKEN', getenv('SYRUP_SAPI_TEST_TOKEN')? getenv('SYRUP_SAPI_TEST_TOKEN') : null);
 defined('SYRUP_ELASTICSEARCH_HOST') || define('SYRUP_ELASTICSEARCH_HOST', getenv('SYRUP_ELASTICSEARCH_HOST')? getenv('SYRUP_ELASTICSEARCH_HOST') : 'http://127.0.0.1:9200');
 defined('SYRUP_SQS_URL') || define('SYRUP_SQS_URL', getenv('SYRUP_SQS_URL')? getenv('SYRUP_SQS_URL') : 'https://sqs.us-east-1.amazonaws.com/[id]/[name]');
@@ -42,9 +40,7 @@ $paramsYaml = \Symfony\Component\Yaml\Yaml::dump([
         'uploader' => [
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
-            's3-upload-path' => SYRUP_S3_BUCKET,
-            'bitly-login' => SYRUP_BITLY_LOGIN,
-            'bitly-api-key' => SYRUP_BITLY_KEY
+            's3-upload-path' => SYRUP_S3_BUCKET
         ],
         'storage_api.url' => 'https://connection.keboola.com/',
         'storage_api.test.url' => 'https://connection.keboola.com/',
