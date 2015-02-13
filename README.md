@@ -1,6 +1,11 @@
 Syrup
 ========================
 
+[![Build Status](https://travis-ci.org/keboola/syrup.svg?branch=master)](https://travis-ci.org/keboola/syrup)
+[![Code Climate](https://codeclimate.com/github/keboola/syrup/badges/gpa.svg)](https://codeclimate.com/github/keboola/syrup)
+[![Test Coverage](https://codeclimate.com/github/keboola/syrup/badges/coverage.svg)](https://codeclimate.com/github/keboola/syrup)
+
+
 Syrup is a framework for rapid development of Keboola Connection components (i.e. extractors).
 It is based on Symfony2 framework.
 
