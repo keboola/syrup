@@ -34,7 +34,11 @@ class CreateIndexCommand extends ContainerAwareCommand
         $mappings = null;
 
         if (!$input->getOption('no-mapping')) {
-            $mappingsPath = realpath(__DIR__ . '/../Resources/views/Elasticsearch/');
+            if (strpos(__DIR__, 'vendor')) {
+                $mappingsPath = realpath($this->getContainer()->get('kernel')->getRootDir() . '/../../../../Resources/views/Elasticsearch/');
+            } else {
+                $mappingsPath = realpath(__DIR__ . '/../Resources/views/Elasticsearch/');
+            }
 
             if (!is_dir($mappingsPath)) {
                 throw new ApplicationException("Unable to access directory 'Resources/views/Elasticsearch'");
