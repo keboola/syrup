@@ -7,10 +7,9 @@
 
 namespace Keboola\Syrup\Elasticsearch;
 
-
 use Keboola\Syrup\Exception\ApplicationException;
 
-class Index
+class Elasticsearch
 {
 
     public static function getMapping($rootDir)

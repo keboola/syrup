@@ -3,7 +3,7 @@
 namespace Keboola\Syrup\Controller;
 
 use Keboola\Encryption\EncryptorInterface;
-use Keboola\Syrup\Elasticsearch\Index;
+use Keboola\Syrup\Elasticsearch\Elasticsearch;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Keboola\StorageApi\Client;
@@ -122,12 +122,12 @@ class ApiController extends BaseController
      */
     protected function getMapping()
     {
-        return Index::getMapping($this->container->get('kernel')->getRootDir());
+        return Elasticsearch::getMapping($this->container->get('kernel')->getRootDir());
     }
 
     protected function checkMappingParams($params)
     {
-        $mapping = Index::getMapping($this->container->get('kernel')->getRootDir());
+        $mapping = Elasticsearch::getMapping($this->container->get('kernel')->getRootDir());
         if (isset($mapping['mappings']['jobs']['properties']['params']['properties'])) {
             $mappingParams = $mapping['mappings']['jobs']['properties']['params']['properties'];
 

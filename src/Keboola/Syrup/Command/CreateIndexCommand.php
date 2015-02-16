@@ -7,7 +7,7 @@
 
 namespace Keboola\Syrup\Command;
 
-use Keboola\Syrup\Elasticsearch\Index;
+use Keboola\Syrup\Elasticsearch\Elasticsearch;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -33,7 +33,7 @@ class CreateIndexCommand extends ContainerAwareCommand
         $mappings = null;
 
         if (!$input->getOption('no-mapping')) {
-            $mapping = Index::getMapping($this->getContainer()->get('kernel')->getRootDir());
+            $mapping = Elasticsearch::getMapping($this->getContainer()->get('kernel')->getRootDir());
 
             $settings = $mapping['settings'];
             $mappings = $mapping['mappings'];

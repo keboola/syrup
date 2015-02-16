@@ -56,7 +56,7 @@ class ApiControllerTest extends WebTestCase
             [],
             [],
             ['HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token')],
-            '{"test":"test"}'
+            '{"account":"test"}'
         );
 
         $result = json_decode(static::$client->getResponse()->getContent(), true);
@@ -76,7 +76,7 @@ class ApiControllerTest extends WebTestCase
             [],
             [],
             ['HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token')],
-            '{"test":"test"}'
+            '{"account":"test"}'
         );
 
         $result = json_decode(static::$client->getResponse()->getContent(), true);
@@ -95,7 +95,7 @@ class ApiControllerTest extends WebTestCase
             [],
             [],
             [],
-            '{"test":"test"}'
+            '{"account":"test"}'
         );
 
         $result = json_decode($clientWithoutToken->getResponse()->getContent(), true);
@@ -116,7 +116,7 @@ class ApiControllerTest extends WebTestCase
             [],
             [],
             ['HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token')],
-            '{"test":"test"}'
+            '{"account":"test"}'
         );
 
         $res = json_decode(static::$client->getResponse()->getContent(), true);
