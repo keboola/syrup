@@ -33,7 +33,6 @@ class ElasticsearchTest extends \PHPUnit_Framework_TestCase
      */
     public function testElasticsearchMapping()
     {
-
         $mapping = \Keboola\Syrup\Elasticsearch\Elasticsearch::getMapping(__DIR__.'/../../../../app');
         $this->assertNotNull($mapping);
         $this->assertArrayHasKey('mappings', $mapping);
