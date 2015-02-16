@@ -7,12 +7,11 @@
 
 namespace Keboola\Syrup\Command;
 
+use Keboola\Syrup\Elasticsearch\Index;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Job\Metadata\JobManager;
 
 class CreateIndexCommand extends ContainerAwareCommand
@@ -34,26 +33,7 @@ class CreateIndexCommand extends ContainerAwareCommand
         $mappings = null;
 
         if (!$input->getOption('no-mapping')) {
-            if (strpos(__DIR__, 'vendor')) {
-                $mappingsPath = realpath($this->getContainer()->get('kernel')->getRootDir() . '/../../../../Resources/views/Elasticsearch/');
-            } else {
-                $mappingsPath = realpath(__DIR__ . '/../Resources/views/Elasticsearch/');
-            }
-
-            if (!is_dir($mappingsPath)) {
-                throw new ApplicationException("Unable to access directory 'Resources/views/Elasticsearch'");
-            }
-
-            $this->getContainer()->get('twig.loader')->addPath($mappingsPath, $namespace = '__main__');
-
-            /** @var TwigEngine $templating */
-            $templating = $this->getContainer()->get('templating');
-            $mappingJson = $templating->render('mapping.json.twig');
-            $mapping = json_decode($mappingJson, true);
-
-            if (null == $mapping) {
-                throw new ApplicationException("Error in mapping, check your mapping syntax");
-            }
+            $mapping = Index::getMapping($this->getContainer()->get('kernel')->getRootDir());
 
             $settings = $mapping['settings'];
             $mappings = $mapping['mappings'];

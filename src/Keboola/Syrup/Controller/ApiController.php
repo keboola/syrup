@@ -3,6 +3,7 @@
 namespace Keboola\Syrup\Controller;
 
 use Keboola\Encryption\EncryptorInterface;
+use Keboola\Syrup\Elasticsearch\Index;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Keboola\StorageApi\Client;
@@ -115,16 +116,18 @@ class ApiController extends BaseController
         return $this->container->get('syrup.job_manager');
     }
 
+    /**
+     * @deprecated
+     * @return mixed
+     */
     protected function getMapping()
     {
-        $mappingJson = $this->renderView('@elasticsearch/mapping.json.twig');
-
-        return json_decode($mappingJson, true);
+        return Index::getMapping($this->container->get('kernel')->getRootDir());
     }
 
     protected function checkMappingParams($params)
     {
-        $mapping = $this->getMapping();
+        $mapping = Index::getMapping($this->container->get('kernel')->getRootDir());
         if (isset($mapping['mappings']['jobs']['properties']['params']['properties'])) {
             $mappingParams = $mapping['mappings']['jobs']['properties']['params']['properties'];
 
