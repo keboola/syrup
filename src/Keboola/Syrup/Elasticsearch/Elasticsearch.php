@@ -16,7 +16,10 @@ class Elasticsearch
     {
         $template = file_get_contents($rootDir.'/Resources/Elasticsearch/mapping_template.json');
 
-        if (file_exists($rootDir.'/../../../../Resources/views/Elasticsearch/mapping.json')) {
+        if (file_exists($rootDir.'/../../../../Resources/Elasticsearch/mapping.json')) {
+            $customTemplate = file_get_contents($rootDir . '/../../../../Resources/Elasticsearch/mapping.json');
+        } elseif (file_exists($rootDir.'/../../../../Resources/views/Elasticsearch/mapping.json')) {
+            // deprecated location
             $customTemplate = file_get_contents($rootDir.'/../../../../Resources/views/Elasticsearch/mapping.json');
         } elseif (file_exists($rootDir.'/../../../../Resources/views/Elasticsearch/mapping.json.twig')) {
             // deprecated format
