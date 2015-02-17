@@ -10,24 +10,18 @@ parameters:
         db_data_col: value
         db_time_col: time
 
-imports:
-    - { resource: parameters_shared.yml }
-    - { resource: parameters.yml }
-    - { resource: security.yml }
 
 framework:
-    #esi:             ~
-    #translator:      { fallback: "%locale%" }
-    secret:          "%secret%"
+    secret: "%secret%"
     router:
-        resource:     "%kernel.root_dir%/config/routing.yml"
+        resource: "%kernel.root_dir%/config/routing.yml"
         strict_requirements: ~
-    form:             ~
-    csrf_protection:  false
-    validation:       { enable_annotations: true }
-    templating:       { engines: ['twig'] } #assets_version: SomeVersionScheme
-    default_locale:   "%locale%"
-    session:          ~
+    form: ~
+    csrf_protection: false
+    validation: { enable_annotations: true }
+    templating:  { engines: ['twig'] } #assets_version: SomeVersionScheme
+    default_locale: "%locale%"
+    session: ~
     http_method_override: true
     session:
         handler_id: session.handler.pdo
@@ -80,6 +74,7 @@ swiftmailer:
     password:  %mailer_password%
     spool:     { type: memory }
 
-twig:
-    paths:
-        "%kernel.root_dir%/../../../../Resources/views/Elasticsearch": elasticsearch
+imports:
+    - { resource: parameters_shared.yml }
+    - { resource: parameters.yml }
+    - { resource: security.yml }

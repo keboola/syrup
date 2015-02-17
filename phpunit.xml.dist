@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="true"
+         stopOnError="true"
+         syntaxCheck="true"
+         bootstrap="tests/bootstrap.php">
+    <php>
+        <server name="KERNEL_DIR" value="app/" />
+        <ini name="date.timezone" value="Europe/Prague"/>
+    </php>
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/Keboola/Syrup/Aws</directory>
+            <directory>tests/Keboola/Syrup/Elasticsearch</directory>
+            <directory>tests/Keboola/Syrup/Listener</directory>
+            <directory>tests/Keboola/Syrup/Monolog</directory>
+        </testsuite>
+        <testsuite name="syrup">
+            <directory>tests/Keboola/Syrup/Command</directory>
+            <directory>tests/Keboola/Syrup/Controller</directory>
+            <directory>tests/Keboola/Syrup/Job</directory>
+            <directory>tests/Keboola/Syrup/Service</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <blacklist>
+            <directory>vendor</directory>
+        </blacklist>
+    </filter>
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
+</phpunit>

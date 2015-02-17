@@ -1,7 +1,6 @@
 <?php
 
-use Symfony\Component\ClassLoader\ApcClassLoader;
-use Syrup\CoreBundle\Debug\Debug;
+use Keboola\Syrup\Debug\Debug;
 use Symfony\Component\HttpFoundation\Request;
 
 umask(0002);
@@ -25,7 +24,6 @@ require_once __DIR__.'/../app/AppKernel.php';
 
 $kernel = new AppKernel('prod', false);
 $kernel->loadClassCache();
-//$kernel = new AppCache($kernel);
 $request = Request::createFromGlobals();
 $response = $kernel->handle($request);
 $response->send();
