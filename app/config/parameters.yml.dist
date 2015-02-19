@@ -4,4 +4,4 @@ parameters:
     # Components
     components:
         ex-dummy:
-            class:  Syrup\ComponentBundle\Component\DummyExtractor
+            class:  Keboola\Syrup\Component\DummyExtractor

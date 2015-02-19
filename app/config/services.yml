@@ -76,11 +76,11 @@ services:
 
     syrup.queue_factory:
         class: Keboola\Syrup\Service\Queue\QueueFactory
-        arguments: [@doctrine.dbal.syrup_connection, %queue%]
+        arguments: [@doctrine.dbal.syrup_connection, %queue%, %app_name%]
 
     syrup.job_manager:
         class: Keboola\Syrup\Job\Metadata\JobManager
-        arguments: [@syrup.elasticsearch, %job_manager%, %app_name%]
+        arguments: [@syrup.elasticsearch, %job_manager%, %app_name%, @syrup.encryptor]
 
     syrup.job_executor:
         class: Keboola\Syrup\Job\Executor

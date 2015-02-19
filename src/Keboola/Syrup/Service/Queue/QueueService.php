@@ -16,29 +16,51 @@ class QueueService
      */
     protected $client;
     protected $queueUrl;
+    protected $componentName;
 
-    public function __construct(array $config)
+    public function __construct(array $config, $componentName)
     {
-        $this->client = SqsClient::factory(array(
+        $this->client = SqsClient::factory([
             'key'       => $config['access_key'],
             'secret'    => $config['secret_key'],
             'region'    => $config['region']
-        ));
+        ]);
         $this->queueUrl = $config['url'];
+        $this->componentName = $componentName;
     }
 
     /**
-     * @param     $body
-     * @param int $delay
+     * For backwards compatibility it accepts either ($data, $delay) arguments or ($jobId, $queue, $data, $delay)
+     * @param $job array|int
+     * @param $queue string|int
+     * @param $data
+     * @param $delay
      * @return int $messageId
      */
-    public function enqueue($body, $delay = 0)
+    public function enqueue($job, $queue = null, array $data = [], $delay = 0)
     {
-        $message = $this->client->sendMessage(array(
+        if (is_int($job)) {
+            $job = [
+                'jobId' => $job,
+                'component' => $this->componentName
+            ];
+
+            if (count($data)) {
+                $job = array_merge($job, $data);
+            }
+
+
+        } else {
+            if ($queue && is_int($queue)) {
+                $delay = $queue;
+            }
+        }
+
+        $message = $this->client->sendMessage([
             'QueueUrl' => $this->queueUrl,
-            'MessageBody' => json_encode($body),
+            'MessageBody' => json_encode($job),
             'DelaySeconds' => $delay,
-        ));
+        ]);
         return $message['MessageId'];
     }
 
@@ -48,12 +70,12 @@ class QueueService
      */
     public function receive($messagesCount = 1)
     {
-        $result = $this->client->receiveMessage(array(
+        $result = $this->client->receiveMessage([
             'QueueUrl'          => $this->queueUrl,
             'WaitTimeSeconds'   => 20,
             'VisibilityTimeout' => 3600,
             'MaxNumberOfMessages' => $messagesCount,
-        ));
+        ]);
 
         $queueUrl = $this->queueUrl;
         return array_map(function($message) use ($queueUrl) {
@@ -69,9 +91,9 @@ class QueueService
 
     public function deleteMessage(QueueMessage $message)
     {
-        $this->client->deleteMessage(array(
+        $this->client->deleteMessage([
             'QueueUrl' => $message->getQueueUrl(),
             'ReceiptHandle' => $message->getReceiptHandle(),
-        ));
+        ]);
     }
 }

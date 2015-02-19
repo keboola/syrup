@@ -9,24 +9,44 @@ namespace Keboola\Syrup\Job\Metadata;
 
 use Elasticsearch\Client as ElasticsearchClient;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Keboola\StorageApi\Client;
+use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Exception\ApplicationException;
 
 class JobManager
 {
     const PAGING = 100;
 
-    /** @var ElasticsearchClient */
+    /**
+     * @var ElasticsearchClient
+     */
     protected $client;
 
     protected $config;
 
     protected $componentName;
 
-    public function __construct(ElasticsearchClient $client, array $config, $componentName)
+    /**
+     * @var Encryptor
+     */
+    protected $encryptor;
+
+    /**
+     * @var \Keboola\StorageApi\Client
+     */
+    protected $storageApiClient;
+
+    public function __construct(ElasticsearchClient $client, array $config, $componentName, Encryptor $encryptor)
     {
         $this->client = $client;
         $this->config = $config;
         $this->componentName = $componentName;
+        $this->encryptor = $encryptor;
+    }
+
+    public function setStorageApiClient($client)
+    {
+        $this->storageApiClient = $client;
     }
 
     /**
@@ -101,6 +121,36 @@ class JobManager
         return $nextIndexName;
     }
 
+    public function createJob($command, $params)
+    {
+        if (!$this->storageApiClient) {
+            throw new \Exception('Storage API client must be set');
+        }
+
+        $tokenData = $this->storageApiClient->verifyToken();
+        return new Job([
+            'id' => $this->storageApiClient->generateId(),
+            'runId' => $this->storageApiClient->generateRunId(),
+            'project' => [
+                'id' => $tokenData['owner']['id'],
+                'name' => $tokenData['owner']['name']
+            ],
+            'token' => [
+                'id' => $tokenData['id'],
+                'description' => $tokenData['description'],
+                'token' => $this->encryptor->encrypt($this->storageApiClient->getTokenString())
+            ],
+            'component' => $this->componentName,
+            'command' => $command,
+            'params' => $params,
+            'process' => [
+                'host' => gethostname(),
+                'pid' => getmypid()
+            ],
+            'createdTime' => date('c')
+        ]);
+    }
+
     /**
      * @param JobInterface $job
      * @return string jobId
@@ -109,27 +159,27 @@ class JobManager
     {
         $job->validate();
 
-        $jobData = array(
+        $jobData = [
             'index' => $this->getIndexCurrent(),
             'type'  => 'jobs',
             'id'    => $job->getId(),
             'body'  => $job->getData()
-        );
+        ];
 
         $response = $this->client->index($jobData);
 
         if (!$response['created']) {
             $e = new ApplicationException("Unable to index job");
-            $e->setData(array(
+            $e->setData([
                 'job' => $jobData,
                 'elasticResponse' => $response
-            ));
+            ]);
             throw $e;
         }
 
-        $this->client->indices()->refresh(array(
+        $this->client->indices()->refresh([
             'index' => $this->getIndexCurrent()
-        ));
+        ]);
 
         return $response['_id'];
     }
@@ -142,20 +192,20 @@ class JobManager
     {
         $job->validate();
 
-        $jobData = array(
+        $jobData = [
             'index' => $job->getIndex(),
             'type'  => $job->getType(),
             'id'    => $job->getId(),
-            'body'  => array(
+            'body'  => [
                 'doc'   => $job->getData()
-            )
-        );
+            ]
+        ];
 
         $response = $this->client->update($jobData);
 
-        $this->client->indices()->refresh(array(
+        $this->client->indices()->refresh([
             'index' => $job->getIndex()
-        ));
+        ]);
 
         return $response['_id'];
     }

@@ -16,10 +16,13 @@ class QueueFactory
 
     protected $dbTable;
 
-    public function __construct(Connection $db, $queueParams)
+    protected $componentName;
+
+    public function __construct(Connection $db, $queueParams, $componentName)
     {
         $this->db = $db;
         $this->dbTable = $queueParams['db_table'];
+        $this->componentName = $componentName;
     }
 
     public function get($name)
@@ -31,6 +34,6 @@ class QueueFactory
             throw new ApplicationException('No queue configuration found in DB.');
         }
 
-        return new QueueService($queueConfig);
+        return new QueueService($queueConfig, $this->componentName);
     }
 }

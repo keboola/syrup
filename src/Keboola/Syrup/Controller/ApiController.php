@@ -10,7 +10,6 @@ use Keboola\StorageApi\Client;
 use Keboola\StorageApi\Event as SapiEvent;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Exception\UserException;
-use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobInterface;
 use Keboola\Syrup\Job\Metadata\JobManager;
 use Keboola\Syrup\Service\Queue\QueueService;
@@ -49,8 +48,7 @@ class ApiController extends BaseController
         $this->checkMappingParams($params);
 
         // Create new job
-        /** @var Job $job */
-        $job = $this->createJob('run', $params);
+        $job = $this->getJobManager()->createJob('run', $params);
 
         // Add job to Elasticsearch
         try {
@@ -113,7 +111,9 @@ class ApiController extends BaseController
      */
     protected function getJobManager()
     {
-        return $this->container->get('syrup.job_manager');
+        $jobManager = $this->container->get('syrup.job_manager');
+        $jobManager->setStorageApiClient($this->storageApi);
+        return $jobManager;
     }
 
     /**
@@ -144,35 +144,14 @@ class ApiController extends BaseController
     }
 
     /**
+     * @deprecated
      * @param string $command
      * @param array $params
      * @return JobInterface
      */
     protected function createJob($command, $params)
     {
-        $tokenData = $this->storageApi->verifyToken();
-
-        return new Job([
-            'id'    => (int) $this->storageApi->generateId(),
-            'runId'     => $this->storageApi->getRunId(),
-            'project'   => [
-                'id'        => $tokenData['owner']['id'],
-                'name'      => $tokenData['owner']['name']
-            ],
-            'token'     => [
-                'id'            => $tokenData['id'],
-                'description'   => $tokenData['description'],
-                'token'         => $this->getEncryptor()->encrypt($this->storageApi->getTokenString())
-            ],
-            'component' => $this->componentName,
-            'command'   => $command,
-            'params'    => $params,
-            'process'   => [
-                'host'  => gethostname(),
-                'pid'   => getmypid()
-            ],
-            'createdTime'   => date('c')
-        ]);
+        return $this->getJobManager()->createJob($command, $params);
     }
 
     /**
@@ -184,19 +163,9 @@ class ApiController extends BaseController
      */
     protected function enqueue($jobId, $queueName = 'default', $otherData = [])
     {
-        $data = [
-            'jobId'     => $jobId,
-            'component' => $this->componentName
-        ];
-
-        if (count($otherData)) {
-            $data = array_merge($data, $otherData);
-        }
-
         /** @var QueueService $queue */
         $queue = $this->container->get('syrup.queue_factory')->get($queueName);
-
-        return $queue->enqueue($data);
+        return $queue->enqueue($jobId, $queueName, $otherData);
     }
 
     /** Stuff */
@@ -220,6 +189,9 @@ class ApiController extends BaseController
         $this->storageApi->createEvent($sapiEvent);
     }
 
+    /**
+     * @deprecated
+     */
     public function camelize($value)
     {
         if (!is_string($value)) {

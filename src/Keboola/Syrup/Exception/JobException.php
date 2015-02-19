@@ -3,11 +3,6 @@ namespace Keboola\Syrup\Exception;
 
 use Keboola\Syrup\Job\Metadata\Job;
 
-/***
- * Class JobException
- *
- * @package Syrup\ComponentBundle\Exception
- */
 class JobException extends SyrupComponentException
 {
     /**

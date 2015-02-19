@@ -63,6 +63,7 @@ class CreateJobCommand extends ContainerAwareCommand
         $this->encryptor = $this->getContainer()->get('syrup.encryptor');
 
         $this->jobManager = $this->getContainer()->get('syrup.job_manager');
+        $this->jobManager->setStorageApiClient($this->storageApi);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -71,8 +72,7 @@ class CreateJobCommand extends ContainerAwareCommand
         $params = json_decode($input->getArgument('params'), true);
 
         // Create new job
-        /** @var Job $job */
-        $job = $this->createJob($command, $params);
+        $job = $this->jobManager->createJob($command, $params);
 
         // Add job to Elasticsearch
         $jobId = $this->jobManager->indexJob($job);
@@ -103,46 +103,10 @@ class CreateJobCommand extends ContainerAwareCommand
         return 0;
     }
 
-    protected function createJob($command, $params)
-    {
-        $tokenData = $this->storageApi->verifyToken();
-
-        return new Job([
-            'id'        => $this->storageApi->generateId(),
-            'runId'     => $this->storageApi->generateRunId(),
-            'project'   => [
-                'id'        => $tokenData['owner']['id'],
-                'name'      => $tokenData['owner']['name']
-            ],
-            'token'     => [
-                'id'            => $tokenData['id'],
-                'description'   => $tokenData['description'],
-                'token'         => $this->encryptor->encrypt($this->storageApi->getTokenString())
-            ],
-            'component' => $this->componentName,
-            'command'   => $command,
-            'params'    => $params,
-            'process'   => [
-                'host'  => gethostname(),
-                'pid'   => getmypid()
-            ],
-            'createdTime'   => date('c')
-        ]);
-    }
-
     protected function enqueue($jobId, $queueName = 'default', $otherData = [])
     {
-        $data = [
-            'jobId'     => $jobId,
-            'component' => $this->componentName
-        ];
-
-        if (count($otherData)) {
-            $data = array_merge($data, $otherData);
-        }
-
         /** @var QueueService $queue */
         $queue = $this->getContainer()->get('syrup.queue_factory')->get($queueName);
-        $queue->enqueue($data);
+        return $queue->enqueue($jobId, $queueName, $otherData);
     }
 }

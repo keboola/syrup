@@ -30,8 +30,9 @@ class BaseController extends Controller
 
     public function preExecute(Request $request)
     {
+        $this->componentName = $this->container->getParameter('app_name');
+
         $pathInfo = explode('/', $request->getPathInfo());
-        $this->componentName = $pathInfo[1];
         $actionName = $pathInfo[2];
 
         $this->initLogger();
