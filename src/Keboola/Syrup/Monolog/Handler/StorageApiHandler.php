@@ -33,6 +33,11 @@ class StorageApiHandler extends \Monolog\Handler\AbstractHandler
         }
     }
 
+    public function setStorageApiClient(Client $client)
+    {
+        $this->storageApiClient = $client;
+    }
+
     public function handle(array $record)
     {
         if (!$this->storageApiClient || $record['level'] == Logger::DEBUG) {
