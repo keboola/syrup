@@ -7,6 +7,7 @@
 
 namespace Keboola\Syrup\Monolog\Handler;
 
+use Keboola\StorageApi\Client;
 use Keboola\StorageApi\Event;
 use Monolog\Logger;
 use Keboola\Syrup\Exception\NoRequestException;
