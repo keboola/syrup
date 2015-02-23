@@ -2,12 +2,10 @@
 
 namespace Keboola\Syrup\Monolog\Processor;
 
-use Monolog\Logger;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\ExceptionHandler;
 use Keboola\Syrup\Aws\S3\Uploader;
 use Keboola\Syrup\Exception\SyrupComponentException;
-use Keboola\Syrup\Job\Metadata\JobInterface;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
 
 /**
@@ -59,9 +57,6 @@ class SyslogProcessor
 
     public function processRecord(array $record)
     {
-        if (isset($record['message']) && strlen($record['message'])>1024) {
-            $record['message'] = $this->s3Uploader->uploadString('message', $record['message']);
-        }
         $record['component'] = $this->componentName;
         $record['runId'] = $this->runId;
         $record['pid'] = getmypid();
@@ -130,11 +125,25 @@ EOF;
         }
         if (!count($record['context'])) {
             unset($record['context']);
-        } else {
-            $json = json_encode($record['context']);
-            if (strlen($json) > 1024) {
-                $record['context'] = $this->s3Uploader->uploadString('context', $json, 'text/json');
+        }
+
+
+        $json = json_encode($record);
+        if (strlen($json) > 1024) {
+            $r = [
+                'message' => strlen($record['message']) > 256 ? substr($record['message'], 0, 256) . '...' : $record['message'],
+                'component' => $this->componentName,
+                'runId' => $this->runId,
+                'pid' => getmypid(),
+                'priority' => $record['level_name'],
+                'level_name' => $record['level_name'],
+                'level' => $record['level'],
+                'attachment' => $this->s3Uploader->uploadString('log', $json, 'text/json')
+            ];
+            if (isset($record['token'])) {
+                $r['token'] = $record['token'];
             }
+            $record = $r;
         }
 
         return $record;
