@@ -107,6 +107,6 @@ class CreateJobCommand extends ContainerAwareCommand
     {
         /** @var QueueService $queue */
         $queue = $this->getContainer()->get('syrup.queue_factory')->get($queueName);
-        return $queue->enqueue($jobId, $queueName, $otherData);
+        return $queue->enqueue($jobId, $otherData);
     }
 }

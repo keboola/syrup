@@ -32,12 +32,11 @@ class QueueService
     /**
      * For backwards compatibility it accepts either ($data, $delay) arguments or ($jobId, $queue, $data, $delay)
      * @param $job array|int
-     * @param $queue string|int
-     * @param $data
-     * @param $delay
+     * @param $data array|int
+     * @param $delay int
      * @return int $messageId
      */
-    public function enqueue($job, $queue = null, array $data = [], $delay = 0)
+    public function enqueue($job, $data = [], $delay = 0)
     {
         if (is_int($job)) {
             $job = [
@@ -51,8 +50,8 @@ class QueueService
 
 
         } else {
-            if ($queue && is_int($queue)) {
-                $delay = $queue;
+            if ($data && is_int($data)) {
+                $delay = $data;
             }
         }
 

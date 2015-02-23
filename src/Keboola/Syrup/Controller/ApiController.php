@@ -165,7 +165,7 @@ class ApiController extends BaseController
     {
         /** @var QueueService $queue */
         $queue = $this->container->get('syrup.queue_factory')->get($queueName);
-        return $queue->enqueue($jobId, $queueName, $otherData);
+        return $queue->enqueue($jobId, $otherData);
     }
 
     /** Stuff */
