@@ -105,6 +105,10 @@
                         }
                     }
                 },
+                "params": {
+                    "dynamic": "strict",
+                    "type": "object"
+                },
                 "createdTime": {
                     "format": "dateOptionalTime",
                     "type": "date"
