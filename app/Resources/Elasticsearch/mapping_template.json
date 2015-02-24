@@ -81,7 +81,6 @@
                     "index": "not_analyzed",
                     "type": "string"
                 },
-                "params": {},
                 "result": {
                     "type": "object",
                     "enabled": false
