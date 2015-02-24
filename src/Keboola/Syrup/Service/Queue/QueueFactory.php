@@ -25,7 +25,7 @@ class QueueFactory
         $this->componentName = $componentName;
     }
 
-    public function get($name)
+    public function get($name = 'default')
     {
         $sql = "SELECT access_key, secret_key, region, url FROM {$this->dbTable} WHERE id = '{$name}'";
         $queueConfig = $this->db->query($sql)->fetch();
