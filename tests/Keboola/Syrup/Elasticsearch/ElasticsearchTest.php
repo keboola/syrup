@@ -38,8 +38,5 @@ class ElasticsearchTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('mappings', $mapping);
         $this->assertArrayHasKey('jobs', $mapping['mappings']);
         $this->assertArrayHasKey('properties', $mapping['mappings']['jobs']);
-        $this->assertArrayHasKey('params', $mapping['mappings']['jobs']['properties']);
-        $this->assertArrayHasKey('properties', $mapping['mappings']['jobs']['properties']['params']);
-        $this->assertArrayHasKey('account', $mapping['mappings']['jobs']['properties']['params']['properties']);
     }
 }

@@ -1,0 +1,8 @@
+{
+    "params": {
+        "dynamic": "strict",
+        "properties": {
+            "account": {"type": "string"}
+        }
+    }
+}
