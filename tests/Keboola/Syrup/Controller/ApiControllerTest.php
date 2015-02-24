@@ -116,7 +116,7 @@ class ApiControllerTest extends WebTestCase
             [],
             [],
             ['HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token')],
-            '{"account":"test"}'
+            '{}'
         );
 
         $res = json_decode(static::$client->getResponse()->getContent(), true);
