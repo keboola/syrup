@@ -38,7 +38,11 @@ class QueueService
      */
     public function enqueue($job, $data = [], $delay = 0)
     {
-        if (is_int($job)) {
+        if (is_array($job)) {
+            if ($data && is_int($data)) {
+                $delay = $data;
+            }
+        } else {
             $job = [
                 'jobId' => $job,
                 'component' => $this->componentName
@@ -46,12 +50,6 @@ class QueueService
 
             if (count($data)) {
                 $job = array_merge($job, $data);
-            }
-
-
-        } else {
-            if ($data && is_int($data)) {
-                $delay = $data;
             }
         }
 
