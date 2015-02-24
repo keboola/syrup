@@ -168,13 +168,11 @@ class JobManager
 
         $response = $this->client->index($jobData);
 
-        if (!$response['created']) {
-            $e = new ApplicationException("Unable to index job");
-            $e->setData([
+        if (!isset($response['created'])) {
+            throw new ApplicationException("Unable to index job", null, [
                 'job' => $jobData,
                 'elasticResponse' => $response
             ]);
-            throw $e;
         }
 
         $this->client->indices()->refresh([

@@ -28,10 +28,10 @@ use Keboola\Syrup\Service\Db\Lock;
 
 class JobCommand extends ContainerAwareCommand
 {
-    const STATUS_SUCCESS    = 0;
-    const STATUS_ERROR      = 1;
-    const STATUS_LOCK       = 64;
-    const STATUS_RETRY      = 65;
+    const STATUS_SUCCESS = 0;
+    const STATUS_ERROR = 1;
+    const STATUS_LOCK = 64;
+    const STATUS_RETRY = 65;
 
     /** @var JobManager */
     protected $jobManager;
