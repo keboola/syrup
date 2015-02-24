@@ -154,6 +154,19 @@ class JobManagerTest extends WebTestCase
         $this->assertJob($job, $resJob->getData());
     }
 
+    /**
+     * Test getJob method with removed second parameter $component
+     */
+    public function testGetJobWithComponent()
+    {
+        $job = $this->createJob();
+        $id = self::$jobManager->indexJob($job);
+
+        $resJob = self::$jobManager->getJob($id, 'syrup');
+
+        $this->assertJob($job, $resJob->getData());
+    }
+
     public function testGetJobs()
     {
         $job = $this->createJob();

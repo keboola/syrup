@@ -8,27 +8,39 @@
  */
 namespace Keboola\Syrup\Tests\Job;
 
+use Keboola\Syrup\Job\Metadata\IndexNameResolver;
+
 class IndexNameResolverTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testGetYearFromIndexName()
     {
-        $this->assertEquals(2014, \Keboola\Syrup\Job\Metadata\IndexNameResolver::getYearFromIndexName('prod_syrup_ex-twitter_2014_7'));
+        $this->assertEquals(2014, IndexNameResolver::getYearFromIndexName('prod_syrup_ex-twitter_2014_7'));
     }
 
     public function testGetVersionFromIndexName()
     {
-        $this->assertEquals(7, \Keboola\Syrup\Job\Metadata\IndexNameResolver::getVersionFromIndexName('prod_syrup_ex-twitter_2014_7'));
+        $this->assertEquals(7, IndexNameResolver::getVersionFromIndexName('prod_syrup_ex-twitter_2014_7'));
     }
 
     /**
-     * @param $excpected
+     * @param $expected
      * @param $indices
      * @dataProvider resolutionData
      */
-    public function testLastIndexNameResolution($excpected, $indices)
+    public function testLastIndexNameResolution($expected, $indices)
     {
-        $this->assertEquals($excpected, \Keboola\Syrup\Job\Metadata\IndexNameResolver::getLastIndexName($indices));
+        $this->assertEquals($expected, IndexNameResolver::getLastIndexName($indices));
+    }
+
+    /**
+     * @param $expected
+     * @param $indices
+     * @dataProvider resolutionData
+     */
+    public function testSortIndices($expected, $indices)
+    {
+        $this->assertEquals($expected, array_pop(IndexNameResolver::sortIndices($indices)));
     }
 
     public function resolutionData()
