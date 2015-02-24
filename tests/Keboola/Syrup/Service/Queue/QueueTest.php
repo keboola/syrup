@@ -12,11 +12,11 @@ class QueueTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @covers Keboola\Syrup\Service\Queue\QueueFactory::__construct
-     * @covers Keboola\Syrup\Service\Queue\QueueFactory::get
-     * @covers Keboola\Syrup\Service\Queue\QueueService::enqueue
-     * @covers Keboola\Syrup\Service\Queue\QueueService::receive
-     * @covers Keboola\Syrup\Service\Queue\QueueService::deleteMessage
+     * @covers \Keboola\Syrup\Service\Queue\QueueFactory::__construct
+     * @covers \Keboola\Syrup\Service\Queue\QueueFactory::get
+     * @covers \Keboola\Syrup\Service\Queue\QueueService::enqueue
+     * @covers \Keboola\Syrup\Service\Queue\QueueService::receive
+     * @covers \Keboola\Syrup\Service\Queue\QueueService::deleteMessage
      */
     public function testQueue()
     {
@@ -42,7 +42,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
             } else {
                 $queueNotEmpty = false;
             }
-        } while($queueNotEmpty);
+        } while ($queueNotEmpty);
 
         $jobId = rand(0, 128);
         $messageId = $queueService->enqueue($jobId, ['test' => 'test']);
