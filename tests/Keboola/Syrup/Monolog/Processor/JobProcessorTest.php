@@ -15,9 +15,9 @@ class JobProcessorTest extends TestCase
 {
 
     /**
-     * @covers Keboola\Syrup\Monolog\Processor\JobProcessor::__invoke
-     * @covers Keboola\Syrup\Monolog\Processor\JobProcessor::processRecord
-     * @covers Keboola\Syrup\Monolog\Processor\JobProcessor::setJob
+     * @covers \Keboola\Syrup\Monolog\Processor\JobProcessor::__invoke
+     * @covers \Keboola\Syrup\Monolog\Processor\JobProcessor::processRecord
+     * @covers \Keboola\Syrup\Monolog\Processor\JobProcessor::setJob
      */
     public function testProcessor()
     {

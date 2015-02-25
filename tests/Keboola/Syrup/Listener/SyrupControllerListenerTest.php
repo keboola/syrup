@@ -18,7 +18,7 @@ class SyrupControllerListenerTest extends WebTestCase
 {
 
     /**
-     * @covers Keboola\Syrup\Listener\SyrupControllerListener::onKernelController
+     * @covers \Keboola\Syrup\Listener\SyrupControllerListener::onKernelController
      */
     public function testListener()
     {

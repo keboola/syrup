@@ -17,8 +17,8 @@ class SyslogProcessorTest extends TestCase
 {
 
     /**
-     * @covers Keboola\Syrup\Monolog\Processor\SyslogProcessor::__invoke
-     * @covers Keboola\Syrup\Monolog\Processor\SyslogProcessor::processRecord
+     * @covers \Keboola\Syrup\Monolog\Processor\SyslogProcessor::__invoke
+     * @covers \Keboola\Syrup\Monolog\Processor\SyslogProcessor::processRecord
      */
     public function testProcessor()
     {

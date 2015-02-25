@@ -13,9 +13,9 @@ class UploaderTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @covers Keboola\Syrup\Aws\S3\Uploader::getClient
-     * @covers Keboola\Syrup\Aws\S3\Uploader::uploadString
-     * @covers Keboola\Syrup\Aws\S3\Uploader::uploadFile
+     * @covers \Keboola\Syrup\Aws\S3\Uploader::getClient
+     * @covers \Keboola\Syrup\Aws\S3\Uploader::uploadString
+     * @covers \Keboola\Syrup\Aws\S3\Uploader::uploadFile
      */
     public function testS3Uploader()
     {

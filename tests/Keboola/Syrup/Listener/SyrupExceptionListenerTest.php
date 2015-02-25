@@ -53,7 +53,7 @@ class SyrupExceptionListenerTest extends KernelTestCase
     }
 
     /**
-     * @covers Keboola\Syrup\Listener\SyrupExceptionListener::onConsoleException
+     * @covers \Keboola\Syrup\Listener\SyrupExceptionListener::onConsoleException
      */
     public function testConsoleException()
     {
@@ -102,7 +102,7 @@ class SyrupExceptionListenerTest extends KernelTestCase
     }
 
     /**
-     * @covers Keboola\Syrup\Listener\SyrupExceptionListener::onKernelException
+     * @covers \Keboola\Syrup\Listener\SyrupExceptionListener::onKernelException
      */
     public function testKernelException()
     {
