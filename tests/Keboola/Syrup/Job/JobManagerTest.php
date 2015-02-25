@@ -104,42 +104,34 @@ class JobManagerTest extends WebTestCase
     public function testIndexJob()
     {
         $job = $this->createJob();
-        $id = self::$jobManager->indexJob($job);
+        $job = self::$jobManager->indexJob($job);
 
         $res = self::$elasticClient->get(array(
             'index' => self::$jobManager->getIndexCurrent(),
-            'type'  => 'jobs',
-            'id'    => $id
+            'type' => 'jobs',
+            'id' => $job->getId()
         ));
 
-        $resJob = $res['_source'];
+        $this->assertEquals($job->getVersion(), $res['_version']);
 
+        $resJob = $res['_source'];
         $this->assertJob($job, $resJob);
     }
 
     public function testUpdateJob()
     {
         $newJob = $this->createJob();
+        $newJob = self::$jobManager->indexJob($newJob);
 
-        $id = self::$jobManager->indexJob($newJob);
-
-
-        $job = self::$jobManager->getJob($id);
-
+        $job = $newJob;
         $job->setStatus(Job::STATUS_CANCELLED);
+        $job = self::$jobManager->updateJob($job);
 
-        self::$jobManager->updateJob($job);
-
-        $job = self::$jobManager->getJob($id);
-
+        $this->assertEquals($newJob->getVersion()+1, $job->getVersion());
         $this->assertEquals($job->getStatus(), Job::STATUS_CANCELLED);
 
-
         $job->setStatus(Job::STATUS_WARNING);
-
-        self::$jobManager->updateJob($job);
-
-        $job = self::$jobManager->getJob($id);
+        $job = self::$jobManager->updateJob($job);
 
         $this->assertEquals($job->getStatus(), Job::STATUS_WARNING);
     }
@@ -147,9 +139,9 @@ class JobManagerTest extends WebTestCase
     public function testGetJob()
     {
         $job = $this->createJob();
-        $id = self::$jobManager->indexJob($job);
+        $jobId = self::$jobManager->indexJob($job)->getId();
 
-        $resJob = self::$jobManager->getJob($id);
+        $resJob = self::$jobManager->getJob($jobId);
 
         $this->assertJob($job, $resJob->getData());
     }
@@ -160,9 +152,9 @@ class JobManagerTest extends WebTestCase
     public function testGetJobWithComponent()
     {
         $job = $this->createJob();
-        $id = self::$jobManager->indexJob($job);
+        $id = self::$jobManager->indexJob($job)->getId();
 
-        $resJob = self::$jobManager->getJob($id, 'syrup');
+        $resJob = self::$jobManager->getJob($id, SYRUP_APP_NAME);
 
         $this->assertJob($job, $resJob->getData());
     }

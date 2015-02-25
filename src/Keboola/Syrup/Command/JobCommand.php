@@ -142,7 +142,7 @@ class JobCommand extends ContainerAwareCommand
             'pid'   => getmypid()
         ]);
 
-        $this->jobManager->updateJob($this->job);
+        $this->job = $this->jobManager->updateJob($this->job);
 
         // Instantiate jobExecutor based on component name
         $jobExecutorName = str_replace('-', '_', $this->job->getComponent()) . '.job_executor';
@@ -201,7 +201,7 @@ class JobCommand extends ContainerAwareCommand
             ];
             $this->job->setStatus($jobStatus);
             $this->job->setResult($jobResult);
-            $this->jobManager->updateJob($this->job);
+            $this->job = $this->jobManager->updateJob($this->job);
 
             // try to log the exception
             $exceptionId = $this->logException('critical', $e);
@@ -220,7 +220,7 @@ class JobCommand extends ContainerAwareCommand
         $this->job->setResult($jobResult);
         $this->job->setEndTime(date('c', $endTime));
         $this->job->setDurationSeconds($duration);
-        $this->jobManager->updateJob($this->job);
+        $this->job = $this->jobManager->updateJob($this->job);
 
         // postExecution action
         try {

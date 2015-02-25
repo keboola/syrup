@@ -23,36 +23,38 @@ class Job implements JobInterface
 
     protected $type;
 
+    protected $version;
+
     protected $data = [
-        'id'        => null,
-        'runId'     => null,
-        'lockName'  => null,
-        'project'   => [
-            'id'        => null,
-            'name'      => null
+        'id' => null,
+        'runId' => null,
+        'lockName' => null,
+        'project' => [
+            'id' => null,
+            'name' => null
         ],
-        'token'     => [
-            'id'            => null,
-            'description'   => null,
-            'token'         => null
+        'token' => [
+            'id' => null,
+            'description' => null,
+            'token' => null
         ],
         'component' => null,
-        'command'   => null,
-        'params'    => [],
-        'result'    => [],
-        'status'    => null,
-        'process'   => [
-            'host'      => null,
-            'pid'       => null
+        'command' => null,
+        'params' => [],
+        'result' => [],
+        'status' => null,
+        'process' => [
+            'host' => null,
+            'pid' => null
         ],
-        'createdTime'   => null,
-        'startTime'     => null,
-        'endTime'       => null,
-        'durationSeconds'   => null,
-        'waitSeconds'       => null
+        'createdTime' => null,
+        'startTime' => null,
+        'endTime' => null,
+        'durationSeconds' => null,
+        'waitSeconds' => null
     ];
 
-    public function __construct(array $data = [], $index = null, $type = null)
+    public function __construct(array $data = [], $index = null, $type = null, $version = null)
     {
         $this->data['status'] = self::STATUS_WAITING;
         $this->data = array_merge($this->data, $data);
@@ -66,6 +68,7 @@ class Job implements JobInterface
 
         $this->index = $index;
         $this->type = $type;
+        $this->version = $version;
     }
 
     public function getIndex()
@@ -76,6 +79,11 @@ class Job implements JobInterface
     public function getType()
     {
         return $this->type;
+    }
+
+    public function getVersion()
+    {
+        return $this->version;
     }
 
     public function getId()

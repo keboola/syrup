@@ -75,9 +75,9 @@ class CreateJobCommand extends ContainerAwareCommand
         $job = $this->jobManager->createJob($command, $params);
 
         // Add job to Elasticsearch
-        $jobId = $this->jobManager->indexJob($job);
+        $job = $this->jobManager->indexJob($job);
 
-        $output->writeln('Created job id ' . $jobId);
+        $output->writeln('Created job id ' . $job->getId());
 
         // Run Job
         if (!$input->getOption('no-run')) {
@@ -86,7 +86,7 @@ class CreateJobCommand extends ContainerAwareCommand
             $returnCode = $runJobCommand->run(
                 new ArrayInput([
                     'command'   => 'syrup:run-job',
-                    'jobId'     => $jobId
+                    'jobId'     => $job->getId()
                 ]),
                 $output
             );
