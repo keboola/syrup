@@ -162,7 +162,7 @@ class JobManagerTest extends WebTestCase
         $job = $this->createJob();
         $id = self::$jobManager->indexJob($job);
 
-        $resJob = self::$jobManager->getJob($id, 'syrup');
+        $resJob = self::$jobManager->getJob($id, SYRUP_APP_NAME);
 
         $this->assertJob($job, $resJob->getData());
     }

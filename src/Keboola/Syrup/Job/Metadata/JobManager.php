@@ -205,7 +205,7 @@ class JobManager
      * @param $jobId
      * @return Job|null
      */
-    public function getJob($jobId)
+    public function getJob($jobId, $component = null)
     {
         foreach ($this->getIndices() as $index) {
             try {
@@ -327,9 +327,12 @@ class JobManager
         return $results;
     }
 
-    public function getIndex()
+    public function getIndex($component = null)
     {
-        return $this->config['index_prefix'] . '_syrup_' . $this->componentName;
+        if ($component == null) {
+            $component = $this->componentName;
+        }
+        return $this->config['index_prefix'] . '_syrup_' . $component;
     }
 
     public function getIndexCurrent()
@@ -352,11 +355,11 @@ class JobManager
         return null;
     }
 
-    protected function getIndices()
+    protected function getIndices($component = null)
     {
         try {
             return array_keys($this->client->indices()->getAlias([
-                'name'  => $this->getIndex()
+                'name'  => $this->getIndex($component)
             ]));
         } catch (Missing404Exception $e) {
             return null;
