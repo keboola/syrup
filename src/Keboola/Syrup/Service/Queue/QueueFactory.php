@@ -37,4 +37,21 @@ class QueueFactory
 
         return new QueueService($queueConfig, $this->componentName);
     }
+
+    public function create($sqsName)
+    {
+        $client = SqsClient::factory([
+            'region' => 'us-east-1'
+        ]);
+
+        $result = $client->createQueue([
+            'QueueName'  => $sqsName,
+            'Attributes' => [
+                'DelaySeconds'       => 5,
+                'MaximumMessageSize' => 4096
+            ]
+        ]);
+
+        return $result->getAll();
+    }
 }

@@ -6,6 +6,7 @@
  */
 namespace Keboola\Syrup\Tests\Command;
 
+use Keboola\StorageApi\Client as StorageApiClient;
 use Keboola\Syrup\Test\Job\Executor\ErrorExecutor;
 use Keboola\Syrup\Test\Job\Executor\HookExecutor;
 use Keboola\Syrup\Test\Job\Executor\SuccessExecutor;
@@ -20,10 +21,13 @@ use Keboola\Syrup\Tests\Job as TestExecutor;
 
 class JobCommandTest extends WebTestCase
 {
-    /**
-     * @var Application
-     */
+    /** @var Application */
     protected $application;
+
+    /** @var StorageApiClient */
+    protected $storageApiClient;
+
+    protected $storageApiToken;
 
     protected function setUp()
     {
@@ -31,14 +35,19 @@ class JobCommandTest extends WebTestCase
 
         $this->application = new Application(self::$kernel);
         $this->application->add(new JobCommand());
+
+        $this->storageApiToken = self::$kernel->getContainer()->getParameter('storage_api.test.token');
+        $this->storageApiClient = new StorageApiClient([
+            'token' => $this->storageApiToken,
+            'url' => self::$kernel->getContainer()->getParameter('storage_api.test.url')
+        ]);
     }
 
     public function testRunjob()
     {
         /** @var JobManager $jobManager */
         $jobManager = self::$kernel->getContainer()->get('syrup.job_manager');
-        $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')
-            ->encrypt(self::$kernel->getContainer()->getParameter('storage_api.test.token'));
+        $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')->encrypt($this->storageApiToken);
 
         // job execution test
         $job = $jobManager->indexJob($this->createJob($encryptedToken));
@@ -153,8 +162,8 @@ class JobCommandTest extends WebTestCase
     protected function createJob($token)
     {
         return new Job([
-            'id' => rand(0, 128),
-            'runId' => rand(0, 128),
+            'id' => $this->storageApiClient->generateId(),
+            'runId' => $this->storageApiClient->generateRunId(),
             'project' => [
                 'id' => '123',
                 'name' => 'Syrup TEST'
