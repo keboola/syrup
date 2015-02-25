@@ -41,38 +41,38 @@ class JobCommandTest extends WebTestCase
             ->encrypt(self::$kernel->getContainer()->getParameter('storage_api.test.token'));
 
         // job execution test
-        $jobId = $jobManager->indexJob($this->createJob($encryptedToken));
+        $job = $jobManager->indexJob($this->createJob($encryptedToken));
 
         $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute(
             array(
-                'jobId'   => $jobId
+                'jobId' => $job->getId()
             )
         );
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
-        $job = $jobManager->getJob($jobId);
+        $job = $jobManager->getJob($job->getId());
         $this->assertNotNull($job);
         $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
 
         // replace executor with warning executor
         self::$kernel->getContainer()->set('syrup.job_executor', new WarningExecutor());
 
-        $jobId = $jobManager->indexJob($this->createJob($encryptedToken));
+        $job = $jobManager->indexJob($this->createJob($encryptedToken));
 
         $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute(
             array(
-                'jobId'   => $jobId
+                'jobId'   => $job->getId()
             )
         );
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
-        $job = $jobManager->getJob($jobId);
+        $job = $jobManager->getJob($job->getId());
         $this->assertNotNull($job);
         $this->assertArrayHasKey('testing', $job->getResult());
         $this->assertEquals($job->getStatus(), Job::STATUS_WARNING);
@@ -80,19 +80,19 @@ class JobCommandTest extends WebTestCase
         // replace executor with success executor
         self::$kernel->getContainer()->set('syrup.job_executor', new SuccessExecutor());
 
-        $jobId = $jobManager->indexJob($this->createJob($encryptedToken));
+        $job = $jobManager->indexJob($this->createJob($encryptedToken));
 
         $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute(
             array(
-                'jobId'   => $jobId
+                'jobId'   => $job->getId()
             )
         );
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
-        $job = $jobManager->getJob($jobId);
+        $job = $jobManager->getJob($job->getId());
         $this->assertNotNull($job);
         $this->assertArrayHasKey('testing', $job->getResult());
         $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
@@ -100,19 +100,19 @@ class JobCommandTest extends WebTestCase
         // replace executor with error executor
         self::$kernel->getContainer()->set('syrup.job_executor', new ErrorExecutor());
 
-        $jobId = $jobManager->indexJob($this->createJob($encryptedToken));
+        $job = $jobManager->indexJob($this->createJob($encryptedToken));
 
         $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute(
             array(
-                'jobId'   => $jobId
+                'jobId'   => $job->getId()
             )
         );
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
-        $job = $jobManager->getJob($jobId);
+        $job = $jobManager->getJob($job->getId());
         $this->assertNotNull($job);
         $this->assertArrayHasKey('testing', $job->getResult());
         $this->assertEquals($job->getStatus(), Job::STATUS_ERROR);
@@ -128,19 +128,19 @@ class JobCommandTest extends WebTestCase
         self::$kernel->getContainer()->set('syrup.job_executor', new HookExecutor($jobManager));
 
         // job execution test
-        $jobId = $jobManager->indexJob($this->createJob($encryptedToken));
+        $job = $jobManager->indexJob($this->createJob($encryptedToken));
 
         $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute(
             array(
-                'jobId'   => $jobId
+                'jobId'   => $job->getId()
             )
         );
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
-        $job = $jobManager->getJob($jobId);
+        $job = $jobManager->getJob($job->getId());
 
         $result = $job->getResult();
 

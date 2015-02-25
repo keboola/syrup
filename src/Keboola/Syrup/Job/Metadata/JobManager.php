@@ -154,7 +154,8 @@ class JobManager
 
     /**
      * @param JobInterface $job
-     * @return string jobId
+     * @return Job $job
+     * @throws ApplicationException
      */
     public function indexJob(JobInterface $job)
     {
@@ -176,12 +177,27 @@ class JobManager
             ]);
         }
 
-        return $response['_id'];
+        $i = 0;
+        while ($i < 5) {
+            $resJob = $this->getJob($job->getId(), $job->getComponent());
+            if ($resJob != null) {
+                $job = $resJob;
+                return $job;
+            }
+
+            sleep(1 + pow($i, 2)/2);
+        }
+
+        throw new ApplicationException("Unable to retrieve new job", null, [
+            'job' => $job->getData(),
+            'elasticResponse' => $response
+        ]);
     }
 
     /**
      * @param JobInterface $job
-     * @return string jobId
+     * @return Job $job
+     * @throws ApplicationException
      */
     public function updateJob(JobInterface $job)
     {
@@ -189,46 +205,66 @@ class JobManager
 
         $jobData = [
             'index' => $job->getIndex(),
-            'type'  => $job->getType(),
-            'id'    => $job->getId(),
-            'body'  => [
-                'doc'   => $job->getData()
+            'type' => $job->getType(),
+            'id' => $job->getId(),
+            'version' => $job->getVersion(),
+            'body' => [
+                'doc' => $job->getData()
             ]
         ];
 
         $response = $this->client->update($jobData);
 
-        return $response['_id'];
-    }
+        $i = 0;
+        while ($i < 5) {
+            $resJob = $this->getJob($job->getId(), $job->getComponent());
 
-    /**
-     * @param $jobId
-     * @return Job|null
-     */
-    public function getJob($jobId, $component = null)
-    {
-        foreach ($this->getIndices() as $index) {
-            try {
-                $result = $this->client->get([
-                    'id' => $jobId,
-                    'index' => $index,
-                    'type' => 'jobs'
-                ]);
-
-                return new Job(
-                    $result['_source'],
-                    $result['_index'],
-                    $result['_type']
-                );
-
-            } catch (ClientErrorResponseException $e) {
-                // job not found in index, try next one
-                if ($e->getResponse()->getStatusCode() != 404) {
-                    throw $e;
-                }
+            if ($resJob != null && $resJob->getVersion() == $response['_version']) {
+                $job = $resJob;
+                return $job;
             }
+
+            sleep(1 + pow($i, 2)/2);
         }
 
+        throw new ApplicationException("Unable to retrieve latest version of job after update", null, [
+            'job' => $job->getData(),
+            'elasticResponse' => $response
+        ]);
+    }
+
+    public function getJob($jobId, $component = null)
+    {
+        $params = [];
+        $params['index'] = $this->config['index_prefix'] . '_syrup*';
+
+        if (!is_null($component)) {
+            $params['index'] = $this->config['index_prefix'] . '_syrup_' . $component . '*';
+        }
+
+        $params['body'] = [
+            'version' => true,
+            'size'  => 1,
+            'query' => [
+                'match_all' => []
+            ],
+            'filter' => [
+                'ids' => [
+                    'values' => [$jobId]
+                ]
+            ]
+        ];
+
+        $result = $this->client->search($params);
+
+        if ($result['hits']['total'] > 0) {
+            return new Job(
+                $result['hits']['hits'][0]['_source'],
+                $result['hits']['hits'][0]['_index'],
+                $result['hits']['hits'][0]['_type'],
+                $result['hits']['hits'][0]['_version']
+            );
+        }
         return null;
     }
 
@@ -335,9 +371,9 @@ class JobManager
         return $this->config['index_prefix'] . '_syrup_' . $component;
     }
 
-    public function getIndexCurrent()
+    public function getIndexCurrent($component = null)
     {
-        return $this->getIndex() . '_current' ;
+        return $this->getIndex($component) . '_current' ;
     }
 
     public function getIndexPrefix()
@@ -345,9 +381,9 @@ class JobManager
         return $this->config['index_prefix'];
     }
 
-    protected function getLastIndex()
+    protected function getLastIndex($component = null)
     {
-        $indices = $this->getIndices();
+        $indices = $this->getIndices($component);
 
         if (null != $indices) {
             return IndexNameResolver::getLastIndexName($indices);
