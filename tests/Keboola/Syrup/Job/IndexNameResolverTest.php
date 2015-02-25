@@ -33,14 +33,28 @@ class IndexNameResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, IndexNameResolver::getLastIndexName($indices));
     }
 
-    /**
-     * @param $expected
-     * @param $indices
-     * @dataProvider resolutionData
-     */
-    public function testSortIndices($expected, $indices)
+    public function testSortIndices()
     {
-        $this->assertEquals($expected, array_pop(IndexNameResolver::sortIndices($indices)));
+        $testData = [
+            'syrup_prod_2014_2',
+            'syrup_prod_2014_3',
+            'syrup_prod_2014_1',
+            'syrup_prod_2014_10',
+            'syrup_prod_2014_6',
+            'syrup_prod_2014_4'
+        ];
+
+        $expected = [
+            'syrup_prod_2014_1',
+            'syrup_prod_2014_2',
+            'syrup_prod_2014_3',
+            'syrup_prod_2014_4',
+            'syrup_prod_2014_6',
+            'syrup_prod_2014_10'
+
+        ];
+
+        $this->assertEquals($expected, IndexNameResolver::sortIndices($testData));
     }
 
     public function resolutionData()
