@@ -7,29 +7,11 @@
 
 namespace Keboola\Syrup\Tests\Elasticsearch;
 
-use Keboola\StorageApi\Client;
-use Keboola\StorageApi\ClientException;
-use Monolog\Handler\TestHandler;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Keboola\Syrup\Aws\S3\Uploader;
-use Keboola\Syrup\Command\JobCommand;
-use Keboola\Syrup\Exception\UserException;
-use Keboola\Syrup\Listener\SyrupExceptionListener;
-use Keboola\Syrup\Monolog\Formatter\JsonFormatter;
-use Keboola\Syrup\Monolog\Processor\SyslogProcessor;
-use Keboola\Syrup\Service\StorageApi\StorageApiService;
-
 class ElasticsearchTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @covers Keboola\Syrup\Elasticsearch\Elasticsearch::getMapping
+     * @covers \Keboola\Syrup\Elasticsearch\Elasticsearch::getMapping
      */
     public function testElasticsearchMapping()
     {

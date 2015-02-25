@@ -14,6 +14,9 @@ use Keboola\Syrup\Service\StorageApi\StorageApiService;
 
 class StorageApiServiceTest extends WebTestCase
 {
+    /**
+     * @covers \Keboola\Syrup\Service\StorageApi\StorageApiService::getClient
+     */
     public function testStorageApiService()
     {
         $client = static::createClient();
