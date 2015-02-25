@@ -7,6 +7,7 @@
 
 namespace Keboola\Syrup\Service\Queue;
 
+use Aws\Sqs\SqsClient;
 use Doctrine\DBAL\Connection;
 use Keboola\Syrup\Exception\ApplicationException;
 

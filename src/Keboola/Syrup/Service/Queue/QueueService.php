@@ -8,6 +8,7 @@
 namespace Keboola\Syrup\Service\Queue;
 
 use Aws\Sqs\SqsClient;
+use Keboola\Syrup\Exception\ApplicationException;
 
 class QueueService
 {
@@ -75,10 +76,25 @@ class QueueService
         ]);
 
         $queueUrl = $this->queueUrl;
+
         return array_map(function($message) use ($queueUrl) {
+
+            $body = json_decode($message['Body']);
+
+            if (!is_object($body)) {
+                $this->client->deleteMessage([
+                    'QueueUrl' => $queueUrl,
+                    'ReceiptHandle' => $message['ReceiptHandle'],
+                ]);
+
+                throw new ApplicationException("Corrupted message {$message['MessageId']} received. Message was deleted from SQS.", null, [
+                    'message' => $message
+                ]);
+            }
+
             return new QueueMessage(
                 $message['MessageId'],
-                json_decode($message['Body']),
+                $body,
                 $message['ReceiptHandle'],
                 $queueUrl
             );

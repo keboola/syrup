@@ -21,23 +21,8 @@ class IndexNameResolver
      */
     public static function getLastIndexName(array $indexNames)
     {
-        usort($indexNames, function($a, $b) {
-            $aYear = self::getYearFromIndexName($a);
-            $bYear = self::getYearFromIndexName($b);
-
-            if ($aYear == $bYear) {
-                $aVersion = self::getVersionFromIndexName($a);
-                $bVersion = self::getVersionFromIndexName($b);
-
-                if ($aVersion == $bVersion) {
-                    return 0;
-                }
-                return ($aVersion < $bVersion) ? -1 : 1;
-            }
-
-            return ($aYear < $bYear) ? -1 : 1;
-        });
-        return array_pop($indexNames);
+        $indices = self::sortIndices($indexNames);
+        return array_pop($indices);
     }
 
     public static function getVersionFromIndexName($indexName)
@@ -60,5 +45,26 @@ class IndexNameResolver
         if (count($parts) < 3) {
             throw new \Exception("Invalid index name: $indexName");
         }
+    }
+
+    public static function sortIndices(array $indexNames)
+    {
+        usort($indexNames, function($a, $b) {
+            $aYear = self::getYearFromIndexName($a);
+            $bYear = self::getYearFromIndexName($b);
+
+            if ($aYear == $bYear) {
+                $aVersion = self::getVersionFromIndexName($a);
+                $bVersion = self::getVersionFromIndexName($b);
+
+                if ($aVersion == $bVersion) {
+                    return 0;
+                }
+                return ($aVersion < $bVersion) ? -1 : 1;
+            }
+
+            return ($aYear < $bYear) ? -1 : 1;
+        });
+        return $indexNames;
     }
 }
