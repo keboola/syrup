@@ -8,7 +8,6 @@
 namespace Keboola\Syrup\Job\Metadata;
 
 use Keboola\Syrup\Exception\ApplicationException;
-use Keboola\Syrup\Exception\UserException;
 
 class Job implements JobInterface
 {

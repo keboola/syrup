@@ -7,12 +7,11 @@
 
 namespace Keboola\Syrup\Command;
 
-use Keboola\Syrup\Elasticsearch\Elasticsearch;
+use Keboola\Syrup\Elasticsearch\Index;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Keboola\Syrup\Job\Metadata\JobManager;
 
 class CreateIndexCommand extends ContainerAwareCommand
 {
@@ -30,27 +29,27 @@ class CreateIndexCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $settings = null;
-        $mappings = null;
+        $mapping = null;
 
         if (!$input->getOption('no-mapping')) {
-            $mapping = Elasticsearch::getMapping($this->getContainer()->get('kernel')->getRootDir());
+            $mapping = Index::buildMapping($this->getContainer()->get('kernel')->getRootDir());
 
             $settings = $mapping['settings'];
-            $mappings = $mapping['mappings'];
+            $mapping = $mapping['mappings'];
         }
 
-        /** @var JobManager $jobManager */
-        $jobManager = $this->getContainer()->get('syrup.job_manager');
+        /** @var Index $index */
+        $index = $this->getContainer()->get('syrup.elasticsearch.index');
 
         // try put mapping first
         try {
-            $indexName = $jobManager->putMappings($mappings);
+            $indexName = $index->putMapping($mapping);
             echo "Mapping $indexName updated successfuly" . PHP_EOL;
         } catch (\Exception $e) {
             echo "Can't updated mapping: " . $e->getMessage() . PHP_EOL;
 
-            $index = $jobManager->createIndex($settings, $mappings);
-            echo "Created new index '" . $index ."'" . PHP_EOL;
+            $indexName = $index->createIndex($settings, $mapping);
+            echo "Created new index '" . $indexName ."'" . PHP_EOL;
         }
 
     }

@@ -4,19 +4,21 @@
  * Date: 11/06/14
  * Time: 16:36
  */
-namespace Keboola\Syrup\Tests\Job;
+namespace Keboola\Syrup\Tests\Elasticsearch;
 
 use Elasticsearch\Client as ElasticClient;
 use Keboola\Encryption\EncryptorInterface;
 use Keboola\StorageApi\Client as SapiClient;
+use Keboola\Syrup\Elasticsearch\Index;
+use Keboola\Syrup\Elasticsearch\Search;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Keboola\Syrup\Job\Metadata\Job;
-use Keboola\Syrup\Job\Metadata\JobManager;
+use Keboola\Syrup\Elasticsearch\Job as ElasticsearchJob;
 
-class JobManagerTest extends WebTestCase
+class SearchTest extends WebTestCase
 {
-    /** @var JobManager */
-    protected static $jobManager;
+    /** @var Search */
+    protected static $search;
 
     /** @var SapiClient */
     protected static $sapiClient;
@@ -26,15 +28,21 @@ class JobManagerTest extends WebTestCase
 
     /** @var ElasticClient */
     protected static $elasticClient;
+    /** @var Index */
+    protected static $index;
+    /** @var ElasticsearchJob */
+    protected static $esJob;
 
     public static function setUpBeforeClass()
     {
         self::$kernel = static::createKernel();
         self::$kernel->boot();
 
-        self::$elasticClient = self::$kernel->getContainer()->get('syrup.elasticsearch');
+        self::$elasticClient = self::$kernel->getContainer()->get('syrup.elasticsearch.client');
 
-        self::$jobManager = self::$kernel->getContainer()->get('syrup.job_manager');
+        self::$search = self::$kernel->getContainer()->get('syrup.elasticsearch.search');
+        self::$index = self::$kernel->getContainer()->get('syrup.elasticsearch.index');
+        self::$esJob = self::$kernel->getContainer()->get('syrup.elasticsearch.job');
 
         self::$sapiClient = new SapiClient([
             'token' => self::$kernel->getContainer()->getParameter('storage_api.test.token'),
@@ -48,7 +56,7 @@ class JobManagerTest extends WebTestCase
         $sapiData = self::$sapiClient->getLogData();
         $projectId = $sapiData['owner']['id'];
 
-        $jobs = self::$jobManager->getJobs($projectId, SYRUP_APP_NAME);
+        $jobs = self::$search->getJobs($projectId, SYRUP_APP_NAME);
         foreach ($jobs as $job) {
             self::$elasticClient->delete([
                 'index' => $job['_index'],
@@ -101,55 +109,12 @@ class JobManagerTest extends WebTestCase
         $this->assertEquals($job->getStatus(), $resJob['status']);
     }
 
-    public function testIndexJob()
-    {
-        $job = $this->createJob();
-        $id = self::$jobManager->indexJob($job);
-
-        $res = self::$elasticClient->get(array(
-            'index' => self::$jobManager->getIndexCurrent(),
-            'type'  => 'jobs',
-            'id'    => $id
-        ));
-
-        $resJob = $res['_source'];
-
-        $this->assertJob($job, $resJob);
-    }
-
-    public function testUpdateJob()
-    {
-        $newJob = $this->createJob();
-
-        $id = self::$jobManager->indexJob($newJob);
-
-
-        $job = self::$jobManager->getJob($id);
-
-        $job->setStatus(Job::STATUS_CANCELLED);
-
-        self::$jobManager->updateJob($job);
-
-        $job = self::$jobManager->getJob($id);
-
-        $this->assertEquals($job->getStatus(), Job::STATUS_CANCELLED);
-
-
-        $job->setStatus(Job::STATUS_WARNING);
-
-        self::$jobManager->updateJob($job);
-
-        $job = self::$jobManager->getJob($id);
-
-        $this->assertEquals($job->getStatus(), Job::STATUS_WARNING);
-    }
-
     public function testGetJob()
     {
         $job = $this->createJob();
-        $id = self::$jobManager->indexJob($job);
+        $id = self::$esJob->create($job);
 
-        $resJob = self::$jobManager->getJob($id);
+        $resJob = self::$search->getJob($id);
 
         $this->assertJob($job, $resJob->getData());
     }
@@ -157,10 +122,10 @@ class JobManagerTest extends WebTestCase
     public function testGetJobs()
     {
         $job = $this->createJob();
-        self::$jobManager->indexJob($job);
+        self::$esJob->create($job);
 
         $job2 = $this->createJob();
-        self::$jobManager->indexJob($job2);
+        self::$esJob->create($job2);
 
         $retries = 0;
 
@@ -172,7 +137,7 @@ class JobManagerTest extends WebTestCase
 
             $projectId = $job->getProject()['id'];
 
-            $res = self::$jobManager->getJobs($projectId, SYRUP_APP_NAME, null, null, '-1 day', 'now');
+            $res = self::$search->getJobs($projectId, SYRUP_APP_NAME, null, null, '-1 day', 'now');
 
             if (count($res) >= 2) {
                 break;

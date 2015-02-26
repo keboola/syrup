@@ -1,10 +1,9 @@
 <?php
 namespace Keboola\Syrup\Test\Job\Executor;
 
-use Keboola\Syrup\Exception\JobException;
+use Keboola\Syrup\Elasticsearch\Job as ElasticsearchJob;
 use Keboola\Syrup\Job\HookExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
-use Keboola\Syrup\Job\Metadata\JobManager;
 
 class HookExecutor extends \Keboola\Syrup\Job\Executor implements HookExecutorInterface
 {
@@ -17,16 +16,13 @@ class HookExecutor extends \Keboola\Syrup\Job\Executor implements HookExecutorIn
     private $job;
 
     /**
-     * @var JobManager
+     * @var ElasticsearchJob
      */
-    private $jobManager;
+    private $elasticsearchJob;
 
-    /**
-     * @param JobManager $jobManager
-     */
-    public function __construct(JobManager $jobManager)
+    public function __construct(ElasticsearchJob $elasticsearchJob)
     {
-        $this->jobManager = $jobManager;
+        $this->elasticsearchJob = $elasticsearchJob;
     }
 
     /**
@@ -39,7 +35,7 @@ class HookExecutor extends \Keboola\Syrup\Job\Executor implements HookExecutorIn
 
         $this->job = $job;
 
-        return array('testing' => 'HookExecutor');
+        return ['testing' => 'HookExecutor'];
     }
 
     /**
@@ -60,6 +56,6 @@ class HookExecutor extends \Keboola\Syrup\Job\Executor implements HookExecutorIn
 
         $job->setResult($job->getResult() + array(self::HOOK_RESULT_KEY => self::HOOK_RESULT_VALUE));
 
-        $this->jobManager->updateJob($job);
+        $this->elasticsearchJob->update($job);
     }
 }

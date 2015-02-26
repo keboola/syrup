@@ -3,7 +3,9 @@
 namespace Keboola\Syrup\Controller;
 
 use Keboola\Encryption\EncryptorInterface;
-use Keboola\Syrup\Elasticsearch\Elasticsearch;
+use Keboola\Syrup\Elasticsearch\Index;
+use Keboola\Syrup\Elasticsearch\Job as ElasticsearchJob;
+use Keboola\Syrup\Job\Metadata\JobFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Keboola\StorageApi\Client;
@@ -11,7 +13,6 @@ use Keboola\StorageApi\Event as SapiEvent;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Exception\UserException;
 use Keboola\Syrup\Job\Metadata\JobInterface;
-use Keboola\Syrup\Job\Metadata\JobManager;
 use Keboola\Syrup\Service\Queue\QueueService;
 
 class ApiController extends BaseController
@@ -48,11 +49,16 @@ class ApiController extends BaseController
         $this->checkMappingParams($params);
 
         // Create new job
-        $job = $this->getJobManager()->createJob('run', $params);
+        /** @var JobFactory $jobFactory */
+        $jobFactory = $this->container->get('syrup.job_factory');
+        $jobFactory->setStorageApiClient($this->storageApi);
+        $job = $jobFactory->create('run', $params);
 
         // Add job to Elasticsearch
         try {
-            $jobId = $this->getJobManager()->indexJob($job);
+            /** @var ElasticsearchJob $elasticsearchJob */
+            $elasticsearchJob = $this->container->get('syrup.elasticsearch.job');
+            $jobId = $elasticsearchJob->create($job);
         } catch (\Exception $e) {
             throw new ApplicationException("Failed to create job", $e);
         }
@@ -106,28 +112,9 @@ class ApiController extends BaseController
         return $queueParams['url'] . '/job/' . $jobId;
     }
 
-    /**
-     * @return JobManager
-     */
-    protected function getJobManager()
-    {
-        $jobManager = $this->container->get('syrup.job_manager');
-        $jobManager->setStorageApiClient($this->storageApi);
-        return $jobManager;
-    }
-
-    /**
-     * @deprecated
-     * @return mixed
-     */
-    protected function getMapping()
-    {
-        return Elasticsearch::getMapping($this->container->get('kernel')->getRootDir());
-    }
-
     protected function checkMappingParams($params)
     {
-        $mapping = Elasticsearch::getMapping($this->container->get('kernel')->getRootDir());
+        $mapping = Index::buildMapping($this->container->get('kernel')->getRootDir());
         if (isset($mapping['mappings']['jobs']['properties']['params']['properties'])) {
             $mappingParams = $mapping['mappings']['jobs']['properties']['params']['properties'];
 
@@ -151,7 +138,9 @@ class ApiController extends BaseController
      */
     protected function createJob($command, $params)
     {
-        return $this->getJobManager()->createJob($command, $params);
+        $jobFactory = $this->container->get('syrup.job_factory');
+        $jobFactory->setStorageApiClient($this->storageApi);
+        return $jobFactory->create($command, $params);
     }
 
     /**

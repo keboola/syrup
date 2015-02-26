@@ -13,7 +13,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Keboola\StorageApi\Client as StorageApiClient;
 use Keboola\Syrup\Command\JobCommand;
 use Keboola\Syrup\Job\Metadata\Job;
-use Keboola\Syrup\Job\Metadata\JobManager;
+use Keboola\Syrup\Elasticsearch\Job as ElasticsearchJob;
 
 abstract class AbstractFunctionalTest extends WebTestCase
 {
@@ -31,9 +31,9 @@ abstract class AbstractFunctionalTest extends WebTestCase
      */
     protected $commandTester;
     /**
-     * @var JobManager
+     * @var ElasticsearchJob
      */
-    protected $jobManager;
+    protected $elasticsearchJob;
 
 
     /**
@@ -52,7 +52,7 @@ abstract class AbstractFunctionalTest extends WebTestCase
             'HTTP_X-StorageApi-Token' => $this->storageApiToken
         ]);
 
-        $this->jobManager = $container->get('syrup.job_manager');
+        $this->elasticsearchJob = $container->get('syrup.elasticsearch.job');
 
         $application = new Application($this->httpClient->getKernel());
         $application->add(new JobCommand());
@@ -108,6 +108,6 @@ abstract class AbstractFunctionalTest extends WebTestCase
             'jobId' => $responseJson['id']
         ]);
 
-        return $this->jobManager->getJob($responseJson['id']);
+        return $this->elasticsearchJob->get($responseJson['id']);
     }
 }

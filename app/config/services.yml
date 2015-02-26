@@ -70,17 +70,26 @@ services:
         class: Keboola\Syrup\Encryption\Encryptor
         arguments: [%encryption_key%]
 
-    syrup.elasticsearch:
+    syrup.elasticsearch.client:
         class: Elasticsearch\Client
         arguments: [%elasticsearch%]
+    syrup.elasticsearch.index:
+        class: Keboola\Syrup\Elasticsearch\Index
+        arguments: [%app_name%, %elasticsearch.index_prefix%, @syrup.elasticsearch.client]
+    syrup.elasticsearch.job:
+        class: Keboola\Syrup\Elasticsearch\Job
+        arguments: [@syrup.elasticsearch.client, @syrup.elasticsearch.index]
+    syrup.elasticsearch.search:
+        class: Keboola\Syrup\Elasticsearch\Search
+        arguments: [@syrup.elasticsearch.client, %elasticsearch.index_prefix%]
 
     syrup.queue_factory:
         class: Keboola\Syrup\Service\Queue\QueueFactory
         arguments: [@doctrine.dbal.syrup_connection, %queue%, %app_name%]
 
-    syrup.job_manager:
-        class: Keboola\Syrup\Job\Metadata\JobManager
-        arguments: [@syrup.elasticsearch, %job_manager%, %app_name%, @syrup.encryptor]
+    syrup.job_factory:
+        class: Keboola\Syrup\Job\Metadata\JobFactory
+        arguments: [%app_name%, @syrup.encryptor]
 
     syrup.job_executor:
         class: Keboola\Syrup\Job\Executor
