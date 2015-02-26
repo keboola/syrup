@@ -22,7 +22,7 @@ class CreateIndexCommand extends ContainerAwareCommand
             ->setName('syrup:create-index')
             ->setDescription('Create new elasticsearch index')
             ->addOption('default', '-d', InputOption::VALUE_NONE, 'If set, default mapping wil be used, use this option
-                also when running command from Keboola\Syrup itself.')
+                also when running command from syrup-component-bundle space.')
             ->addOption('no-mapping', null, InputOption::VALUE_NONE, 'Creates index without any mappings.')
         ;
     }

@@ -24,7 +24,7 @@ class JobCommandTest extends WebTestCase
      * @var Application
      */
     protected $application;
-
+    
     protected function setUp()
     {
         $this->bootKernel();
@@ -54,7 +54,6 @@ class JobCommandTest extends WebTestCase
         $this->assertEquals(0, $commandTester->getStatusCode());
 
         $job = $jobManager->getJob($jobId);
-        $this->assertNotNull($job);
         $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
 
         // replace executor with warning executor
@@ -73,7 +72,6 @@ class JobCommandTest extends WebTestCase
         $this->assertEquals(0, $commandTester->getStatusCode());
 
         $job = $jobManager->getJob($jobId);
-        $this->assertNotNull($job);
         $this->assertArrayHasKey('testing', $job->getResult());
         $this->assertEquals($job->getStatus(), Job::STATUS_WARNING);
 
@@ -93,7 +91,6 @@ class JobCommandTest extends WebTestCase
         $this->assertEquals(0, $commandTester->getStatusCode());
 
         $job = $jobManager->getJob($jobId);
-        $this->assertNotNull($job);
         $this->assertArrayHasKey('testing', $job->getResult());
         $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
 
@@ -113,7 +110,6 @@ class JobCommandTest extends WebTestCase
         $this->assertEquals(0, $commandTester->getStatusCode());
 
         $job = $jobManager->getJob($jobId);
-        $this->assertNotNull($job);
         $this->assertArrayHasKey('testing', $job->getResult());
         $this->assertEquals($job->getStatus(), Job::STATUS_ERROR);
     }
