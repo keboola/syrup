@@ -9,7 +9,6 @@ namespace Keboola\Syrup\Job\Metadata;
 
 use Elasticsearch\Client as ElasticsearchClient;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
-use Guzzle\Http\Exception\ClientErrorResponseException;
 use Keboola\StorageApi\Client;
 use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Exception\ApplicationException;
@@ -176,6 +175,10 @@ class JobManager
             ]);
         }
 
+        $this->client->indices()->refresh([
+            'index' => $this->getIndexCurrent()
+        ]);
+
         return $response['_id'];
     }
 
@@ -198,37 +201,45 @@ class JobManager
 
         $response = $this->client->update($jobData);
 
+        $this->client->indices()->refresh([
+            'index' => $job->getIndex()
+        ]);
+
         return $response['_id'];
     }
 
-    /**
-     * @param $jobId
-     * @return Job|null
-     */
-    public function getJob($jobId)
+    public function getJob($jobId, $component = null)
     {
-        foreach ($this->getIndices() as $index) {
-            try {
-                $result = $this->client->get([
-                    'id' => $jobId,
-                    'index' => $index,
-                    'type' => 'jobs'
-                ]);
+        $params = [];
+        $params['index'] = $this->config['index_prefix'] . '_syrup*';
 
-                return new Job(
-                    $result['_source'],
-                    $result['_index'],
-                    $result['_type']
-                );
-
-            } catch (ClientErrorResponseException $e) {
-                // job not found in index, try next one
-                if ($e->getResponse()->getStatusCode() != 404) {
-                    throw $e;
-                }
-            }
+        if (!is_null($component)) {
+            $params['index'] = $this->config['index_prefix'] . '_syrup_' . $component;
         }
 
+        $params['body'] = [
+            'size'  => 1,
+            'query' => [
+                'match_all' => []
+            ],
+            'filter' => [
+                'ids' => [
+                    'values' => [$jobId]
+                ]
+            ]
+        ];
+
+        $result = $this->client->search($params);
+
+        if ($result['hits']['total'] > 0) {
+            $job = new Job(
+                $result['hits']['hits'][0]['_source'],
+                $result['hits']['hits'][0]['_index'],
+                $result['hits']['hits'][0]['_type']
+            );
+
+            return $job;
+        }
         return null;
     }
 
@@ -344,22 +355,16 @@ class JobManager
 
     protected function getLastIndex()
     {
-        $indices = $this->getIndices();
-
-        if (null != $indices) {
-            return IndexNameResolver::getLastIndexName($indices);
-        }
-        return null;
-    }
-
-    protected function getIndices()
-    {
         try {
-            return array_keys($this->client->indices()->getAlias([
+            $indices = $this->client->indices()->getAlias([
                 'name'  => $this->getIndex()
-            ]));
+            ]);
+
+            return IndexNameResolver::getLastIndexName(array_keys($indices));
+
         } catch (Missing404Exception $e) {
             return null;
+
         }
     }
 }

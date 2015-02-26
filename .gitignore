@@ -13,4 +13,3 @@ composer.phar
 .kdev4
 *.kdev4
 build
-runtest.sh
