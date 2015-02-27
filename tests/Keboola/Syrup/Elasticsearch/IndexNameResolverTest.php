@@ -7,25 +7,10 @@
 
 namespace Keboola\Syrup\Tests\Elasticsearch;
 
-use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Elasticsearch\IndexNameResolver;
 
 class IndexNameResolverTest extends \PHPUnit_Framework_TestCase
 {
-
-
-    /**
-     * @covers \Keboola\Syrup\Elasticsearch\IndexNameResolver::buildMapping
-     */
-    public function testMapping()
-    {
-        $mapping = ComponentIndex::buildMapping(__DIR__.'/../../../../app');
-        $this->assertNotNull($mapping);
-        $this->assertArrayHasKey('mappings', $mapping);
-        $this->assertArrayHasKey('jobs', $mapping['mappings']);
-        $this->assertArrayHasKey('properties', $mapping['mappings']['jobs']);
-    }
-
     /**
      * @covers \Keboola\Syrup\Elasticsearch\IndexNameResolver::getYearFromIndexName
      */
