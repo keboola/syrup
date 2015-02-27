@@ -56,7 +56,7 @@ class SearchTest extends WebTestCase
         $sapiData = self::$sapiClient->getLogData();
         $projectId = $sapiData['owner']['id'];
 
-        $jobs = self::$search->getJobs($projectId, SYRUP_APP_NAME);
+        $jobs = self::$search->getJobs(['projectId' => $projectId, 'component' => SYRUP_APP_NAME]);
         foreach ($jobs as $job) {
             self::$elasticClient->delete([
                 'index' => $job['_index'],
@@ -137,7 +137,12 @@ class SearchTest extends WebTestCase
 
             $projectId = $job->getProject()['id'];
 
-            $res = self::$search->getJobs($projectId, SYRUP_APP_NAME, null, null, '-1 day', 'now');
+            $res = self::$search->getJobs([
+                'projectId' => $projectId,
+                'component' => SYRUP_APP_NAME,
+                'since' => '-1 day',
+                'until' => 'now'
+            ]);
 
             if (count($res) >= 2) {
                 break;

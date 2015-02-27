@@ -7,7 +7,7 @@
 namespace Keboola\Syrup\Elasticsearch;
 
 use Elasticsearch\Client;
-use Keboola\Syrup\Job\Metadata\Job as MetadataJob;
+use Keboola\Syrup\Job\Metadata\Job;
 
 class Search
 {
@@ -45,7 +45,7 @@ class Search
         $result = $this->client->search($params);
 
         if ($result['hits']['total'] > 0) {
-            $job = new MetadataJob(
+            $job = new Job(
                 $result['hits']['hits'][0]['_source'],
                 $result['hits']['hits'][0]['_index'],
                 $result['hits']['hits'][0]['_type']
@@ -56,17 +56,32 @@ class Search
         return null;
     }
 
-    public function getJobs(
-        $projectId = null,
-        $component = null,
-        $runId = null,
-        $queryString = null,
-        $since = null,
-        $until = null,
-        $offset = 0,
-        $limit = 100,
-        $status = null
-    ) {
+    /**
+     * @param array $params array of searching params:
+     * - projectId
+     * - component
+     * - runId
+     * - query
+     * - since
+     * - until
+     * - offset
+     * - limit
+     * - status
+     * @return array
+     */
+    public function getJobs(array $params)
+    {
+        $projectId = null;
+        $component = null;
+        $runId = null;
+        $query = null;
+        $since = null;
+        $until = null;
+        $offset = 0;
+        $limit = 100;
+        $status = null;
+        extract($params);
+
         $filter = [];
 
         if ($projectId != null) {
@@ -81,13 +96,13 @@ class Search
             $filter[] = ['term' => ['status' => $status]];
         }
 
-        $query = ['match_all' => []];
-        if ($queryString != null) {
-            $query = [
+        $queryParam = ['match_all' => []];
+        if ($query != null) {
+            $queryParam = [
                 'query_string' => [
                     'allow_leading_wildcard' => 'false',
                     'default_operator' => 'AND',
-                    'query' => $queryString
+                    'query' => $query
                 ]
             ];
         }
@@ -124,7 +139,7 @@ class Search
                                 'must' => $filter
                             ]
                         ],
-                        'query' => $query
+                        'query' => $queryParam
                     ]
                 ],
                 'sort' => [
