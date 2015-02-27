@@ -28,7 +28,7 @@ class IndexNameResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \Keboola\Syrup\Elasticsearch\IndexNameResolver::getLastIndex
+     * @covers \Keboola\Syrup\Elasticsearch\IndexNameResolver::getLastIndexname
      * @dataProvider resolutionData
      */
     public function testLastIndexNameResolution($expected, $indices)
