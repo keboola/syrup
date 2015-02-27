@@ -72,6 +72,7 @@ class JobMapperTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $resJob = $res['_source'];
+        $job = self::$jobMapper->get($id);
         $this->assertJob($job, $resJob);
         $this->assertEquals($job->getVersion(), $res['_version']);
     }
