@@ -80,7 +80,6 @@ class JobMapper
             'index' => $job->getIndex(),
             'type'  => $job->getType(),
             'id'    => $job->getId(),
-            'version' => $job->getVersion(),
             'body'  => [
                 'doc'   => $job->getData()
             ]
