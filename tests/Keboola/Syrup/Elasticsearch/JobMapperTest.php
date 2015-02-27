@@ -8,21 +8,21 @@
 namespace Keboola\Syrup\Tests\Elasticsearch;
 
 use Elasticsearch\Client;
-use Keboola\Syrup\Elasticsearch\Index;
-use Keboola\Syrup\Elasticsearch\Job as ElasticsearchJob;
+use Keboola\Syrup\Elasticsearch\ComponentIndex;
+use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Keboola\Syrup\Job\Metadata\JobInterface;
 
-class JobTest extends \PHPUnit_Framework_TestCase
+class JobMapperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Client
      */
     private static $client;
     /**
-     * @var Index
+     * @var ComponentIndex
      */
     private static $index;
     /**
@@ -30,17 +30,17 @@ class JobTest extends \PHPUnit_Framework_TestCase
      */
     private static $jobFactory;
     /**
-     * @var ElasticsearchJob
+     * @var JobMapper
      */
-    private static $job;
+    private static $jobMapper;
 
     public static function setUpBeforeClass()
     {
         self::$client = new Client(['hosts' => [SYRUP_ELASTICSEARCH_HOST]]);
-        self::$index = new Index(SYRUP_APP_NAME, 'devel', self::$client);
+        self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', self::$client);
         self::$jobFactory = new JobFactory(SYRUP_APP_NAME, new Encryptor(md5(uniqid())));
         self::$jobFactory->setStorageApiClient(new \Keboola\StorageApi\Client(['token' => SYRUP_SAPI_TEST_TOKEN]));
-        self::$job = new ElasticsearchJob(self::$client, self::$index);
+        self::$jobMapper = new JobMapper(self::$client, self::$index);
     }
 
     private function assertJob(JobInterface $job, $resJob)
@@ -63,7 +63,7 @@ class JobTest extends \PHPUnit_Framework_TestCase
     public function testCreateJob()
     {
         $job = self::$jobFactory->create(uniqid());
-        $id = self::$job->create($job);
+        $id = self::$jobMapper->create($job);
 
         $res = self::$client->get([
             'index' => self::$index->getIndexNameCurrent(),
@@ -79,9 +79,9 @@ class JobTest extends \PHPUnit_Framework_TestCase
     public function testGetJob()
     {
         $job = self::$jobFactory->create(uniqid());
-        $id = self::$job->create($job);
+        $id = self::$jobMapper->create($job);
 
-        $resJob = self::$job->get($id);
+        $resJob = self::$jobMapper->get($id);
 
         $this->assertJob($job, $resJob->getData());
     }
@@ -89,24 +89,24 @@ class JobTest extends \PHPUnit_Framework_TestCase
     public function testUpdateJob()
     {
         $job = self::$jobFactory->create(uniqid());
-        $id = self::$job->create($job);
+        $id = self::$jobMapper->create($job);
 
-        $job = self::$job->get($id);
+        $job = self::$jobMapper->get($id);
 
         $job->setStatus(Job::STATUS_CANCELLED);
 
-        self::$job->update($job);
+        self::$jobMapper->update($job);
 
-        $job = self::$job->get($id);
+        $job = self::$jobMapper->get($id);
 
         $this->assertEquals($job->getStatus(), Job::STATUS_CANCELLED);
 
 
         $job->setStatus(Job::STATUS_WARNING);
 
-        self::$job->update($job);
+        self::$jobMapper->update($job);
 
-        $job = self::$job->get($id);
+        $job = self::$jobMapper->get($id);
 
         $this->assertEquals($job->getStatus(), Job::STATUS_WARNING);
     }

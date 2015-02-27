@@ -1,7 +1,7 @@
 <?php
 namespace Keboola\Syrup\Test\Job\Executor;
 
-use Keboola\Syrup\Elasticsearch\Job as ElasticsearchJob;
+use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\Syrup\Job\HookExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
 
@@ -16,13 +16,13 @@ class HookExecutor extends \Keboola\Syrup\Job\Executor implements HookExecutorIn
     private $job;
 
     /**
-     * @var ElasticsearchJob
+     * @var JobMapper
      */
-    private $elasticsearchJob;
+    private $jobMapper;
 
-    public function __construct(ElasticsearchJob $elasticsearchJob)
+    public function __construct(JobMapper $jobMapper)
     {
-        $this->elasticsearchJob = $elasticsearchJob;
+        $this->jobMapper = $jobMapper;
     }
 
     /**
@@ -56,6 +56,6 @@ class HookExecutor extends \Keboola\Syrup\Job\Executor implements HookExecutorIn
 
         $job->setResult($job->getResult() + array(self::HOOK_RESULT_KEY => self::HOOK_RESULT_VALUE));
 
-        $this->elasticsearchJob->update($job);
+        $this->jobMapper->update($job);
     }
 }

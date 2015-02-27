@@ -3,8 +3,8 @@
 namespace Keboola\Syrup\Controller;
 
 use Keboola\Encryption\EncryptorInterface;
-use Keboola\Syrup\Elasticsearch\Index;
-use Keboola\Syrup\Elasticsearch\Job as ElasticsearchJob;
+use Keboola\Syrup\Elasticsearch\ComponentIndex;
+use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,9 +56,9 @@ class ApiController extends BaseController
 
         // Add job to Elasticsearch
         try {
-            /** @var ElasticsearchJob $elasticsearchJob */
-            $elasticsearchJob = $this->container->get('syrup.elasticsearch.job');
-            $jobId = $elasticsearchJob->create($job);
+            /** @var JobMapper $jobMapper */
+            $jobMapper = $this->container->get('syrup.elasticsearch.current_component_job_mapper');
+            $jobId = $jobMapper->create($job);
         } catch (\Exception $e) {
             throw new ApplicationException("Failed to create job", $e);
         }
@@ -114,7 +114,7 @@ class ApiController extends BaseController
 
     protected function checkMappingParams($params)
     {
-        $mapping = Index::buildMapping($this->container->get('kernel')->getRootDir());
+        $mapping = ComponentIndex::buildMapping($this->container->get('kernel')->getRootDir());
         if (isset($mapping['mappings']['jobs']['properties']['params']['properties'])) {
             $mappingParams = $mapping['mappings']['jobs']['properties']['params']['properties'];
 

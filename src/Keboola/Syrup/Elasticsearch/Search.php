@@ -7,7 +7,7 @@
 namespace Keboola\Syrup\Elasticsearch;
 
 use Elasticsearch\Client;
-use Keboola\Syrup\Job\Metadata\Job;
+use Keboola\Syrup\Job\Metadata\Job as MetadataJob;
 
 class Search
 {
@@ -45,7 +45,7 @@ class Search
         $result = $this->client->search($params);
 
         if ($result['hits']['total'] > 0) {
-            $job = new Job(
+            $job = new MetadataJob(
                 $result['hits']['hits'][0]['_source'],
                 $result['hits']['hits'][0]['_index'],
                 $result['hits']['hits'][0]['_type']

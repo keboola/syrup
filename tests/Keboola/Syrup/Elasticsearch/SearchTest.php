@@ -9,11 +9,11 @@ namespace Keboola\Syrup\Tests\Elasticsearch;
 use Elasticsearch\Client as ElasticClient;
 use Keboola\Encryption\EncryptorInterface;
 use Keboola\StorageApi\Client as SapiClient;
-use Keboola\Syrup\Elasticsearch\Index;
+use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Elasticsearch\Search;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Keboola\Syrup\Job\Metadata\Job;
-use Keboola\Syrup\Elasticsearch\Job as ElasticsearchJob;
+use Keboola\Syrup\Elasticsearch\JobMapper;
 
 class SearchTest extends WebTestCase
 {
@@ -28,10 +28,10 @@ class SearchTest extends WebTestCase
 
     /** @var ElasticClient */
     protected static $elasticClient;
-    /** @var Index */
+    /** @var ComponentIndex */
     protected static $index;
-    /** @var ElasticsearchJob */
-    protected static $esJob;
+    /** @var JobMapper */
+    protected static $jobMapper;
 
     public static function setUpBeforeClass()
     {
@@ -41,8 +41,8 @@ class SearchTest extends WebTestCase
         self::$elasticClient = self::$kernel->getContainer()->get('syrup.elasticsearch.client');
 
         self::$search = self::$kernel->getContainer()->get('syrup.elasticsearch.search');
-        self::$index = self::$kernel->getContainer()->get('syrup.elasticsearch.index');
-        self::$esJob = self::$kernel->getContainer()->get('syrup.elasticsearch.job');
+        self::$index = self::$kernel->getContainer()->get('syrup.elasticsearch.current_component_index');
+        self::$jobMapper = self::$kernel->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
 
         self::$sapiClient = new SapiClient([
             'token' => self::$kernel->getContainer()->getParameter('storage_api.test.token'),
@@ -112,7 +112,7 @@ class SearchTest extends WebTestCase
     public function testGetJob()
     {
         $job = $this->createJob();
-        $id = self::$esJob->create($job);
+        $id = self::$jobMapper->create($job);
 
         $resJob = self::$search->getJob($id);
 
@@ -122,10 +122,10 @@ class SearchTest extends WebTestCase
     public function testGetJobs()
     {
         $job = $this->createJob();
-        self::$esJob->create($job);
+        self::$jobMapper->create($job);
 
         $job2 = $this->createJob();
-        self::$esJob->create($job2);
+        self::$jobMapper->create($job2);
 
         $retries = 0;
 

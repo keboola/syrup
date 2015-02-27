@@ -11,19 +11,19 @@ use Elasticsearch\Client;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Job\Metadata\JobInterface;
 
-class Job
+class JobMapper
 {
     /**
      * @var Client
      */
     protected $client;
     /**
-     * @var Index
+     * @var ComponentIndex
      */
     protected $index;
 
 
-    public function __construct(Client $client, Index $index)
+    public function __construct(Client $client, ComponentIndex $index)
     {
         $this->client = $client;
         $this->index = $index;

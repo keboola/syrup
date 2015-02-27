@@ -24,7 +24,7 @@ use Keboola\Syrup\Job\ExecutorInterface;
 use Keboola\Syrup\Job\HookExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\Db\Lock;
-use Keboola\Syrup\Elasticsearch\Job as ElasticsearchJob;
+use Keboola\Syrup\Elasticsearch\JobMapper;
 
 class JobCommand extends ContainerAwareCommand
 {
@@ -36,8 +36,8 @@ class JobCommand extends ContainerAwareCommand
     /** @var Job */
     protected $job;
 
-    /** @var ElasticsearchJob */
-    protected $esJob;
+    /** @var JobMapper */
+    protected $jobMapper;
 
     /** @var SapiClient */
     protected $sapiClient;
@@ -59,10 +59,10 @@ class JobCommand extends ContainerAwareCommand
 
     protected function init($jobId)
     {
-        $this->esJob = $this->getContainer()->get('syrup.elasticsearch.job');
+        $this->jobMapper = $this->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
 
         // Get job from ES
-        $this->job = $this->esJob->get($jobId);
+        $this->job = $this->jobMapper->get($jobId);
 
         if ($this->job == null) {
             $this->logger->error("Job id '".$jobId."' not found.");
@@ -144,7 +144,7 @@ class JobCommand extends ContainerAwareCommand
             'pid'   => getmypid()
         ]);
 
-        $this->esJob->update($this->job);
+        $this->jobMapper->update($this->job);
 
         // Instantiate jobExecutor based on component name
         $jobExecutorName = str_replace('-', '_', $this->job->getComponent()) . '.job_executor';
@@ -203,7 +203,7 @@ class JobCommand extends ContainerAwareCommand
             ];
             $this->job->setStatus($jobStatus);
             $this->job->setResult($jobResult);
-            $this->esJob->update($this->job);
+            $this->jobMapper->update($this->job);
 
             // try to log the exception
             $exceptionId = $this->logException('critical', $e);
@@ -222,7 +222,7 @@ class JobCommand extends ContainerAwareCommand
         $this->job->setResult($jobResult);
         $this->job->setEndTime(date('c', $endTime));
         $this->job->setDurationSeconds($duration);
-        $this->esJob->update($this->job);
+        $this->jobMapper->update($this->job);
 
         // postExecution action
         try {

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Keboola\Syrup\Service\Queue\QueueService;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
-use Keboola\Syrup\Elasticsearch\Job as ElasticsearchJob;
+use Keboola\Syrup\Elasticsearch\JobMapper;
 
 class CreateJobCommand extends ContainerAwareCommand
 {
@@ -72,9 +72,9 @@ class CreateJobCommand extends ContainerAwareCommand
         $job = $jobFactory->create($command, $params);
 
         // Add job to Elasticsearch
-        /** @var ElasticsearchJob $elasticsearchJob */
-        $elasticsearchJob = $this->getContainer()->get('syrup.elasticsearch.job');
-        $jobId = $elasticsearchJob->create($job);
+        /** @var JobMapper $jobMapper */
+        $jobMapper = $this->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
+        $jobId = $jobMapper->create($job);
 
         $output->writeln('Created job id ' . $jobId);
 
