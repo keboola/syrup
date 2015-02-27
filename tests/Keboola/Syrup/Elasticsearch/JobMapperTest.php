@@ -72,17 +72,15 @@ class JobMapperTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $resJob = $res['_source'];
-
         $this->assertJob($job, $resJob);
+        $this->assertEquals($job->getVersion(), $res['_version']);
     }
 
     public function testGetJob()
     {
         $job = self::$jobFactory->create(uniqid());
         $id = self::$jobMapper->create($job);
-
         $resJob = self::$jobMapper->get($id);
-
         $this->assertJob($job, $resJob->getData());
     }
 
@@ -92,22 +90,14 @@ class JobMapperTest extends \PHPUnit_Framework_TestCase
         $id = self::$jobMapper->create($job);
 
         $job = self::$jobMapper->get($id);
-
         $job->setStatus(Job::STATUS_CANCELLED);
-
         self::$jobMapper->update($job);
-
         $job = self::$jobMapper->get($id);
-
         $this->assertEquals($job->getStatus(), Job::STATUS_CANCELLED);
 
-
         $job->setStatus(Job::STATUS_WARNING);
-
         self::$jobMapper->update($job);
-
         $job = self::$jobMapper->get($id);
-
         $this->assertEquals($job->getStatus(), Job::STATUS_WARNING);
     }
 }

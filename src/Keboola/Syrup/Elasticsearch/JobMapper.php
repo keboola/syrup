@@ -53,11 +53,19 @@ class JobMapper
             ]);
         }
 
-        $this->client->indices()->refresh([
-            'index' => $this->index->getIndexNameCurrent()
-        ]);
+        $i = 0;
+        while ($i < 5) {
+            $resJob = $this->get($job->getId());
+            if ($resJob != null) {
+                return $response['_id'];
+            }
+            sleep(1 + pow($i, 2)/2);
+        }
 
-        return $response['_id'];
+        throw new ApplicationException("Unable to find the job in index", null, [
+            'job' => $job->getData(),
+            'elasticResponse' => $response
+        ]);
     }
 
     /**
@@ -72,6 +80,7 @@ class JobMapper
             'index' => $job->getIndex(),
             'type'  => $job->getType(),
             'id'    => $job->getId(),
+            'version' => $job->getVersion(),
             'body'  => [
                 'doc'   => $job->getData()
             ]
@@ -79,11 +88,19 @@ class JobMapper
 
         $response = $this->client->update($jobData);
 
-        $this->client->indices()->refresh([
-            'index' => $job->getIndex()
-        ]);
+        $i = 0;
+        while ($i < 5) {
+            $resJob = $this->get($job->getId());
+            if ($resJob != null && $resJob->getVersion() == $response['_version']) {
+                return $response['_id'];
+            }
+            sleep(1 + pow($i, 2)/2);
+        }
 
-        return $response['_id'];
+        throw new ApplicationException("Unable to find the job in index", null, [
+            'job' => $job->getData(),
+            'elasticResponse' => $response
+        ]);
     }
 
     public function get($jobId)
@@ -91,6 +108,7 @@ class JobMapper
         $params = [
             'index' => $this->index->getIndexName(),
             'body' => [
+                'version' => true,
                 'size'  => 1,
                 'query' => [
                     'match_all' => []
@@ -109,7 +127,8 @@ class JobMapper
             $job = new \Keboola\Syrup\Job\Metadata\Job(
                 $result['hits']['hits'][0]['_source'],
                 $result['hits']['hits'][0]['_index'],
-                $result['hits']['hits'][0]['_type']
+                $result['hits']['hits'][0]['_type'],
+                $result['hits']['hits'][0]['_version']
             );
 
             return $job;

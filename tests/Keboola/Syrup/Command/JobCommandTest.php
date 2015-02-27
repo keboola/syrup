@@ -45,11 +45,9 @@ class JobCommandTest extends WebTestCase
 
         $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array(
-                'jobId'   => $jobId
-            )
-        );
+        $commandTester->execute([
+            'jobId'   => $jobId
+        ]);
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
