@@ -17,6 +17,7 @@ use Keboola\Syrup\Command\JobCommand;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Tests\Job as TestExecutor;
 use Keboola\Syrup\Elasticsearch\JobMapper;
+use Keboola\StorageApi\Client as StorageApiClient;
 
 class JobCommandTest extends WebTestCase
 {
@@ -24,6 +25,12 @@ class JobCommandTest extends WebTestCase
      * @var Application
      */
     protected $application;
+    protected $storageApiToken;
+    /**
+     * @var StorageApiClient;
+     */
+    protected $storageApiClient;
+
 
     protected function setUp()
     {
@@ -31,14 +38,19 @@ class JobCommandTest extends WebTestCase
 
         $this->application = new Application(self::$kernel);
         $this->application->add(new JobCommand());
+
+        $this->storageApiToken = self::$kernel->getContainer()->getParameter('storage_api.test.token');
+        $this->storageApiClient = new StorageApiClient([
+            'token' => $this->storageApiToken,
+            'url' => self::$kernel->getContainer()->getParameter('storage_api.test.url')
+        ]);
     }
 
     public function testRunjob()
     {
         /** @var JobMapper $jobMapper */
         $jobMapper = self::$kernel->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
-        $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')
-            ->encrypt(self::$kernel->getContainer()->getParameter('storage_api.test.token'));
+        $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')->encrypt($this->storageApiToken);
 
         // job execution test
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
@@ -61,11 +73,9 @@ class JobCommandTest extends WebTestCase
 
         $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array(
-                'jobId'   => $jobId
-            )
-        );
+        $commandTester->execute([
+            'jobId'   => $jobId
+        ]);
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
@@ -80,11 +90,9 @@ class JobCommandTest extends WebTestCase
 
         $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array(
-                'jobId'   => $jobId
-            )
-        );
+        $commandTester->execute([
+            'jobId'   => $jobId
+        ]);
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
@@ -99,11 +107,9 @@ class JobCommandTest extends WebTestCase
 
         $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array(
-                'jobId'   => $jobId
-            )
-        );
+        $commandTester->execute([
+            'jobId'   => $jobId
+        ]);
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
@@ -126,11 +132,9 @@ class JobCommandTest extends WebTestCase
 
         $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array(
-                'jobId'   => $jobId
-            )
-        );
+        $commandTester->execute([
+            'jobId'   => $jobId
+        ]);
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
@@ -147,8 +151,8 @@ class JobCommandTest extends WebTestCase
     protected function createJob($token)
     {
         return new Job([
-            'id' => rand(0, 128),
-            'runId' => rand(0, 128),
+            'id' => $this->storageApiClient->generateId(),
+            'runId' => $this->storageApiClient->generateId(),
             'project' => [
                 'id' => '123',
                 'name' => 'Syrup TEST'
