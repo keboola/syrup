@@ -35,7 +35,7 @@ class Lock
         $sql = 'SELECT GET_LOCK(:name, :timeout)';
         $sth = $this->conn->prepare($sql);
         $sth->execute(array('name' => $this->prefixedLockName(), 'timeout' => $timeout));
-        return $sth->fetchColumn();
+        return (bool)$sth->fetchColumn();
     }
 
     public function isFree()
@@ -43,14 +43,14 @@ class Lock
         $sql = 'SELECT IS_FREE_LOCK(:name)';
         $sth = $this->conn->prepare($sql);
         $sth->execute(array('name' => $this->prefixedLockName()));
-        return $sth->fetchColumn();
+        return (bool)$sth->fetchColumn();
     }
 
     public function unlock()
     {
         $sql = 'DO RELEASE_LOCK(:name)';
         $sth = $this->conn->prepare($sql);
-        $sth->execute(array('name' => $this->prefixedLockName()));
+        return (bool)$sth->execute(array('name' => $this->prefixedLockName()));
     }
 
     protected function prefixedLockName()
