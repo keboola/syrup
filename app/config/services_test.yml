@@ -1,0 +1,3 @@
+services:
+    syrup.job_executor:
+        class: Keboola\Syrup\Test\Job\Executor\Executor

@@ -26,6 +26,8 @@ use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\Db\Lock;
 use Keboola\Syrup\Elasticsearch\JobMapper;
 
+declare(ticks = 10);
+
 class JobCommand extends ContainerAwareCommand
 {
     const STATUS_SUCCESS = 0;
@@ -152,6 +154,9 @@ class JobCommand extends ContainerAwareCommand
         /** @var ExecutorInterface $jobExecutor */
         $jobExecutor = $this->getContainer()->get($jobExecutorName);
         $jobExecutor->setStorageApi($this->sapiClient);
+
+        // register signal handler for SIGTERM
+        pcntl_signal(SIGTERM, [$jobExecutor, 'onTerminate']);
 
         // Execute job
         try {

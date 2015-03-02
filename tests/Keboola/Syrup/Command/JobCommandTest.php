@@ -8,6 +8,7 @@ namespace Keboola\Syrup\Tests\Command;
 
 use Keboola\Syrup\Test\Job\Executor\ErrorExecutor;
 use Keboola\Syrup\Test\Job\Executor\HookExecutor;
+use Keboola\Syrup\Test\Job\Executor\SignaledExectuor;
 use Keboola\Syrup\Test\Job\Executor\SuccessExecutor;
 use Keboola\Syrup\Test\Job\Executor\WarningExecutor;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -18,6 +19,7 @@ use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Tests\Job as TestExecutor;
 use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\StorageApi\Client as StorageApiClient;
+use Symfony\Component\Process\Process;
 
 class JobCommandTest extends WebTestCase
 {
@@ -46,6 +48,35 @@ class JobCommandTest extends WebTestCase
         ]);
     }
 
+    public function testSignalJob()
+    {
+        /** @var JobMapper $jobMapper */
+        $jobMapper = self::$kernel->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
+        $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')->encrypt($this->storageApiToken);
+
+        // job execution test
+        $jobId = $jobMapper->create($this->createJob($encryptedToken));
+
+        $process = new Process(self::$kernel->getRootDir() . '/console syrup:run-job ' . $jobId . ' --env=test');
+        $process->setTimeout(60);
+        $process->setIdleTimeout(60);
+        $process->start();
+
+        // let it run for a while
+        sleep(10);
+
+        // terminate the job
+        $process->signal(SIGTERM);
+
+        while ($process->isRunning()) {
+            // waiting for process to finish
+        }
+
+        $job = $jobMapper->get($jobId);
+
+        $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus());
+    }
+
     public function testRunjob()
     {
         /** @var JobMapper $jobMapper */
@@ -71,7 +102,8 @@ class JobCommandTest extends WebTestCase
 
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        $this->application->find('syrup:run-job');
+        echo "warning executor" . PHP_EOL;
+        $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'jobId'   => $jobId
@@ -88,7 +120,8 @@ class JobCommandTest extends WebTestCase
 
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        $this->application->find('syrup:run-job');
+        echo "success executor" . PHP_EOL;
+        $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'jobId'   => $jobId
@@ -105,7 +138,8 @@ class JobCommandTest extends WebTestCase
 
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        $this->application->find('syrup:run-job');
+        echo "error executor" . PHP_EOL;
+        $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'jobId'   => $jobId

@@ -8,6 +8,7 @@
 namespace Keboola\Syrup\Job;
 
 use Keboola\StorageApi\Client as SapiClient;
+use Keboola\Syrup\Exception\JobException;
 use Keboola\Syrup\Job\Metadata\Job;
 
 class Executor implements ExecutorInterface
@@ -20,9 +21,16 @@ class Executor implements ExecutorInterface
         $this->storageApi = $sapi;
     }
 
-
     public function execute(Job $job)
     {
         // do stuff
     }
+
+    public function onTerminate()
+    {
+        $e = new JobException(500, "Job terminated");
+        $e->setStatus(Job::STATUS_TERMINATED);
+        throw $e;
+    }
+
 }
