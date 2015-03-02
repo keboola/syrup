@@ -4,10 +4,8 @@
  * User: martinhalamicek
  * Date: 14/11/14
  * Time: 09:22
- * To change this template use File | Settings | File Templates.
  */
-
-namespace Keboola\Syrup\Job\Metadata;
+namespace Keboola\Syrup\Elasticsearch;
 
 class IndexNameResolver
 {
@@ -24,17 +22,14 @@ class IndexNameResolver
         usort($indexNames, function($a, $b) {
             $aYear = self::getYearFromIndexName($a);
             $bYear = self::getYearFromIndexName($b);
-
             if ($aYear == $bYear) {
                 $aVersion = self::getVersionFromIndexName($a);
                 $bVersion = self::getVersionFromIndexName($b);
-
                 if ($aVersion == $bVersion) {
                     return 0;
                 }
                 return ($aVersion < $bVersion) ? -1 : 1;
             }
-
             return ($aYear < $bYear) ? -1 : 1;
         });
         return array_pop($indexNames);

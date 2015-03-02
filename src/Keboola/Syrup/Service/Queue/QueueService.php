@@ -22,36 +22,29 @@ class QueueService
     public function __construct(array $config, $componentName)
     {
         $this->client = SqsClient::factory([
-            'key'       => $config['access_key'],
-            'secret'    => $config['secret_key'],
-            'region'    => $config['region']
+            'key' => $config['access_key'],
+            'secret' => $config['secret_key'],
+            'region' => $config['region']
         ]);
         $this->queueUrl = $config['url'];
         $this->componentName = $componentName;
     }
 
     /**
-     * For backwards compatibility it accepts either ($data, $delay) arguments or ($jobId, $queue, $data, $delay)
-     * @param $job array|int
-     * @param $data array|int
+     * @param $jobId int
+     * @param $data array
      * @param $delay int
      * @return int $messageId
      */
-    public function enqueue($job, $data = [], $delay = 0)
+    public function enqueue($jobId, $data = [], $delay = 0)
     {
-        if (is_array($job)) {
-            if ($data && is_int($data)) {
-                $delay = $data;
-            }
-        } else {
-            $job = [
-                'jobId' => $job,
-                'component' => $this->componentName
-            ];
+        $job = [
+            'jobId' => $jobId,
+            'component' => $this->componentName
+        ];
 
-            if (count($data)) {
-                $job = array_merge($job, $data);
-            }
+        if (count($data)) {
+            $job = array_merge($job, $data);
         }
 
         $message = $this->client->sendMessage([
@@ -69,8 +62,8 @@ class QueueService
     public function receive($messagesCount = 1)
     {
         $result = $this->client->receiveMessage([
-            'QueueUrl'          => $this->queueUrl,
-            'WaitTimeSeconds'   => 20,
+            'QueueUrl' => $this->queueUrl,
+            'WaitTimeSeconds' => 20,
             'VisibilityTimeout' => 3600,
             'MaxNumberOfMessages' => $messagesCount,
         ]);

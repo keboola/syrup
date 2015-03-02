@@ -9,16 +9,16 @@ namespace Keboola\Syrup\Command;
 
 use Keboola\Encryption\EncryptorInterface;
 use Keboola\StorageApi\Client as SapiClient;
+use Keboola\Syrup\Job\Metadata\JobFactory;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Keboola\Syrup\Job\Metadata\Job;
-use Keboola\Syrup\Job\Metadata\JobManager;
 use Keboola\Syrup\Service\Queue\QueueService;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
+use Keboola\Syrup\Elasticsearch\JobMapper;
 
 class CreateJobCommand extends ContainerAwareCommand
 {
@@ -27,9 +27,6 @@ class CreateJobCommand extends ContainerAwareCommand
 
     /** @var EncryptorInterface $encryptor */
     private $encryptor;
-
-    /** @var JobManager */
-    private $jobManager;
 
     private $componentName;
 
@@ -61,9 +58,6 @@ class CreateJobCommand extends ContainerAwareCommand
         $storageApiService->setClient($this->storageApi);
 
         $this->encryptor = $this->getContainer()->get('syrup.encryptor');
-
-        $this->jobManager = $this->getContainer()->get('syrup.job_manager');
-        $this->jobManager->setStorageApiClient($this->storageApi);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -72,10 +66,15 @@ class CreateJobCommand extends ContainerAwareCommand
         $params = json_decode($input->getArgument('params'), true);
 
         // Create new job
-        $job = $this->jobManager->createJob($command, $params);
+        /** @var JobFactory $jobFactory */
+        $jobFactory = $this->getContainer()->get('syrup.job_factory');
+        $jobFactory->setStorageApiClient($this->storageApi);
+        $job = $jobFactory->create($command, $params);
 
         // Add job to Elasticsearch
-        $jobId = $this->jobManager->indexJob($job);
+        /** @var JobMapper $jobMapper */
+        $jobMapper = $this->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
+        $jobId = $jobMapper->create($job);
 
         $output->writeln('Created job id ' . $jobId);
 

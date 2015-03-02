@@ -23,8 +23,8 @@ use Keboola\Syrup\Job\Exception\InitializationException;
 use Keboola\Syrup\Job\ExecutorInterface;
 use Keboola\Syrup\Job\HookExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
-use Keboola\Syrup\Job\Metadata\JobManager;
 use Keboola\Syrup\Service\Db\Lock;
+use Keboola\Syrup\Elasticsearch\JobMapper;
 
 class JobCommand extends ContainerAwareCommand
 {
@@ -33,11 +33,11 @@ class JobCommand extends ContainerAwareCommand
     const STATUS_LOCK = 64;
     const STATUS_RETRY = 65;
 
-    /** @var JobManager */
-    protected $jobManager;
-
     /** @var Job */
     protected $job;
+
+    /** @var JobMapper */
+    protected $jobMapper;
 
     /** @var SapiClient */
     protected $sapiClient;
@@ -59,8 +59,10 @@ class JobCommand extends ContainerAwareCommand
 
     protected function init($jobId)
     {
+        $this->jobMapper = $this->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
+
         // Get job from ES
-        $this->job = $this->getJobManager()->getJob($jobId);
+        $this->job = $this->jobMapper->get($jobId);
 
         if ($this->job == null) {
             $this->logger->error("Job id '".$jobId."' not found.");
@@ -142,7 +144,7 @@ class JobCommand extends ContainerAwareCommand
             'pid'   => getmypid()
         ]);
 
-        $this->jobManager->updateJob($this->job);
+        $this->jobMapper->update($this->job);
 
         // Instantiate jobExecutor based on component name
         $jobExecutorName = str_replace('-', '_', $this->job->getComponent()) . '.job_executor';
@@ -201,7 +203,7 @@ class JobCommand extends ContainerAwareCommand
             ];
             $this->job->setStatus($jobStatus);
             $this->job->setResult($jobResult);
-            $this->jobManager->updateJob($this->job);
+            $this->jobMapper->update($this->job);
 
             // try to log the exception
             $exceptionId = $this->logException('critical', $e);
@@ -220,7 +222,7 @@ class JobCommand extends ContainerAwareCommand
         $this->job->setResult($jobResult);
         $this->job->setEndTime(date('c', $endTime));
         $this->job->setDurationSeconds($duration);
-        $this->jobManager->updateJob($this->job);
+        $this->jobMapper->update($this->job);
 
         // postExecution action
         try {
@@ -236,18 +238,6 @@ class JobCommand extends ContainerAwareCommand
         $this->lock->unlock();
 
         return $status;
-    }
-
-    /**
-     * @return JobManager
-     */
-    protected function getJobManager()
-    {
-        if ($this->jobManager == null) {
-            $this->jobManager = $this->getContainer()->get('syrup.job_manager');
-        }
-
-        return $this->jobManager;
     }
 
     protected function logException($level, \Exception $exception)

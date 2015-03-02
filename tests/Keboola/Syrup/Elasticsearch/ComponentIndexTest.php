@@ -1,0 +1,44 @@
+<?php
+/**
+ * @package syrup-component-bundle
+ * @copyright 2015 Keboola
+ * @author Jakub Matejka <jakub@keboola.com>
+ */
+
+namespace Keboola\Syrup\Tests\Elasticsearch;
+
+use Elasticsearch\Client;
+use Keboola\Syrup\Elasticsearch\ComponentIndex;
+
+class ComponentIndexTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @var ComponentIndex
+     */
+    private static $index;
+
+    public static function setUpBeforeClass()
+    {
+        self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', new Client(['hosts' => [SYRUP_ELASTICSEARCH_HOST]]));
+    }
+
+    /**
+     * @covers \Keboola\Syrup\Elasticsearch\ComponentIndex::getIndexPrefix
+     */
+    public function testGetIndexPrefix()
+    {
+        $this->assertEquals('devel', self::$index->getIndexPrefix());
+    }
+
+    /**
+     * @covers \Keboola\Syrup\Elasticsearch\ComponentIndex::buildMapping
+     */
+    public function testMapping()
+    {
+        $mapping = ComponentIndex::buildMapping(__DIR__.'/../../../../app');
+        $this->assertNotNull($mapping);
+        $this->assertArrayHasKey('mappings', $mapping);
+        $this->assertArrayHasKey('jobs', $mapping['mappings']);
+        $this->assertArrayHasKey('properties', $mapping['mappings']['jobs']);
+    }
+}

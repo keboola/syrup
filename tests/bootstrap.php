@@ -48,12 +48,10 @@ $paramsYaml = \Symfony\Component\Yaml\Yaml::dump([
         'elasticsearch' => [
             'hosts' => [SYRUP_ELASTICSEARCH_HOST]
         ],
+        'elasticsearch.index_prefix' => 'devel',
         'queue' => [
             'url' => null,
             'db_table' => 'queues'
-        ],
-        'job_manager' => [
-            'index_prefix' => 'devel'
         ],
         'components' => [
 
