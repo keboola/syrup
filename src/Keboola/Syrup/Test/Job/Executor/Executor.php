@@ -15,6 +15,7 @@ class Executor extends \Keboola\Syrup\Job\Executor
     {
         // simulate long running job
         for ($i=0; $i<180; $i++) {
+            pcntl_signal_dispatch();
             sleep(1);
         }
     }

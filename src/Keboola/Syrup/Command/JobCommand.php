@@ -26,8 +26,6 @@ use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\Db\Lock;
 use Keboola\Syrup\Elasticsearch\JobMapper;
 
-declare(ticks = 10);
-
 class JobCommand extends ContainerAwareCommand
 {
     const STATUS_SUCCESS = 0;
