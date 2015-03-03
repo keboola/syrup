@@ -14,6 +14,8 @@ class Executor extends \Keboola\Syrup\Job\Executor
     public function execute(Job $job)
     {
         // simulate long running job
-        sleep(180);
+        for ($i=0; $i<180; $i++) {
+            sleep(1);
+        }
     }
 }
