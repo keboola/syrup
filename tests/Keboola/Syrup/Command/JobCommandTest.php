@@ -75,7 +75,14 @@ class JobCommandTest extends WebTestCase
 
         $job = $jobMapper->get($jobId);
 
-        $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus());
+        $i = 0;
+        while ($job->getVersion() < 3 && $i<5) {
+            $job = $jobMapper->get($jobId);
+            sleep(1 + pow(2, $i)/2);
+            $i++;
+        }
+
+        $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus(), "job version: " . $job->getVersion());
     }
 
     public function testRunjob()
