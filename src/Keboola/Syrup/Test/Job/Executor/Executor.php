@@ -8,15 +8,24 @@
 namespace Keboola\Syrup\Test\Job\Executor;
 
 use Keboola\Syrup\Job\Metadata\Job;
+use Monolog\Logger;
 
 class Executor extends \Keboola\Syrup\Job\Executor
 {
+    /** @var Logger */
+    protected $logger;
+
+    public function __construct($logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function execute(Job $job)
     {
         // simulate long running job
-        for ($i=0; $i<180; $i++) {
-            pcntl_signal_dispatch();
-            sleep(1);
+        for ($i=0; $i<20; $i++) {
+            $this->logger->info("I'm running!");
+            sleep(3);
         }
     }
 }

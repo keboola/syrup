@@ -70,6 +70,7 @@ class JobCommandTest extends WebTestCase
 
         while ($process->isRunning()) {
             // waiting for process to finish
+            sleep(2);
         }
 
         $job = $jobMapper->get($jobId);
