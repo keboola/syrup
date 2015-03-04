@@ -82,7 +82,13 @@ class JobCommandTest extends WebTestCase
             $i++;
         }
 
-        $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus(), "job version: " . $job->getVersion());
+        var_dump($process->getOutput());
+
+        var_dump($process->getErrorOutput());
+
+        $this->assertEquals(0, $process->getExitCode());
+
+        $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus(), "job version: " . $job->getVersion() . " data " . var_export($job->getData()));
     }
 
     public function testRunjob()
