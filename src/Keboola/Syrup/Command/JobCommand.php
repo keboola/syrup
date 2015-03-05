@@ -131,6 +131,16 @@ class JobCommand extends ContainerAwareCommand
             return self::STATUS_LOCK;
         }
 
+        // Instantiate jobExecutor based on component name
+        $jobExecutorName = str_replace('-', '_', $this->job->getComponent()) . '.job_executor';
+
+        /** @var ExecutorInterface $jobExecutor */
+        $jobExecutor = $this->getContainer()->get($jobExecutorName);
+        $jobExecutor->setStorageApi($this->sapiClient);
+
+        // register signal handler for SIGTERM
+        pcntl_signal(SIGUSR1, [$jobExecutor, 'onTerminate']);
+
         $startTime = time();
 
         // Update job status to 'processing'
@@ -145,16 +155,6 @@ class JobCommand extends ContainerAwareCommand
         ]);
 
         $this->jobMapper->update($this->job);
-
-        // Instantiate jobExecutor based on component name
-        $jobExecutorName = str_replace('-', '_', $this->job->getComponent()) . '.job_executor';
-
-        /** @var ExecutorInterface $jobExecutor */
-        $jobExecutor = $this->getContainer()->get($jobExecutorName);
-        $jobExecutor->setStorageApi($this->sapiClient);
-
-        // register signal handler for SIGTERM
-        pcntl_signal(SIGTERM, [$jobExecutor, 'onTerminate']);
 
         // Execute job
         try {

@@ -50,6 +50,10 @@ class JobCommandTest extends WebTestCase
 
     public function testSignalJob()
     {
+        if (!extension_loaded('pcntl')) {
+            $this->markTestSkipped("No pcntl extension, skipping...");
+        }
+
         /** @var JobMapper $jobMapper */
         $jobMapper = self::$kernel->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
         $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')->encrypt($this->storageApiToken);
@@ -76,7 +80,7 @@ class JobCommandTest extends WebTestCase
         $this->assertEquals(Job::STATUS_PROCESSING, $job->getStatus());
 
         // terminate the job
-        $process->signal(SIGTERM);
+        $process->signal(SIGUSR1);
 
         while ($process->isRunning()) {
             // waiting for process to finish
@@ -92,11 +96,9 @@ class JobCommandTest extends WebTestCase
             $i++;
         }
 
-        var_dump($process->getOutput());
+        var_dump("exit code " . $process->getExitCodeText() . ' ' . $process->getExitCode());
 
-        var_dump($process->getErrorOutput());
-
-        $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus(), "job version: " . $job->getVersion() . " data " . var_export($job->getData()));
+        $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus());
     }
 
     public function testRunjob()
