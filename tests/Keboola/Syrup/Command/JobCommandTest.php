@@ -65,6 +65,16 @@ class JobCommandTest extends WebTestCase
         // let it run for a while
         sleep(10);
 
+        $job = $jobMapper->get($jobId);
+        $i=0;
+        while ($job->getStatus() != Job::STATUS_PROCESSING && $i<10) {
+            sleep(2);
+            $i++;
+        }
+
+        // make sure the job is in processing state
+        $this->assertEquals(Job::STATUS_PROCESSING, $job->getStatus());
+
         // terminate the job
         $process->signal(SIGTERM);
 
@@ -85,8 +95,6 @@ class JobCommandTest extends WebTestCase
         var_dump($process->getOutput());
 
         var_dump($process->getErrorOutput());
-
-        $this->assertEquals(0, $process->getExitCode());
 
         $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus(), "job version: " . $job->getVersion() . " data " . var_export($job->getData()));
     }

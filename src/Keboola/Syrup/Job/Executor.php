@@ -32,5 +32,4 @@ class Executor implements ExecutorInterface
         $e->setStatus(Job::STATUS_TERMINATED);
         throw $e;
     }
-
 }
