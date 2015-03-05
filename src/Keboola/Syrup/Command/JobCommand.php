@@ -139,10 +139,11 @@ class JobCommand extends ContainerAwareCommand
         $jobExecutor->setStorageApi($this->sapiClient);
 
         // register signal handler for SIGTERM
-        $handlerRegistered = pcntl_signal(SIGUSR1, [$jobExecutor, 'onTerminate']);
+//        pcntl_signal(SIGTERM, [$jobExecutor, 'onTerminate']);
 
-        var_dump("handler registered: ");
-        var_dump($handlerRegistered?'true':'false');
+        pcntl_signal(SIGTERM, function ($signo) {
+            var_dump("Signal received " . $signo);
+        });
 
         $startTime = time();
 
@@ -229,9 +230,6 @@ class JobCommand extends ContainerAwareCommand
         $this->job->setEndTime(date('c', $endTime));
         $this->job->setDurationSeconds($duration);
         $this->jobMapper->update($this->job);
-
-        var_dump("job command job: ");
-        var_dump($this->job);
 
         // postExecution action
         try {

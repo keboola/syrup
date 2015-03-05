@@ -80,7 +80,7 @@ class JobCommandTest extends WebTestCase
         $this->assertEquals(Job::STATUS_PROCESSING, $job->getStatus());
 
         // terminate the job
-        $process->signal(SIGUSR1);
+        $process->signal(SIGTERM);
 
         while ($process->isRunning()) {
             // waiting for process to finish
