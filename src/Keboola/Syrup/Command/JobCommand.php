@@ -10,6 +10,7 @@ namespace Keboola\Syrup\Command;
 
 use Doctrine\DBAL\Connection;
 use Keboola\Encryption\EncryptorInterface;
+use Keboola\Syrup\Exception\MaintenanceException;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -168,6 +169,8 @@ class JobCommand extends ContainerAwareCommand
             $jobStatus = Job::STATUS_PROCESSING;
             $status = self::STATUS_RETRY;
 
+        } catch (MaintenanceException $e) {
+            return self::STATUS_LOCK;
         } catch (UserException $e) {
             $exceptionId = $this->logException('error', $e);
             $jobResult = [
