@@ -96,6 +96,9 @@ class JobCommandTest extends WebTestCase
             $i++;
         }
 
+        var_dump($process->getOutput());
+        var_dump($process->getErrorOutput());
+
         var_dump("exit code " . $process->getExitCodeText() . ' ' . $process->getExitCode());
 
         $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus());

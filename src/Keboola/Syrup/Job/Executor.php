@@ -28,6 +28,8 @@ class Executor implements ExecutorInterface
 
     public function onTerminate()
     {
+        var_dump("handler triggered");
+
         $e = new JobException(500, "Job terminated");
         $e->setStatus(Job::STATUS_TERMINATED);
         throw $e;

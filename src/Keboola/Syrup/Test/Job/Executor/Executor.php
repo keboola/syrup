@@ -22,6 +22,8 @@ class Executor extends \Keboola\Syrup\Job\Executor
 
     public function execute(Job $job)
     {
+        var_dump("Test Executor is running");
+
         // simulate long running job
         for ($i=0; $i<20; $i++) {
             // this will trigger pcntl_signal_dispatch()
