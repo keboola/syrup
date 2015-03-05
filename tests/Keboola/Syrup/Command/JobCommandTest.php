@@ -80,7 +80,6 @@ class JobCommandTest extends WebTestCase
         $this->assertEquals(Job::STATUS_PROCESSING, $job->getStatus());
 
         // terminate the job
-//        $process->signal(SIGTERM);
         posix_kill($job->getProcess()['pid'], SIGTERM);
 
         while ($process->isRunning()) {
@@ -96,11 +95,6 @@ class JobCommandTest extends WebTestCase
             sleep(1 + pow(2, $i)/2);
             $i++;
         }
-
-        var_dump($process->getOutput());
-        var_dump($process->getErrorOutput());
-
-        var_dump("exit code " . $process->getExitCodeText() . ' ' . $process->getExitCode());
 
         $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus());
     }
@@ -130,7 +124,6 @@ class JobCommandTest extends WebTestCase
 
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        echo "warning executor" . PHP_EOL;
         $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
@@ -148,7 +141,6 @@ class JobCommandTest extends WebTestCase
 
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        echo "success executor" . PHP_EOL;
         $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
@@ -166,7 +158,6 @@ class JobCommandTest extends WebTestCase
 
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        echo "error executor" . PHP_EOL;
         $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
