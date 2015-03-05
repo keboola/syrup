@@ -31,7 +31,9 @@
     </testsuites>
     <filter>
         <blacklist>
+            <directory>app</directory>
             <directory>vendor</directory>
+            <directory>web</directory>
         </blacklist>
     </filter>
     <logging>
