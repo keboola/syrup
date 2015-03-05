@@ -70,7 +70,7 @@ class QueueService
 
         $queueUrl = $this->queueUrl;
 
-        return array_map(function($message) use ($queueUrl) {
+        return array_map(function ($message) use ($queueUrl) {
 
             $body = json_decode($message['Body']);
 
