@@ -170,6 +170,7 @@ class JobCommand extends ContainerAwareCommand
             $status = self::STATUS_RETRY;
 
         } catch (MaintenanceException $e) {
+            $jobResult = [];
             $jobStatus = Job::STATUS_WAITING;
             $status = self::STATUS_LOCK;
         } catch (UserException $e) {
