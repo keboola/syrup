@@ -28,10 +28,14 @@ class Executor implements ExecutorInterface
 
     public function onTerminate()
     {
-        var_dump("handler triggered");
-
-        $e = new JobException(500, "Job terminated");
+        $this->cleanup();
+        $e = new JobException(500, 'Job terminated with signal "15"');
         $e->setStatus(Job::STATUS_TERMINATED);
         throw $e;
+    }
+
+    public function cleanup($job = null)
+    {
+
     }
 }

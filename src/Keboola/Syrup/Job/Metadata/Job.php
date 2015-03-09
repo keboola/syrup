@@ -11,12 +11,13 @@ use Keboola\Syrup\Exception\ApplicationException;
 
 class Job implements JobInterface
 {
-    const STATUS_WAITING    = 'waiting';
+    const STATUS_WAITING = 'waiting';
     const STATUS_PROCESSING = 'processing';
-    const STATUS_SUCCESS    = 'success';
-    const STATUS_CANCELLED  = 'cancelled';
-    const STATUS_ERROR      = 'error';
-    const STATUS_WARNING    = 'warning';
+    const STATUS_SUCCESS = 'success';
+    const STATUS_CANCELLED = 'cancelled';
+    const STATUS_ERROR = 'error';
+    const STATUS_WARNING = 'warning';
+    const STATUS_TERMINATING = 'terminating';
     const STATUS_TERMINATED = 'terminated';
 
     protected $index;
@@ -311,15 +312,16 @@ class Job implements JobInterface
 
     public function validate()
     {
-        $allowedStatuses = array(
+        $allowedStatuses = [
             self::STATUS_WAITING,
             self::STATUS_PROCESSING,
             self::STATUS_SUCCESS,
             self::STATUS_ERROR,
             self::STATUS_CANCELLED,
             self::STATUS_WARNING,
+            self::STATUS_TERMINATING,
             self::STATUS_TERMINATED,
-        );
+        ];
 
         if (!in_array($this->getStatus(), $allowedStatuses)) {
             throw new ApplicationException(

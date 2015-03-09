@@ -19,4 +19,6 @@ interface ExecutorInterface
      * @return array|Job
      */
     public function execute(Job $job);
+
+    public function cleanup($job);
 }
