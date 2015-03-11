@@ -7,7 +7,7 @@
 
 namespace Keboola\Syrup\Tests\Command;
 
-use Keboola\Syrup\Command\CleanupCommand;
+use Keboola\Syrup\Command\JobCleanupCommand;
 use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Test\WebTestCase;
@@ -33,7 +33,7 @@ class CleanupCommandTest extends WebTestCase
         $this->bootKernel();
 
         $this->application = new Application(self::$kernel);
-        $this->application->add(new CleanupCommand());
+        $this->application->add(new JobCleanupCommand());
 
         $this->storageApiToken = self::$kernel->getContainer()->getParameter('storage_api.test.token');
         $this->storageApiClient = new StorageApiClient([
@@ -51,7 +51,7 @@ class CleanupCommandTest extends WebTestCase
         // job execution test
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        $command = $this->application->find('syrup:cleanup');
+        $command = $this->application->find('syrup:job:cleanup');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'jobId'   => $jobId

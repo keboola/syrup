@@ -20,7 +20,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Keboola\StorageApi\Client as SapiClient;
 
-class CleanupCommand extends ContainerAwareCommand
+class JobCleanupCommand extends ContainerAwareCommand
 {
     /** @var Job */
     protected $job;
@@ -37,9 +37,10 @@ class CleanupCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('syrup:cleanup')
+            ->setName('syrup:job:cleanup')
             ->setDescription('Clean-up after a job has been terminated with extreme prejudice')
-            ->addArgument('jobId', InputArgument::REQUIRED, 'ID of the job');
+            ->addArgument('jobId', InputArgument::REQUIRED, 'ID of the job')
+        ;
     }
 
     protected function init($jobId)

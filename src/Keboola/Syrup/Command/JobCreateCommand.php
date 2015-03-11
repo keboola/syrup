@@ -20,7 +20,7 @@ use Keboola\Syrup\Service\Queue\QueueService;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
 use Keboola\Syrup\Elasticsearch\JobMapper;
 
-class CreateJobCommand extends ContainerAwareCommand
+class JobCreateCommand extends ContainerAwareCommand
 {
     /** @var SapiClient */
     private $storageApi;
@@ -33,7 +33,7 @@ class CreateJobCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('syrup:create-job')
+            ->setName('syrup:job:create')
             ->setDescription('Command to execute jobs')
             ->addArgument('token', InputArgument::REQUIRED, 'SAPI token')
             ->addArgument('component', InputArgument::REQUIRED, 'Component name')

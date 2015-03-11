@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RegisterQueueCommand extends ContainerAwareCommand
+class QueueRegisterCommand extends ContainerAwareCommand
 {
     protected function configure()
     {

@@ -51,7 +51,8 @@ class JobCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('syrup:run-job')
+            ->setName('syrup:job:run')
+            ->setAliases(['syrup:run-job'])
             ->setDescription('Command to execute jobs')
             ->addArgument('jobId', InputArgument::REQUIRED, 'ID of the job')
         ;

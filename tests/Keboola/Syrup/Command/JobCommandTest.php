@@ -8,7 +8,6 @@ namespace Keboola\Syrup\Tests\Command;
 
 use Keboola\Syrup\Test\Job\Executor\ErrorExecutor;
 use Keboola\Syrup\Test\Job\Executor\HookExecutor;
-use Keboola\Syrup\Test\Job\Executor\SignaledExectuor;
 use Keboola\Syrup\Test\Job\Executor\SuccessExecutor;
 use Keboola\Syrup\Test\Job\Executor\WarningExecutor;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -108,6 +107,7 @@ class JobCommandTest extends WebTestCase
         // job execution test
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
+        // use old (alias) name of the job command to test BC
         $command = $this->application->find('syrup:run-job');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
@@ -124,7 +124,7 @@ class JobCommandTest extends WebTestCase
 
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        $command = $this->application->find('syrup:run-job');
+        $command = $this->application->find('syrup:job:run');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'jobId'   => $jobId
@@ -141,7 +141,7 @@ class JobCommandTest extends WebTestCase
 
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        $command = $this->application->find('syrup:run-job');
+        $command = $this->application->find('syrup:job:run');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'jobId'   => $jobId
@@ -158,7 +158,7 @@ class JobCommandTest extends WebTestCase
 
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        $command = $this->application->find('syrup:run-job');
+        $command = $this->application->find('syrup:job:run');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'jobId'   => $jobId
@@ -183,7 +183,7 @@ class JobCommandTest extends WebTestCase
         // job execution test
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
 
-        $command = $this->application->find('syrup:run-job');
+        $command = $this->application->find('syrup:job:run');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'jobId'   => $jobId
