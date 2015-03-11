@@ -37,4 +37,22 @@ class QueueFactory
 
         return new QueueService($queueConfig, $this->componentName);
     }
+
+    public function create($name, $region = 'us-east-1', $key = null, $secret = null)
+    {
+        $data['region'] = $region;
+
+        if ($key != null && $secret != null) {
+            $data['key'] = $key;
+            $data['secret'] = $secret;
+        }
+
+        $sqsClient = SqsClient::factory($data);
+
+        $sqsQueue = $sqsClient->createQueue([
+            'QueueName' => $name
+        ]);
+
+        return $sqsQueue;
+    }
 }

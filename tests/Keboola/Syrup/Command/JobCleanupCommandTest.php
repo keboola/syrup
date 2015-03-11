@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Keboola\StorageApi\Client as StorageApiClient;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class CleanupCommandTest extends WebTestCase
+class JobCleanupCommandTest extends WebTestCase
 {
     /**
      * @var Application
