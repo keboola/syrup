@@ -7,7 +7,6 @@
 
 namespace Keboola\Syrup\Tests\Service\Queue;
 
-
 use Aws\Sqs\SqsClient;
 use Doctrine\DBAL\DriverManager;
 use Keboola\Syrup\Service\Queue\QueueFactory;
@@ -37,5 +36,4 @@ class QueueFactoryTest extends \PHPUnit_Framework_TestCase
             'QueueUrl' => $sqsQueue->get('QueueUrl')
         ]);
     }
-
 }
