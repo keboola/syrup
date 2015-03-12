@@ -124,16 +124,23 @@ class ExceptionHandler extends BaseExceptionHandler
                     $ind = $count - $position + 1;
                     $class = $this->formatClass($e['class']);
                     $message = nl2br(self::utf8Htmlize($e['message']));
-                    $content .= sprintf(<<<EOF
+                    $contentTemplate = <<<EOF
                         <h2 class="block_exception clear_fix">
                             <span class="exception_counter">%d/%d</span>
                             <span class="exception_title">%s (%d)%s:</span>
                             <span class="exception_message">%s</span>
                         </h2>
                         <div class="block">
-
-EOF
-                        , $ind, $total, $class, $e['code'], $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']), $message);
+EOF;
+                    $content .= sprintf(
+                        $contentTemplate,
+                        $ind,
+                        $total,
+                        $class,
+                        $e['code'],
+                        $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']),
+                        $message
+                    );
                     if (!empty($e['data'])) {
                         $content .= '<h2>Data</h2>';
                         $content .= '<pre>'.json_encode($e['data'], JSON_PRETTY_PRINT).'</pre>';
