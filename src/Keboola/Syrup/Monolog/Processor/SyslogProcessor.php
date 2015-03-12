@@ -114,6 +114,10 @@ EOF;
                     'code' => $e->getCode(),
                     'attachment' => $this->s3Uploader->uploadString('exception', $serialized, 'text/html')
                 ];
+                if ($e instanceof SyrupComponentException) {
+                    /** @var SyrupComponentException $e */
+                    $record['exception']['data'] = $e->getData();
+                }
             }
         }
 
