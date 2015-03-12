@@ -140,6 +140,9 @@ EOF;
                 'level' => $record['level'],
                 'attachment' => $this->s3Uploader->uploadString('log', $json, 'text/json')
             ];
+            if (isset($record['exceptionId'])) {
+                $r['exceptionId'] = $record['exceptionId'];
+            }
             if (isset($record['token'])) {
                 $r['token'] = $record['token'];
             }
