@@ -21,11 +21,21 @@ class QueueService
 
     public function __construct(array $config, $componentName)
     {
-        $this->client = SqsClient::factory([
-            'key' => $config['access_key'],
-            'secret' => $config['secret_key'],
+        $data = [
             'region' => $config['region']
-        ]);
+        ];
+
+        if (
+            isset($config['access_key'])
+            && isset($config['secret_key'])
+            && !is_null($config['access_key'])
+            && !is_null($config['secret_key'])
+        ) {
+            $data['key'] = $config['access_key'];
+            $data['secret'] = $componentName['secret_key'];
+        }
+
+        $this->client = SqsClient::factory($data);
         $this->queueUrl = $config['url'];
         $this->componentName = $componentName;
     }
@@ -101,5 +111,15 @@ class QueueService
             'QueueUrl' => $message->getQueueUrl(),
             'ReceiptHandle' => $message->getReceiptHandle(),
         ]);
+    }
+
+    public function getUrl()
+    {
+        return $this->queueUrl;
+    }
+
+    public function getClient()
+    {
+        return $this->client;
     }
 }
