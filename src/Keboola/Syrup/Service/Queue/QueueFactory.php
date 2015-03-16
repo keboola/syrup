@@ -28,6 +28,11 @@ class QueueFactory
 
     public function get($name = 'default')
     {
+        if ($name == 'kill') {
+            $hostnameArr = explode('.', gethostname());
+            $name = 'syrup_kill_' . array_shift($hostnameArr);
+        }
+
         $sql = "SELECT access_key, secret_key, region, url FROM {$this->dbTable} WHERE id = '{$name}'";
         $queueConfig = $this->db->query($sql)->fetch();
 

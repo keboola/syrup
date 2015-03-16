@@ -13,8 +13,10 @@ class SignalHandler extends AbstractHandler
 {
     public function handle(array $record)
     {
-        // call handlers for pending signalse
-        pcntl_signal_dispatch();
+        // call handlers for pending signals
+        if (php_sapi_name() == "cli") {
+            pcntl_signal_dispatch();
+        }
 
         // let other logging handlers handle the record
         return false;
