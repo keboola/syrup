@@ -28,11 +28,11 @@ class QueueService
         if (
             isset($config['access_key'])
             && isset($config['secret_key'])
-            && !is_null($config['access_key'])
-            && !is_null($config['secret_key'])
+            && !empty($config['access_key'])
+            && !empty($config['secret_key'])
         ) {
             $data['key'] = $config['access_key'];
-            $data['secret'] = $componentName['secret_key'];
+            $data['secret'] = $config['secret_key'];
         }
 
         $this->client = SqsClient::factory($data);
