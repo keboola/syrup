@@ -1,7 +1,7 @@
 #branches:
 #  only:
 #    - master
-#sudo: false
+sudo: false
 language: php
 php:
   - '5.6'
