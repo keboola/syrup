@@ -2,8 +2,8 @@
 
 namespace Keboola\Syrup\Monolog\Processor;
 
-use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\Debug\ExceptionHandler;
+use Keboola\Syrup\Debug\Exception\FlattenException;
+use Keboola\Syrup\Debug\ExceptionHandler;
 use Keboola\Syrup\Aws\S3\Uploader;
 use Keboola\Syrup\Exception\SyrupComponentException;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
@@ -85,34 +85,12 @@ class SyslogProcessor
             if ($e instanceof \Exception) {
                 $flattenException = FlattenException::create($e);
                 $eHandler = new ExceptionHandler(true);
-                $css = $eHandler->getStylesheet($flattenException);
-                $content = $eHandler->getContent($flattenException);
-                $serialized = <<<EOF
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="robots" content="noindex,nofollow" />
-        <style>
-            html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:text-top;}sub{vertical-align:text-bottom;}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;}input,textarea,select{*font-size:100%;}legend{color:#000;}
-
-            html { background: #eee; padding: 10px }
-            img { border: 0; }
-            #sf-resetcontent { width:970px; margin:0 auto; }
-            $css
-        </style>
-    </head>
-    <body>
-        $content
-    </body>
-</html>
-EOF;
-
+                $html = $eHandler->getHtml($flattenException);
                 $record['exception'] = [
                     'class' => get_class($e),
                     'message' => $e->getMessage(),
                     'code' => $e->getCode(),
-                    'attachment' => $this->s3Uploader->uploadString('exception', $serialized, 'text/html')
+                    'attachment' => $this->s3Uploader->uploadString('exception', $html, 'text/html')
                 ];
             }
         }
@@ -140,8 +118,8 @@ EOF;
                 'level' => $record['level'],
                 'attachment' => $this->s3Uploader->uploadString('log', $json, 'text/json')
             ];
-            if (isset($record['token'])) {
-                $r['token'] = $record['token'];
+            if (isset($record['app'])) {
+                $r['app'] = $record['app'];
             }
             $record = $r;
         }

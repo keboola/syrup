@@ -51,7 +51,9 @@
         "codeclimate/php-test-reporter": "dev-master"
     },
     "scripts": {
-        "post-install-cmd": [],
+        "post-install-cmd": [
+            "bash git/setup.sh"
+        ],
         "post-update-cmd": []
     },
     "config": {
