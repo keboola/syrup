@@ -25,12 +25,10 @@ class QueueService
             'region' => $config['region']
         ];
 
-        if (
-            isset($config['access_key'])
+        if (isset($config['access_key'])
             && isset($config['secret_key'])
             && !empty($config['access_key'])
-            && !empty($config['secret_key'])
-        ) {
+            && !empty($config['secret_key'])) {
             $data['key'] = $config['access_key'];
             $data['secret'] = $config['secret_key'];
         }
@@ -103,7 +101,6 @@ class QueueService
             );
         }, (array) $result['Messages']);
     }
-
 
     public function deleteMessage(QueueMessage $message)
     {
