@@ -35,18 +35,29 @@ class JobCleanupCommandTest extends WebTestCase
         $this->application = new Application(self::$kernel);
         $this->application->add(new JobCleanupCommand());
 
-        $this->storageApiToken = self::$kernel->getContainer()->getParameter('storage_api.test.token');
+        $this->storageApiToken = self::$kernel
+            ->getContainer()
+            ->getParameter('storage_api.test.token');
+
         $this->storageApiClient = new StorageApiClient([
             'token' => $this->storageApiToken,
-            'url' => self::$kernel->getContainer()->getParameter('storage_api.test.url')
+            'url' => self::$kernel
+                ->getContainer()
+                ->getParameter('storage_api.test.url')
         ]);
     }
 
     public function testCleanup()
     {
         /** @var JobMapper $jobMapper */
-        $jobMapper = self::$kernel->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
-        $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')->encrypt($this->storageApiToken);
+        $jobMapper = self::$kernel
+            ->getContainer()
+            ->get('syrup.elasticsearch.current_component_job_mapper');
+
+        $encryptedToken = self::$kernel
+            ->getContainer()
+            ->get('syrup.encryptor')
+            ->encrypt($this->storageApiToken);
 
         // job execution test
         $jobId = $jobMapper->create($this->createJob($encryptedToken));
@@ -61,6 +72,7 @@ class JobCleanupCommandTest extends WebTestCase
 
         $job = $jobMapper->get($jobId);
         $this->assertEquals($job->getStatus(), Job::STATUS_TERMINATED);
+        $this->assertEquals('cleaned', $job->getResult()['message']);
     }
 
     protected function createJob($token)

@@ -7,6 +7,7 @@
 
 namespace Keboola\Syrup\Test\Job\Executor;
 
+use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\Syrup\Job\Metadata\Job;
 use Monolog\Logger;
 
@@ -15,9 +16,13 @@ class Executor extends \Keboola\Syrup\Job\Executor
     /** @var Logger */
     protected $logger;
 
-    public function __construct($logger)
+    /** @var JobMapper */
+    protected $jobMapper;
+
+    public function __construct($logger, $jobMapper)
     {
         $this->logger = $logger;
+        $this->jobMapper = $jobMapper;
     }
 
     public function execute(Job $job)
@@ -29,5 +34,13 @@ class Executor extends \Keboola\Syrup\Job\Executor
 
             sleep(3);
         }
+    }
+
+    public function cleanup($job)
+    {
+        /** @var Job $job */
+        $job->setResult(['message' => 'cleaned']);
+
+        $this->jobMapper->update($job);
     }
 }
