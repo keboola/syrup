@@ -11,6 +11,7 @@ namespace Keboola\Syrup\Command;
 use Doctrine\DBAL\Connection;
 use Keboola\Encryption\EncryptorInterface;
 use Keboola\Syrup\Exception\MaintenanceException;
+use Keboola\Syrup\Job\ExecutorFactory;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -81,6 +82,7 @@ class JobCommand extends ContainerAwareCommand
             'userAgent' => $this->job->getComponent(),
         ]);
         $this->sapiClient->setRunId($this->job->getRunId());
+
         /** @var \Keboola\Syrup\Service\StorageApi\StorageApiService $storageApiService */
         $storageApiService = $this->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient($this->sapiClient);
@@ -133,16 +135,6 @@ class JobCommand extends ContainerAwareCommand
             return self::STATUS_LOCK;
         }
 
-        // Instantiate jobExecutor based on component name
-        $jobExecutorName = str_replace('-', '_', $this->job->getComponent()) . '.job_executor';
-
-        /** @var ExecutorInterface $jobExecutor */
-        $jobExecutor = $this->getContainer()->get($jobExecutorName);
-        $jobExecutor->setStorageApi($this->sapiClient);
-
-        // register signal handler for SIGTERM
-        pcntl_signal(SIGTERM, [$jobExecutor, 'onTerminate']);
-
         $startTime = time();
 
         // Update job status to 'processing'
@@ -157,6 +149,13 @@ class JobCommand extends ContainerAwareCommand
         ]);
 
         $this->jobMapper->update($this->job);
+
+        // Instantiate jobExecutor based on component name
+        /** @var ExecutorFactory $jobExecutorFactory */
+        $jobExecutorFactory = $this->getContainer()->get('syrup.job_executor_factory');
+
+        /** @var ExecutorInterface $jobExecutor */
+        $jobExecutor = $jobExecutorFactory->create($this->job);
 
         // Execute job
         try {

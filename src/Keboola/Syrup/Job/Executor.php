@@ -16,6 +16,14 @@ class Executor implements ExecutorInterface
     /** @var SapiClient */
     protected $storageApi;
 
+    /** @var Job */
+    protected $job;
+
+    public function setJob(Job $job)
+    {
+        $this->job = $job;
+    }
+
     public function setStorageApi(SapiClient $sapi)
     {
         $this->storageApi = $sapi;
@@ -34,7 +42,7 @@ class Executor implements ExecutorInterface
         throw $e;
     }
 
-    public function cleanup($job = null)
+    public function cleanup()
     {
 
     }

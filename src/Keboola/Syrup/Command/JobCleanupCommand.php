@@ -11,6 +11,7 @@ use Doctrine\DBAL\Connection;
 use Keboola\Encryption\EncryptorInterface;
 use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\Syrup\Exception\ApplicationException;
+use Keboola\Syrup\Job\ExecutorFactory;
 use Keboola\Syrup\Job\ExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\Db\Lock;
@@ -64,6 +65,7 @@ class JobCleanupCommand extends ContainerAwareCommand
             'userAgent' => $this->job->getComponent(),
         ]);
         $this->sapiClient->setRunId($this->job->getRunId());
+
         /** @var \Keboola\Syrup\Service\StorageApi\StorageApiService $storageApiService */
         $storageApiService = $this->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient($this->sapiClient);
@@ -96,11 +98,11 @@ class JobCleanupCommand extends ContainerAwareCommand
         $this->init($jobId);
 
         // Instantiate jobExecutor based on component name
-        $jobExecutorName = str_replace('-', '_', $this->job->getComponent()) . '.job_executor';
+        /** @var ExecutorFactory $jobExecutorFactory */
+        $jobExecutorFactory = $this->getContainer()->get('syrup.job_executor_factory');
 
         /** @var ExecutorInterface $jobExecutor */
-        $jobExecutor = $this->getContainer()->get($jobExecutorName);
-        $jobExecutor->setStorageApi($this->sapiClient);
+        $jobExecutor = $jobExecutorFactory->create($this->job);
 
         // Ensure that job status is 'terminating'
         if ($this->job->getStatus() != Job::STATUS_TERMINATING) {
@@ -108,7 +110,8 @@ class JobCleanupCommand extends ContainerAwareCommand
             $this->jobMapper->update($this->job);
         }
 
-        $jobExecutor->cleanup($this->job);
+        // run cleanup
+        $jobExecutor->cleanup();
 
         // Update job status to 'terminated'
         $this->job->setStatus(Job::STATUS_TERMINATED);
