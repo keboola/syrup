@@ -37,5 +37,4 @@ class ExecutorFactory
 
         return $jobExecutor;
     }
-
 }
