@@ -100,7 +100,7 @@ services:
         arguments: [%app_name%, @syrup.encryptor]
 
     syrup.job_executor:
-        class: class: Keboola\Syrup\Job\Executor
+        class: Keboola\Syrup\Job\Executor
 
     syrup.job_executor_factory:
         class: Keboola\Syrup\Job\ExecutorFactory
