@@ -224,12 +224,14 @@ class JobCommand extends ContainerAwareCommand
 
         // Update job with results
         $endTime = time();
+        $createdTime = $this->job->getCreatedTime();
+        $waitSeconds = is_null($createdTime)?:$endTime - strtotime($createdTime);
 
         $this->job->setStatus($jobStatus);
         $this->job->setResult($jobResult);
         $this->job->setEndTime(date('c', $endTime));
         $this->job->setDurationSeconds($endTime - $startTime);
-        $this->job->setWaitSeconds($endTime - strtotime($this->job->getCreatedTime()));
+        $this->job->setWaitSeconds($waitSeconds);
         $this->jobMapper->update($this->job);
 
         // postExecution action
