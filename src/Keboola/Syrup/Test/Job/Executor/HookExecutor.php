@@ -11,11 +11,6 @@ class HookExecutor extends \Keboola\Syrup\Job\Executor implements HookExecutorIn
     const HOOK_RESULT_VALUE = 'done';
 
     /**
-     * @var Job
-     */
-    private $job;
-
-    /**
      * @var JobMapper
      */
     private $jobMapper;
