@@ -6,60 +6,32 @@
  */
 namespace Keboola\Syrup\Tests\Command;
 
+use Keboola\Syrup\Test\CommandTestCase;
 use Keboola\Syrup\Test\Job\Executor\ErrorExecutor;
 use Keboola\Syrup\Test\Job\Executor\HookExecutor;
 use Keboola\Syrup\Test\Job\Executor\MaintenanceExecutor;
 use Keboola\Syrup\Test\Job\Executor\SuccessExecutor;
 use Keboola\Syrup\Test\Job\Executor\WarningExecutor;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Keboola\Syrup\Test\WebTestCase;
 use Keboola\Syrup\Command\JobCommand;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Tests\Job as TestExecutor;
-use Keboola\Syrup\Elasticsearch\JobMapper;
-use Keboola\StorageApi\Client as StorageApiClient;
 use Symfony\Component\Process\Process;
 
 /**
  * @covers \Keboola\Syrup\Command\JobCommand
  */
-class JobCommandTest extends WebTestCase
+class JobCommandTest extends CommandTestCase
 {
-    /**
-     * @var Application
-     */
-    protected $application;
-    protected $storageApiToken;
-    /**
-     * @var StorageApiClient;
-     */
-    protected $storageApiClient;
-    /**
-     * @var JobMapper $jobMapper
-     */
-    protected $jobMapper;
     /**
      * @var CommandTester
      */
     protected $commandTester;
 
-
     protected function setUp()
     {
-        $this->bootKernel();
-
-        $this->application = new Application(self::$kernel);
+        parent::setUp();
         $this->application->add(new JobCommand());
-
-        $this->storageApiToken = self::$kernel->getContainer()->getParameter('storage_api.test.token');
-        $this->storageApiClient = new StorageApiClient([
-            'token' => $this->storageApiToken,
-            'url'   => self::$kernel->getContainer()->getParameter('storage_api.test.url')
-        ]);
-
-        /** @var JobMapper $jobMapper */
-        $this->jobMapper = self::$kernel->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
 
         // use old (alias) name of the job command to test BC
         $command = $this->application->find('syrup:run-job');
@@ -72,13 +44,8 @@ class JobCommandTest extends WebTestCase
             $this->markTestSkipped("No pcntl extension, skipping...");
         }
 
-        /** @var JobMapper $jobMapper */
-        $jobMapper = self::$kernel->getContainer()->get('syrup.elasticsearch.current_component_job_mapper');
-        $encryptedToken = self::$kernel->getContainer()->get('syrup.encryptor')->encrypt($this->storageApiToken);
-
-        // job execution test
-        $jobId = $jobMapper->create($this->createJob($encryptedToken));
-
+        // create and start the job
+        $jobId = $this->jobMapper->create($this->createJob());
         $process = new Process(self::$kernel->getRootDir() . '/console syrup:run-job ' . $jobId . ' --env=test');
         $process->setTimeout(60);
         $process->setIdleTimeout(60);
@@ -86,8 +53,7 @@ class JobCommandTest extends WebTestCase
 
         // let it run for a while
         sleep(10);
-
-        $job = $jobMapper->get($jobId);
+        $job = $this->jobMapper->get($jobId);
         $i=0;
         while ($job->getStatus() != Job::STATUS_PROCESSING && $i<10) {
             sleep(2);
@@ -100,20 +66,13 @@ class JobCommandTest extends WebTestCase
         // terminate the job
         posix_kill($job->getProcess()['pid'], SIGTERM);
 
+        // waiting for process to finish
         while ($process->isRunning()) {
-            // waiting for process to finish
             sleep(2);
         }
 
-        $job = $jobMapper->get($jobId);
-
-        $i = 0;
-        while ($job->getVersion() < 3 && $i<5) {
-            $job = $jobMapper->get($jobId);
-            sleep(1 + pow(2, $i)/2);
-            $i++;
-        }
-
+        // get the job and check it
+        $job = $this->jobMapper->get($jobId);
         $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus());
     }
 
@@ -185,30 +144,5 @@ class JobCommandTest extends WebTestCase
         $jobId = $this->jobMapper->create($this->createJob());
         $this->commandTester->execute(['jobId'   => $jobId]);
         $this->assertEquals(JobCommand::STATUS_LOCK, $this->commandTester->getStatusCode());
-    }
-
-    protected function createJob()
-    {
-        return new Job([
-            'id' => $this->storageApiClient->generateId(),
-            'runId' => $this->storageApiClient->generateId(),
-            'project' => [
-                'id' => '123',
-                'name' => 'Syrup TEST'
-            ],
-            'token' => [
-                'id' => '123',
-                'description' => 'fake token',
-                'token' => self::$kernel->getContainer()->get('syrup.encryptor')->encrypt($this->storageApiToken)
-            ],
-            'component' => 'syrup',
-            'command' => 'run',
-            'params' => [],
-            'process' => [
-                'host' => gethostname(),
-                'pid' => getmypid()
-            ],
-            'createdTime' => date('c')
-        ]);
     }
 }

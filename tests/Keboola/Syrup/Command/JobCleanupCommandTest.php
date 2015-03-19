@@ -8,95 +8,34 @@
 namespace Keboola\Syrup\Tests\Command;
 
 use Keboola\Syrup\Command\JobCleanupCommand;
-use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\Syrup\Job\Metadata\Job;
-use Keboola\Syrup\Test\WebTestCase;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Keboola\StorageApi\Client as StorageApiClient;
+use Keboola\Syrup\Test\CommandTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class JobCleanupCommandTest extends WebTestCase
+class JobCleanupCommandTest extends CommandTestCase
 {
-    /**
-     * @var Application
-     */
-    protected $application;
-    protected $storageApiToken;
-    /**
-     * @var StorageApiClient;
-     */
-    protected $storageApiClient;
-
-
     protected function setUp()
     {
-        $this->bootKernel();
+        parent::setUp();
 
-        $this->application = new Application(self::$kernel);
         $this->application->add(new JobCleanupCommand());
-
-        $this->storageApiToken = self::$kernel
-            ->getContainer()
-            ->getParameter('storage_api.test.token');
-
-        $this->storageApiClient = new StorageApiClient([
-            'token' => $this->storageApiToken,
-            'url' => self::$kernel
-                ->getContainer()
-                ->getParameter('storage_api.test.url')
-        ]);
     }
 
     public function testCleanup()
     {
-        /** @var JobMapper $jobMapper */
-        $jobMapper = self::$kernel
-            ->getContainer()
-            ->get('syrup.elasticsearch.current_component_job_mapper');
-
-        $encryptedToken = self::$kernel
-            ->getContainer()
-            ->get('syrup.encryptor')
-            ->encrypt($this->storageApiToken);
-
         // job execution test
-        $jobId = $jobMapper->create($this->createJob($encryptedToken));
+        $jobId = $this->jobMapper->create($this->createJob());
 
         $command = $this->application->find('syrup:job:cleanup');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            'jobId'   => $jobId
+            'jobId' => $jobId
         ]);
 
         $this->assertEquals(0, $commandTester->getStatusCode());
 
-        $job = $jobMapper->get($jobId);
+        $job = $this->jobMapper->get($jobId);
         $this->assertEquals($job->getStatus(), Job::STATUS_TERMINATED);
         $this->assertEquals('cleaned', $job->getResult()['message']);
-    }
-
-    protected function createJob($token)
-    {
-        return new Job([
-            'id' => $this->storageApiClient->generateId(),
-            'runId' => $this->storageApiClient->generateId(),
-            'project' => [
-                'id' => '123',
-                'name' => 'Syrup TEST'
-            ],
-            'token' => [
-                'id' => '123',
-                'description' => 'fake token',
-                'token' => $token
-            ],
-            'component' => 'syrup',
-            'command' => 'run',
-            'params' => [],
-            'process' => [
-                'host' => gethostname(),
-                'pid' => getmypid()
-            ],
-            'createdTime' => date('c')
-        ]);
     }
 }

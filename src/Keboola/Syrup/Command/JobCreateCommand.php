@@ -28,15 +28,12 @@ class JobCreateCommand extends ContainerAwareCommand
     /** @var EncryptorInterface $encryptor */
     private $encryptor;
 
-    private $componentName;
-
     protected function configure()
     {
         $this
             ->setName('syrup:job:create')
             ->setDescription('Command to execute jobs')
             ->addArgument('token', InputArgument::REQUIRED, 'SAPI token')
-            ->addArgument('component', InputArgument::REQUIRED, 'Component name')
             ->addArgument('cmd', InputArgument::REQUIRED, 'Job command name')
             ->addArgument('params', InputArgument::OPTIONAL, 'Job command parameters as JSON', '{}')
             ->addOption('no-run', 'norun', InputOption::VALUE_NONE, "Dont run the job, just create it")
@@ -46,12 +43,11 @@ class JobCreateCommand extends ContainerAwareCommand
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $token = $input->getArgument('token');
-        $this->componentName = $input->getArgument('component');
 
         $this->storageApi = new SapiClient([
             'url'       => $this->getContainer()->getParameter('storage_api.url'),
             'token'     => $token,
-            'userAgent' => $this->componentName
+            'userAgent' => $this->getContainer()->getParameter('app_name')
         ]);
         /** @var StorageApiService $storageApiService */
         $storageApiService = $this->getContainer()->get('syrup.storage_api');
@@ -100,12 +96,5 @@ class JobCreateCommand extends ContainerAwareCommand
         }
 
         return 0;
-    }
-
-    protected function enqueue($jobId, $queueName = 'default', $otherData = [])
-    {
-        /** @var QueueService $queue */
-        $queue = $this->getContainer()->get('syrup.queue_factory')->get($queueName);
-        return $queue->enqueue($jobId, $otherData);
     }
 }

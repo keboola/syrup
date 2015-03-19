@@ -55,5 +55,7 @@ class QueueCreateCommand extends ContainerAwareCommand
                 'url' => $sqsQueue->get('QueueUrl')
             ]);
         }
+
+        return 0;
     }
 }
