@@ -37,5 +37,4 @@ class JobCreateCommandTest extends CommandTestCase
         $job = $this->jobMapper->get($jobId);
         $this->assertEquals($job->getStatus(), Job::STATUS_WAITING);
     }
-
 }

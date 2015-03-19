@@ -49,7 +49,8 @@ class QueueCreateCommandTest extends CommandTestCase
         $factory = new QueueFactory($db, ['db_table' => 'queues'], SYRUP_APP_NAME);
         $dbQueue = $factory->get($queueName);
 
-        $this->assertEquals($queueName, array_pop(explode('/', $dbQueue->getUrl())));
+        $queueUrlArr = explode('/', $dbQueue->getUrl());
+        $this->assertEquals($queueName, array_pop($queueUrlArr));
 
         $sqsClient = SqsClient::factory([
             'region' => 'us-east-1'

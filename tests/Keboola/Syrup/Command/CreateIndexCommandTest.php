@@ -29,5 +29,4 @@ class CreateIndexCommandTest extends CommandTestCase
 
         $this->assertEquals(0, $commandTester->getStatusCode());
     }
-
 }

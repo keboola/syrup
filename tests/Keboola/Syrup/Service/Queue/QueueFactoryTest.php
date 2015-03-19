@@ -28,7 +28,8 @@ class QueueFactoryTest extends \PHPUnit_Framework_TestCase
 
         $sqsQueue = $factory->create('test');
 
-        $this->assertEquals('test', array_pop(explode('/', $sqsQueue->get('QueueUrl'))));
+        $queueUrlArr = explode('/', $sqsQueue->get('QueueUrl'));
+        $this->assertEquals('test', array_pop($queueUrlArr));
 
         // delete the queue from AWS
         $sqsClient = SqsClient::factory(['region' => 'us-east-1']);
