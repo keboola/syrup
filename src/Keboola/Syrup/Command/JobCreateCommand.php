@@ -36,7 +36,7 @@ class JobCreateCommand extends ContainerAwareCommand
             ->addArgument('token', InputArgument::REQUIRED, 'SAPI token')
             ->addArgument('cmd', InputArgument::REQUIRED, 'Job command name')
             ->addArgument('params', InputArgument::OPTIONAL, 'Job command parameters as JSON', '{}')
-            ->addOption('no-run', 'norun', InputOption::VALUE_NONE, "Dont run the job, just create it")
+            ->addOption('run', 'r', InputOption::VALUE_NONE, "Run the job")
         ;
     }
 
@@ -75,7 +75,7 @@ class JobCreateCommand extends ContainerAwareCommand
         $output->writeln('Created job id ' . $jobId);
 
         // Run Job
-        if (!$input->getOption('no-run')) {
+        if ($input->getOption('run')) {
             $runJobCommand = $this->getApplication()->find('syrup:run-job');
 
             $returnCode = $runJobCommand->run(

@@ -28,8 +28,7 @@ class JobCreateCommandTest extends CommandTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'token' => $this->storageApiToken,
-            'cmd' => 'run',
-            '--no-run' => null
+            'cmd' => 'run'
         ]);
 
         $this->assertEquals(0, $commandTester->getStatusCode());
