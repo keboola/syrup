@@ -148,14 +148,15 @@ class JobCommand extends ContainerAwareCommand
             'pid'   => getmypid()
         ]);
 
-        $this->jobMapper->update($this->job);
-
         // Instantiate jobExecutor based on component name
         /** @var ExecutorFactory $jobExecutorFactory */
         $jobExecutorFactory = $this->getContainer()->get('syrup.job_executor_factory');
 
         /** @var ExecutorInterface $jobExecutor */
         $jobExecutor = $jobExecutorFactory->create($this->job);
+
+        // update the job status after jobExecutor was created, so the signal handler is properly registered
+        $this->jobMapper->update($this->job);
 
         // Execute job
         try {
