@@ -10,6 +10,7 @@ namespace Keboola\Syrup\Job;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 class ExecutorFactory
 {
@@ -28,7 +29,13 @@ class ExecutorFactory
         $jobExecutorName = str_replace('-', '_', $job->getComponent()) . '.job_executor';
 
         /** @var ExecutorInterface $jobExecutor */
-        $jobExecutor = $this->container->get($jobExecutorName);
+
+        try {
+            $jobExecutor = $this->container->get($jobExecutorName);
+        } catch (ServiceNotFoundException $e) {
+            $jobExecutor = $this->container->get('syrup.job_executor');
+        }
+
         $jobExecutor->setStorageApi($storageApiService->getClient());
         $jobExecutor->setJob($job);
 
