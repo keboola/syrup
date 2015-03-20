@@ -20,7 +20,7 @@ use Keboola\Syrup\Service\Queue\QueueService;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
 use Keboola\Syrup\Elasticsearch\JobMapper;
 
-class CreateJobCommand extends ContainerAwareCommand
+class JobCreateCommand extends ContainerAwareCommand
 {
     /** @var SapiClient */
     private $storageApi;
@@ -28,30 +28,26 @@ class CreateJobCommand extends ContainerAwareCommand
     /** @var EncryptorInterface $encryptor */
     private $encryptor;
 
-    private $componentName;
-
     protected function configure()
     {
         $this
-            ->setName('syrup:create-job')
+            ->setName('syrup:job:create')
             ->setDescription('Command to execute jobs')
             ->addArgument('token', InputArgument::REQUIRED, 'SAPI token')
-            ->addArgument('component', InputArgument::REQUIRED, 'Component name')
             ->addArgument('cmd', InputArgument::REQUIRED, 'Job command name')
             ->addArgument('params', InputArgument::OPTIONAL, 'Job command parameters as JSON', '{}')
-            ->addOption('no-run', 'norun', InputOption::VALUE_NONE, "Dont run the job, just create it")
+            ->addOption('run', 'r', InputOption::VALUE_NONE, "Run the job")
         ;
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $token = $input->getArgument('token');
-        $this->componentName = $input->getArgument('component');
 
         $this->storageApi = new SapiClient([
             'url'       => $this->getContainer()->getParameter('storage_api.url'),
             'token'     => $token,
-            'userAgent' => $this->componentName
+            'userAgent' => $this->getContainer()->getParameter('app_name')
         ]);
         /** @var StorageApiService $storageApiService */
         $storageApiService = $this->getContainer()->get('syrup.storage_api');
@@ -79,7 +75,7 @@ class CreateJobCommand extends ContainerAwareCommand
         $output->writeln('Created job id ' . $jobId);
 
         // Run Job
-        if (!$input->getOption('no-run')) {
+        if ($input->getOption('run')) {
             $runJobCommand = $this->getApplication()->find('syrup:run-job');
 
             $returnCode = $runJobCommand->run(
@@ -100,12 +96,5 @@ class CreateJobCommand extends ContainerAwareCommand
         }
 
         return 0;
-    }
-
-    protected function enqueue($jobId, $queueName = 'default', $otherData = [])
-    {
-        /** @var QueueService $queue */
-        $queue = $this->getContainer()->get('syrup.queue_factory')->get($queueName);
-        return $queue->enqueue($jobId, $otherData);
     }
 }

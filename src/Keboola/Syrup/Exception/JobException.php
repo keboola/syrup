@@ -59,6 +59,7 @@ class JobException extends SyrupComponentException
             Job::STATUS_ERROR,
             Job::STATUS_SUCCESS,
             Job::STATUS_WARNING,
+            Job::STATUS_TERMINATED
         );
 
         if (!in_array($status, $allowedStatuses)) {

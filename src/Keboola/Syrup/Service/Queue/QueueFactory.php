@@ -28,6 +28,11 @@ class QueueFactory
 
     public function get($name = 'default')
     {
+        if ($name == 'kill') {
+            $hostnameArr = explode('.', gethostname());
+            $name = 'syrup_kill_' . array_shift($hostnameArr);
+        }
+
         $sql = "SELECT access_key, secret_key, region, url FROM {$this->dbTable} WHERE id = '{$name}'";
         $queueConfig = $this->db->query($sql)->fetch();
 
@@ -36,5 +41,23 @@ class QueueFactory
         }
 
         return new QueueService($queueConfig, $this->componentName);
+    }
+
+    public function create($name, $region = 'us-east-1', $key = null, $secret = null)
+    {
+        $data['region'] = $region;
+
+        if ($key != null && $secret != null) {
+            $data['key'] = $key;
+            $data['secret'] = $secret;
+        }
+
+        $sqsClient = SqsClient::factory($data);
+
+        $sqsQueue = $sqsClient->createQueue([
+            'QueueName' => $name
+        ]);
+
+        return $sqsQueue;
     }
 }

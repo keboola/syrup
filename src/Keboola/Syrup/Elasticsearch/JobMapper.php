@@ -56,10 +56,12 @@ class JobMapper
         $i = 0;
         while ($i < 5) {
             $resJob = $this->get($job->getId());
+
             if ($resJob != null) {
                 return $response['_id'];
             }
-            sleep(1 + pow($i, 2)/2);
+            sleep(1 + intval(pow(2, $i)/2));
+            $i++;
         }
 
         throw new ApplicationException("Unable to find the job in index", null, [
@@ -93,7 +95,8 @@ class JobMapper
             if ($resJob != null && $resJob->getVersion() == $response['_version']) {
                 return $response['_id'];
             }
-            sleep(1 + pow($i, 2)/2);
+            sleep(1 + intval(pow(2, $i)/2));
+            $i++;
         }
 
         throw new ApplicationException("Unable to find the job in index", null, [

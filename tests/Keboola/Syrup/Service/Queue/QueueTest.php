@@ -56,6 +56,5 @@ class QueueTest extends \PHPUnit_Framework_TestCase
 
         // assert that test did not fail
         $this->assertTrue(true);
-
     }
 }

@@ -12,7 +12,6 @@ services:
         class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         arguments: [@pdo, %pdo.db_options%]
 
-
     syrup.listener.exception:
         class: Keboola\Syrup\Listener\SyrupExceptionListener
         arguments: [%app_name%, @syrup.storage_api, @logger]
@@ -25,7 +24,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
-
     syrup.s3_uploader:
         class: Keboola\Syrup\Aws\S3\Uploader
         arguments: [%uploader%]
@@ -33,20 +31,27 @@ services:
     syrup.monolog.sapi_handler:
         class: Keboola\Syrup\Monolog\Handler\StorageApiHandler
         arguments: [%app_name%, @syrup.storage_api]
+
+    syrup.monolog.signal_handler:
+        class: Keboola\Syrup\Monolog\Handler\SignalHandler
+
     syrup.monolog.syslog_processor:
         class: Keboola\Syrup\Monolog\Processor\SyslogProcessor
         arguments: [%app_name%, @syrup.storage_api, @syrup.s3_uploader]
         tags:
             - { name: monolog.processor, method: processRecord, handler: syrup_syslog }
+
     syrup.monolog.request_processor:
         class: Keboola\Syrup\Monolog\Processor\RequestProcessor
         arguments: [@request_stack, @syrup.s3_uploader]
         tags:
             - { name: monolog.processor, method: processRecord }
+
     syrup.monolog.job_processor:
         class: Keboola\Syrup\Monolog\Processor\JobProcessor
         tags:
             - { name: monolog.processor, method: processRecord }
+
     syrup.monolog.formatter:
         class: Keboola\Syrup\Monolog\Formatter\JsonFormatter
 
@@ -73,12 +78,15 @@ services:
     syrup.elasticsearch.client:
         class: Elasticsearch\Client
         arguments: [%elasticsearch%]
+
     syrup.elasticsearch.current_component_index:
         class: Keboola\Syrup\Elasticsearch\ComponentIndex
         arguments: [%app_name%, %elasticsearch.index_prefix%, @syrup.elasticsearch.client]
+
     syrup.elasticsearch.current_component_job_mapper:
         class: Keboola\Syrup\Elasticsearch\JobMapper
         arguments: [@syrup.elasticsearch.client, @syrup.elasticsearch.current_component_index]
+
     syrup.elasticsearch.search:
         class: Keboola\Syrup\Elasticsearch\Search
         arguments: [@syrup.elasticsearch.client, %elasticsearch.index_prefix%]
@@ -93,4 +101,8 @@ services:
 
     syrup.job_executor:
         class: Keboola\Syrup\Job\Executor
+
+    syrup.job_executor_factory:
+        class: Keboola\Syrup\Job\ExecutorFactory
+        arguments: [@service_container]
 

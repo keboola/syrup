@@ -11,6 +11,7 @@ namespace Keboola\Syrup\Command;
 use Doctrine\DBAL\Connection;
 use Keboola\Encryption\EncryptorInterface;
 use Keboola\Syrup\Exception\MaintenanceException;
+use Keboola\Syrup\Job\ExecutorFactory;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -52,7 +53,8 @@ class JobCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('syrup:run-job')
+            ->setName('syrup:job:run')
+            ->setAliases(['syrup:run-job'])
             ->setDescription('Command to execute jobs')
             ->addArgument('jobId', InputArgument::REQUIRED, 'ID of the job')
         ;
@@ -80,6 +82,7 @@ class JobCommand extends ContainerAwareCommand
             'userAgent' => $this->job->getComponent(),
         ]);
         $this->sapiClient->setRunId($this->job->getRunId());
+
         /** @var \Keboola\Syrup\Service\StorageApi\StorageApiService $storageApiService */
         $storageApiService = $this->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient($this->sapiClient);
@@ -145,18 +148,15 @@ class JobCommand extends ContainerAwareCommand
             'pid'   => getmypid()
         ]);
 
-        $this->jobMapper->update($this->job);
-
         // Instantiate jobExecutor based on component name
-        $jobExecutorName = str_replace('-', '_', $this->job->getComponent()) . '.job_executor';
+        /** @var ExecutorFactory $jobExecutorFactory */
+        $jobExecutorFactory = $this->getContainer()->get('syrup.job_executor_factory');
 
         /** @var ExecutorInterface $jobExecutor */
-        try {
-            $jobExecutor = $this->getContainer()->get($jobExecutorName);
-        } catch (\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException $e) {
-            $jobExecutor = $this->getContainer()->get('syrup.job_executor');
-        }
-        $jobExecutor->setStorageApi($this->sapiClient);
+        $jobExecutor = $jobExecutorFactory->create($this->job);
+
+        // update the job status after jobExecutor was created, so the signal handler is properly registered
+        $this->jobMapper->update($this->job);
 
         // Execute job
         try {
@@ -225,12 +225,14 @@ class JobCommand extends ContainerAwareCommand
 
         // Update job with results
         $endTime = time();
-        $duration = $endTime - $startTime;
+        $createdTime = $this->job->getCreatedTime();
+        $waitSeconds = is_null($createdTime)?:$endTime - strtotime($createdTime);
 
         $this->job->setStatus($jobStatus);
         $this->job->setResult($jobResult);
         $this->job->setEndTime(date('c', $endTime));
-        $this->job->setDurationSeconds($duration);
+        $this->job->setDurationSeconds($endTime - $startTime);
+        $this->job->setWaitSeconds($waitSeconds);
         $this->jobMapper->update($this->job);
 
         // postExecution action

@@ -23,20 +23,19 @@ class ExceptionHandler extends BaseExceptionHandler
     public function __construct($debug = true, $charset = 'UTF-8', $env = 'dev')
     {
         $this->env = $env;
-        parent::__construct($debug, $charset);
+        parent::__construct($debug);
         $this->debug = $debug;
         $this->fileLinkFormat = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
     }
 
     /**
      * Registers the exception handler.
-     *
      * @param Boolean $debug
-     *
-     * @param string $env
+     * @param string  $env
+     * @param null    $fileLinkFormat
      * @return ExceptionHandler The registered exception handler
      */
-    public static function register($debug = true, $env = 'dev')
+    public static function register($debug = true, $env = 'dev', $fileLinkFormat = null)
     {
         $handler = new static($debug, 'UTF-8', $env);
 
