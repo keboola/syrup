@@ -151,7 +151,11 @@ class JobCommand extends ContainerAwareCommand
         $jobExecutorName = str_replace('-', '_', $this->job->getComponent()) . '.job_executor';
 
         /** @var ExecutorInterface $jobExecutor */
-        $jobExecutor = $this->getContainer()->get($jobExecutorName);
+        try {
+            $jobExecutor = $this->getContainer()->get($jobExecutorName);
+        } catch (\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException $e) {
+            $jobExecutor = $this->getContainer()->get('syrup.job_executor');
+        }
         $jobExecutor->setStorageApi($this->sapiClient);
 
         // Execute job

@@ -6,10 +6,10 @@
 #
 # see https://github.com/s0enke/git-hooks/tree/master/phpcs-pre-commit
 
+TMP_STAGING=".tmp_staging"
 PHPCS_BIN=bin/phpcs
 PHPCS_CODING_STANDARD=psr2
 PHPCS_IGNORE=app,bin,git,vendor,web
-TMP_STAGING=".tmp_staging"
 PHPCS_SNIFFS=Generic.Files.ByteOrderMark,Generic.PHP.DisallowShortOpenTag
 PHPCS_FILE_PATTERN="\.(php|phtml)$"
 PHPCS_IGNORE_WARNINGS=1
