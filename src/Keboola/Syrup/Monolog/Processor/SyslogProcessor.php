@@ -57,7 +57,9 @@ class SyslogProcessor
 
     public function processRecord(array $record)
     {
-        $record['component'] = $this->componentName;
+        if (empty($record['component'])) {
+            $record['component'] = $this->componentName;
+        }
         $record['runId'] = $this->runId;
         $record['pid'] = getmypid();
         $record['priority'] = $record['level_name'];
@@ -107,7 +109,7 @@ class SyslogProcessor
 
 
         $json = json_encode($record);
-        if (strlen($json) > 1024) {
+            if (strlen($json) > 1024) {
             $r = [
                 'message' => strlen($record['message']) > 256 ? substr($record['message'], 0, 256) . '...' : $record['message'],
                 'component' => $this->componentName,
