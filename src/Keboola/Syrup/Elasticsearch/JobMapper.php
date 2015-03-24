@@ -53,6 +53,7 @@ class JobMapper
             ]);
         }
 
+        sleep(1);
         $i = 0;
         while ($i < 5) {
             $resJob = $this->get($job->getId());
@@ -89,6 +90,7 @@ class JobMapper
 
         $response = $this->client->update($jobData);
 
+        sleep(1);
         $i = 0;
         while ($i < 5) {
             $resJob = $this->get($job->getId());
