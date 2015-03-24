@@ -109,7 +109,7 @@ class SyslogProcessor
 
 
         $json = json_encode($record);
-            if (strlen($json) > 1024) {
+        if (strlen($json) > 1024) {
             $r = [
                 'message' => strlen($record['message']) > 256 ? substr($record['message'], 0, 256) . '...' : $record['message'],
                 'component' => $this->componentName,
