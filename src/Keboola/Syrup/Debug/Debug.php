@@ -26,6 +26,8 @@ class Debug extends BaseDebug
 
         error_reporting(-1);
 
+        // Beware, ExceptionHandler::register and ErrorHandler::register must be called in this order
+        // to fatal errors handling work
         ExceptionHandler::register(true, $environment);
         ErrorHandler::register();
         DebugClassLoader::enable();
