@@ -92,5 +92,6 @@ class StorageApiHandler extends \Monolog\Handler\AbstractHandler
         $event->setType($type);
 
         $this->storageApiClient->createEvent($event);
+        return false;
     }
 }
