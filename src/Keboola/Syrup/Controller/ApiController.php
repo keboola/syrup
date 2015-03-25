@@ -49,10 +49,7 @@ class ApiController extends BaseController
         $this->checkMappingParams($params);
 
         // Create new job
-        /** @var JobFactory $jobFactory */
-        $jobFactory = $this->container->get('syrup.job_factory');
-        $jobFactory->setStorageApiClient($this->storageApi);
-        $job = $jobFactory->create('run', $params);
+        $job = $this->createJob('run', $params);
 
         // Add job to Elasticsearch
         try {
@@ -131,7 +128,6 @@ class ApiController extends BaseController
     }
 
     /**
-     * @deprecated
      * @param string $command
      * @param array $params
      * @return JobInterface
