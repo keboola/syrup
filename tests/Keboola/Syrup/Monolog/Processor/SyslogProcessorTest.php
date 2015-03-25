@@ -69,7 +69,7 @@ class SyslogProcessorTest extends TestCase
         $record = $this->getRecord();
         $record['component'] = 'fooBar';
         $processor = new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
-        $newRecord = $processor($this->getRecord());
+        $newRecord = $processor($record);
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertEquals('fooBar', $newRecord['component']);
     }
