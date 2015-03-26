@@ -48,4 +48,29 @@ class SyslogProcessorTest extends TestCase
         $this->assertArrayHasKey('id', $record['token']['owner']);
         $this->assertArrayHasKey('name', $record['token']['owner']);
     }
+
+    /**
+     * Test that explicitly provided component name is honored.
+     * @covers \Keboola\Syrup\Monolog\Processor\SyslogProcessor::processRecord
+     */
+    public function testProcessorExplicitComponent()
+    {
+        $s3Uploader = new Uploader([
+            'aws-access-key' => SYRUP_AWS_KEY,
+            'aws-secret-key' => SYRUP_AWS_SECRET,
+            's3-upload-path' => SYRUP_S3_BUCKET
+        ]);
+
+        $request = new Request();
+        $request->headers->add(['x-storageapi-token' => SYRUP_SAPI_TEST_TOKEN]);
+        $storageApiService = new StorageApiService();
+        $storageApiService->setRequest($request);
+
+        $record = $this->getRecord();
+        $record['component'] = 'fooBar';
+        $processor = new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
+        $newRecord = $processor($record);
+        $this->assertArrayHasKey('component', $newRecord);
+        $this->assertEquals('fooBar', $newRecord['component']);
+    }
 }

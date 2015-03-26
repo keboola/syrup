@@ -57,7 +57,9 @@ class SyslogProcessor
 
     public function processRecord(array $record)
     {
-        $record['component'] = $this->componentName;
+        if (empty($record['component'])) {
+            $record['component'] = $this->componentName;
+        }
         $record['runId'] = $this->runId;
         $record['pid'] = getmypid();
         $record['priority'] = $record['level_name'];
