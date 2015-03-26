@@ -39,8 +39,10 @@ class ExecutorFactory
         $jobExecutor->setStorageApi($storageApiService->getClient());
         $jobExecutor->setJob($job);
 
-        // register signal handler for SIGTERM
-        pcntl_signal(SIGTERM, [$jobExecutor, 'onTerminate']);
+        // register signal handler for SIGTERM if not on Win
+        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            pcntl_signal(SIGTERM, [$jobExecutor, 'onTerminate']); 
+        }
 
         return $jobExecutor;
     }
