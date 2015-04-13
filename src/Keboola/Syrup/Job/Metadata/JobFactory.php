@@ -42,7 +42,7 @@ class JobFactory
         $tokenData = $this->storageApiClient->verifyToken();
         $job = new Job([
             'id' => $this->storageApiClient->generateId(),
-            'runId' => $this->storageApiClient->generateRunId(),
+            'runId' => $this->storageApiClient->getRunId(),
             'project' => [
                 'id' => $tokenData['owner']['id'],
                 'name' => $tokenData['owner']['name']
