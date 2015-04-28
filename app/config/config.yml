@@ -5,7 +5,7 @@ parameters:
     mailer_user: null
     mailer_password: null
     pdo.db_options:
-        db_table: sessions
+        db_table: session
         db_id_col: id
         db_data_col: value
         db_time_col: time
