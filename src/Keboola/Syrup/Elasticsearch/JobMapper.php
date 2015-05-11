@@ -94,14 +94,14 @@ class JobMapper
         $i = 0;
         while ($i < 5) {
             $resJob = $this->get($job->getId());
-            if ($resJob != null && $resJob->getVersion() == $response['_version']) {
+            if ($resJob != null && $resJob->getVersion() >= $response['_version']) {
                 return $response['_id'];
             }
             sleep(1 + intval(pow(2, $i)/2));
             $i++;
         }
 
-        throw new ApplicationException("Unable to find the job in index", null, [
+        throw new ApplicationException("Unable to find job after update", null, [
             'job' => $job->getData(),
             'elasticResponse' => $response
         ]);
