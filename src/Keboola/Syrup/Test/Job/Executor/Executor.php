@@ -42,4 +42,12 @@ class Executor extends \Keboola\Syrup\Job\Executor
 
         $this->jobMapper->update($this->job);
     }
+
+    public function postCleanup()
+    {
+        $oldRes = $this->job->getResult();
+        $this->job->setResult(['message' => $oldRes['message'] . '&cleared']);
+
+        $this->jobMapper->update($this->job);
+    }
 }

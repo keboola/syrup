@@ -36,6 +36,6 @@ class JobCleanupCommandTest extends CommandTestCase
 
         $job = $this->jobMapper->get($jobId);
         $this->assertEquals($job->getStatus(), Job::STATUS_TERMINATED);
-        $this->assertEquals('cleaned', $job->getResult()['message']);
+        $this->assertEquals('cleaned&cleared', $job->getResult()['message']);
     }
 }
