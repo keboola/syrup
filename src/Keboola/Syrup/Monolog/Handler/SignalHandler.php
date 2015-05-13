@@ -9,6 +9,7 @@ namespace Keboola\Syrup\Monolog\Handler;
 
 use Monolog\Handler\AbstractHandler;
 
+/** @deprecated */
 class SignalHandler extends AbstractHandler
 {
     public function handle(array $record)

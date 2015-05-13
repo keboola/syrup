@@ -34,6 +34,7 @@ class Executor implements ExecutorInterface
         // do stuff
     }
 
+    /** @deprecated */
     public function onTerminate()
     {
         $this->cleanup();
@@ -43,6 +44,11 @@ class Executor implements ExecutorInterface
     }
 
     public function cleanup()
+    {
+
+    }
+
+    public function postCleanup()
     {
 
     }

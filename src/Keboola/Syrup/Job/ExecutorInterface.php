@@ -24,4 +24,6 @@ interface ExecutorInterface
     public function execute(Job $job);
 
     public function cleanup();
+
+    public function postCleanup();
 }

@@ -39,7 +39,8 @@ class ExecutorFactory
         $jobExecutor->setStorageApi($storageApiService->getClient());
         $jobExecutor->setJob($job);
 
-        // register signal handler for SIGTERM if not on Win
+        //@todo: remove this block - onTerminate method is deprecated
+        //register signal handler for SIGTERM if not on Win
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
             pcntl_signal(SIGTERM, [$jobExecutor, 'onTerminate']);
         }
