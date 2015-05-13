@@ -97,12 +97,6 @@ class JobCleanupCommand extends ContainerAwareCommand
 
         $this->init($jobId);
 
-        // Ensure that job status is 'terminating'
-        if ($this->job->getStatus() != Job::STATUS_TERMINATING) {
-            $this->job->setStatus(Job::STATUS_TERMINATING);
-            $this->jobMapper->update($this->job);
-        }
-
         // Instantiate jobExecutor based on component name
         /** @var ExecutorFactory $jobExecutorFactory */
         $jobExecutorFactory = $this->getContainer()->get('syrup.job_executor_factory');
@@ -110,16 +104,21 @@ class JobCleanupCommand extends ContainerAwareCommand
         /** @var ExecutorInterface $jobExecutor */
         $jobExecutor = $jobExecutorFactory->create($this->job);
 
-        // run cleanup
-        try {
-            $jobExecutor->cleanup();
-        } catch (\Exception $e) {
-            // no room for errors
+        // Ensure that job status is 'terminating'
+        if ($this->job->getStatus() != Job::STATUS_TERMINATING) {
+            $this->job->setStatus(Job::STATUS_TERMINATING);
+            $this->jobMapper->update($this->job);
         }
+
+        // run cleanup
+        $jobExecutor->cleanup();
 
         // Update job status to 'terminated'
         $this->job->setStatus(Job::STATUS_TERMINATED);
         $this->jobMapper->update($this->job);
+
+        // run post-cleanup
+        $jobExecutor->postCleanup();
 
         // DB unlock
         $this->lock->unlock();
