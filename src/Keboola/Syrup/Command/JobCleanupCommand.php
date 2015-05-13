@@ -113,8 +113,15 @@ class JobCleanupCommand extends ContainerAwareCommand
         // run cleanup
         $jobExecutor->cleanup();
 
-        // Update job status to 'terminated'
+        // Update job
+        $endTime = time();
+        $duration = $endTime - strtotime($this->job->getStartTime());
         $this->job->setStatus(Job::STATUS_TERMINATED);
+        $this->job->setResult([
+            'message' => 'Job has been terminated'
+        ]);
+        $this->job->setEndTime(date('c', $endTime));
+        $this->job->setDurationSeconds($duration);
         $this->jobMapper->update($this->job);
 
         // run post-cleanup
