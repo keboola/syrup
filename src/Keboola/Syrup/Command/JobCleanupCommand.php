@@ -23,6 +23,8 @@ use Keboola\StorageApi\Client as SapiClient;
 
 class JobCleanupCommand extends ContainerAwareCommand
 {
+    const STATUS_LOCK = 64;
+
     /** @var Job */
     protected $job;
 
@@ -96,6 +98,11 @@ class JobCleanupCommand extends ContainerAwareCommand
         $jobId = $input->getArgument('jobId');
 
         $this->init($jobId);
+
+        if (!$this->lock->lock()) {
+            $output->writeln("Job is locked");
+            return self::STATUS_LOCK;
+        }
 
         // Instantiate jobExecutor based on component name
         /** @var ExecutorFactory $jobExecutorFactory */
