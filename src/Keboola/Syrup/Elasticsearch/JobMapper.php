@@ -9,6 +9,7 @@ namespace Keboola\Syrup\Elasticsearch;
 
 use Elasticsearch\Client;
 use Keboola\Syrup\Exception\ApplicationException;
+use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobInterface;
 
 class JobMapper
@@ -53,6 +54,7 @@ class JobMapper
             ]);
         }
 
+        //@todo: remove sleep in next (major) release
         sleep(1);
         $i = 0;
         while ($i < 5) {
@@ -90,6 +92,7 @@ class JobMapper
 
         $response = $this->client->update($jobData);
 
+        //@todo: remove sleep in next (major) release
         sleep(1);
         $i = 0;
         while ($i < 5) {
@@ -109,34 +112,28 @@ class JobMapper
 
     public function get($jobId)
     {
-        $params = [
-            'index' => $this->index->getIndexName(),
-            'body' => [
-                'version' => true,
-                'size'  => 1,
-                'query' => [
-                    'match_all' => []
-                ],
-                'filter' => [
-                    'ids' => [
-                        'values' => [$jobId]
-                    ]
-                ]
-            ]
-        ];
+        $indices = $this->index->getIndices();
 
-        $result = $this->client->search($params);
-
-        if ($result['hits']['total'] > 0) {
-            $job = new \Keboola\Syrup\Job\Metadata\Job(
-                $result['hits']['hits'][0]['_source'],
-                $result['hits']['hits'][0]['_index'],
-                $result['hits']['hits'][0]['_type'],
-                $result['hits']['hits'][0]['_version']
-            );
-
-            return $job;
+        $docs = [];
+        foreach ($indices as $index) {
+            $docs[] = [
+                '_index' => $index,
+                '_type' => 'jobs',
+                '_id' => $jobId
+            ];
         }
+
+        //@todo: backoff
+        $result = $this->client->mget([
+            'body' => ['docs' => $docs]
+        ]);
+
+        foreach ($result['docs'] as $doc) {
+            if ($doc['found']) {
+                return new Job($doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
+            }
+        }
+
         return null;
     }
 }

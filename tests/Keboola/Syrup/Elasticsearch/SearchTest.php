@@ -166,4 +166,11 @@ class SearchTest extends WebTestCase
         $this->assertTrue($job1Asserted);
         $this->assertTrue($job2Asserted);
     }
+
+    public function testGetIndices()
+    {
+        $indices = self::$search->getIndices();
+
+        $this->assertNotEmpty($indices);
+    }
 }

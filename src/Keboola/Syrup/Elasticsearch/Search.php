@@ -27,32 +27,28 @@ class Search
 
     public function getJob($jobId)
     {
-        $params = [
-            'index' => $this->indexPrefix . '_syrup*',
-            'body' => [
-                'size'  => 1,
-                'query' => [
-                    'match_all' => []
-                ],
-                'filter' => [
-                    'ids' => [
-                        'values' => [$jobId]
-                    ]
-                ]
-            ]
-        ];
+        $indices = $this->getIndices();
 
-        $result = $this->client->search($params);
-
-        if ($result['hits']['total'] > 0) {
-            $job = new Job(
-                $result['hits']['hits'][0]['_source'],
-                $result['hits']['hits'][0]['_index'],
-                $result['hits']['hits'][0]['_type']
-            );
-
-            return $job;
+        $docs = [];
+        foreach ($indices as $index) {
+            $docs[] = [
+                '_index' => $index,
+                '_type' => 'jobs',
+                '_id' => $jobId
+            ];
         }
+
+        //@todo: backoff
+        $result = $this->client->mget([
+            'body' => ['docs' => $docs]
+        ]);
+
+        foreach ($result['docs'] as $doc) {
+            if ($doc['found']) {
+                return new Job($doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
+            }
+        }
+
         return null;
     }
 
@@ -162,5 +158,16 @@ class Search
         }
 
         return $results;
+    }
+
+    public function getIndices()
+    {
+        $indices = $this->client->indices()->get([
+            'index' => $this->indexPrefix . '_syrup*'
+        ]);
+        if (!empty($indices)) {
+            return array_keys($indices);
+        }
+        return [];
     }
 }
