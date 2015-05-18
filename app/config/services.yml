@@ -85,11 +85,11 @@ services:
 
     syrup.elasticsearch.current_component_job_mapper:
         class: Keboola\Syrup\Elasticsearch\JobMapper
-        arguments: [@syrup.elasticsearch.client, @syrup.elasticsearch.current_component_index]
+        arguments: [@syrup.elasticsearch.client, @syrup.elasticsearch.current_component_index, @logger]
 
     syrup.elasticsearch.search:
         class: Keboola\Syrup\Elasticsearch\Search
-        arguments: [@syrup.elasticsearch.client, %elasticsearch.index_prefix%]
+        arguments: [@syrup.elasticsearch.client, %elasticsearch.index_prefix%, @logger]
 
     syrup.queue_factory:
         class: Keboola\Syrup\Service\Queue\QueueFactory

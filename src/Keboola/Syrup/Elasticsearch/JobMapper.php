@@ -8,26 +8,28 @@
 namespace Keboola\Syrup\Elasticsearch;
 
 use Elasticsearch\Client;
+use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobInterface;
+use Monolog\Logger;
 
 class JobMapper
 {
-    /**
-     * @var Client
-     */
+    /** @var Client */
     protected $client;
-    /**
-     * @var ComponentIndex
-     */
+
+    /** @var ComponentIndex */
     protected $index;
 
+    /** @var Logger */
+    protected $logger;
 
-    public function __construct(Client $client, ComponentIndex $index)
+    public function __construct(Client $client, ComponentIndex $index, $logger = null)
     {
         $this->client = $client;
         $this->index = $index;
+        $this->logger = $logger;
     }
 
     /**
@@ -45,7 +47,24 @@ class JobMapper
             'body'  => $job->getData()
         ];
 
-        $response = $this->client->index($jobData);
+        $response = null;
+        $i = 0;
+        while ($i < 5) {
+            try {
+                $response = $this->client->index($jobData);
+                break;
+            } catch (ServerErrorResponseException $e) {
+                // ES server error, try again
+                $this->logger->error("Elastic server error response", [
+                    'attemptNo' => $i,
+                    'jobId' => $job->getId(),
+                    'exception' => $e
+                ]);
+            }
+
+            sleep(1 + intval(pow(2, $i)/2));
+            $i++;
+        }
 
         if (!isset($response['created'])) {
             throw new ApplicationException("Unable to index job", null, [
@@ -67,7 +86,7 @@ class JobMapper
             $i++;
         }
 
-        throw new ApplicationException("Unable to find the job in index", null, [
+        throw new ApplicationException("Unable to find job in index after creation", null, [
             'job' => $job->getData(),
             'elasticResponse' => $response
         ]);
@@ -90,7 +109,24 @@ class JobMapper
             ]
         ];
 
-        $response = $this->client->update($jobData);
+        $response = null;
+        $i = 0;
+        while ($i < 5) {
+            try {
+                $response = $this->client->update($jobData);
+                break;
+            } catch (ServerErrorResponseException $e) {
+                // ES server error, try again
+                $this->logger->error("Elastic server error response", [
+                    'attemptNo' => $i,
+                    'jobId' => $job->getId(),
+                    'exception' => $e
+                ]);
+            }
+
+            sleep(1 + intval(pow(2, $i)/2));
+            $i++;
+        }
 
         //@todo: remove sleep in next (major) release
         sleep(1);
@@ -123,15 +159,29 @@ class JobMapper
             ];
         }
 
-        //@todo: backoff
-        $result = $this->client->mget([
-            'body' => ['docs' => $docs]
-        ]);
+        $i = 0;
+        while ($i < 5) {
+            try {
+                $result = $this->client->mget([
+                    'body' => ['docs' => $docs]
+                ]);
 
-        foreach ($result['docs'] as $doc) {
-            if ($doc['found']) {
-                return new Job($doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
+                foreach ($result['docs'] as $doc) {
+                    if ($doc['found']) {
+                        return new Job($doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
+                    }
+                }
+            } catch (ServerErrorResponseException $e) {
+                // ES server error, try again
+                $this->logger->error("Elastic server error response", [
+                    'attemptNo' => $i,
+                    'jobId' => $jobId,
+                    'exception' => $e
+                ]);
             }
+
+            sleep(1 + intval(pow(2, $i)/2));
+            $i++;
         }
 
         return null;
