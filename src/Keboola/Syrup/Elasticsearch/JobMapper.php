@@ -55,7 +55,7 @@ class JobMapper
                 break;
             } catch (ServerErrorResponseException $e) {
                 // ES server error, try again
-                $this->logger->error("Elastic server error response", [
+                $this->log('error', 'Elastic server error response', [
                     'attemptNo' => $i,
                     'jobId' => $job->getId(),
                     'exception' => $e
@@ -117,7 +117,7 @@ class JobMapper
                 break;
             } catch (ServerErrorResponseException $e) {
                 // ES server error, try again
-                $this->logger->error("Elastic server error response", [
+                $this->log('error', 'Elastic server error response', [
                     'attemptNo' => $i,
                     'jobId' => $job->getId(),
                     'exception' => $e
@@ -173,7 +173,7 @@ class JobMapper
                 }
             } catch (ServerErrorResponseException $e) {
                 // ES server error, try again
-                $this->logger->error("Elastic server error response", [
+                $this->log('error', 'Elastic server error response', [
                     'attemptNo' => $i,
                     'jobId' => $jobId,
                     'exception' => $e
@@ -185,5 +185,13 @@ class JobMapper
         }
 
         return null;
+    }
+
+    protected function log($level, $message, $context = [])
+    {
+        // do nothing if logger is null
+        if ($this->logger != null) {
+            $this->logger->$level($message, $context);
+        }
     }
 }
