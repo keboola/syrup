@@ -160,6 +160,7 @@ class JobMapper
         }
 
         $i = 0;
+        $prevException = null;
         while ($i < 5) {
             try {
                 $result = $this->client->mget([
@@ -178,11 +179,17 @@ class JobMapper
                     'jobId' => $jobId,
                     'exception' => $e
                 ]);
+
+                $prevException = $e;
             }
 
             sleep(1 + intval(pow(2, $i)/2));
             $i++;
         }
+
+        $this->log('alert', sprintf("Error getting job id '%s'", $jobId), [
+            'exception' => $prevException
+        ]);
 
         return null;
     }

@@ -44,6 +44,7 @@ class Search
         }
 
         $i = 0;
+        $prevException = null;
         while ($i < 5) {
             try {
                 $result = $this->client->mget([
@@ -62,11 +63,17 @@ class Search
                     'jobId' => $jobId,
                     'exception' => $e
                 ]);
+
+                $prevException = $e;
             }
 
             sleep(1 + intval(pow(2, $i)/2));
             $i++;
         }
+
+        $this->log('alert', sprintf("Error getting job id '%s'", $jobId), [
+            'exception' => $prevException
+        ]);
 
         return null;
     }
@@ -167,6 +174,7 @@ class Search
 
         $results = [];
         $i = 0;
+        $prevException = null;
         while ($i < 5) {
             try {
                 $hits = $this->client->search($params);
@@ -187,11 +195,18 @@ class Search
                     'params' => $params,
                     'exception' => $e
                 ]);
+
+                $prevException = $e;
             }
 
             sleep(1 + intval(pow(2, $i)/2));
             $i++;
         }
+
+        $this->log('alert', "Error in search for jobs", [
+            'exception' => $prevException,
+            'params' => $params
+        ]);
 
         return [];
     }
