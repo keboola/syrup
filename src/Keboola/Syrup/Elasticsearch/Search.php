@@ -7,52 +7,74 @@
 namespace Keboola\Syrup\Elasticsearch;
 
 use Elasticsearch\Client;
+use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Keboola\Syrup\Job\Metadata\Job;
+use Monolog\Logger;
 
 class Search
 {
-    /**
-     * @var Client
-     */
+    /** @var Client */
     protected $client;
+
     protected $indexPrefix;
 
+    /** @var Logger */
+    protected $logger;
 
-    public function __construct(Client $client, $indexPrefix)
+
+    public function __construct(Client $client, $indexPrefix, $logger = null)
     {
         $this->client = $client;
         $this->indexPrefix = $indexPrefix;
+        $this->logger = $logger;
     }
 
 
     public function getJob($jobId)
     {
-        $params = [
-            'index' => $this->indexPrefix . '_syrup*',
-            'body' => [
-                'size'  => 1,
-                'query' => [
-                    'match_all' => []
-                ],
-                'filter' => [
-                    'ids' => [
-                        'values' => [$jobId]
-                    ]
-                ]
-            ]
-        ];
+        $indices = $this->getIndices();
 
-        $result = $this->client->search($params);
-
-        if ($result['hits']['total'] > 0) {
-            $job = new Job(
-                $result['hits']['hits'][0]['_source'],
-                $result['hits']['hits'][0]['_index'],
-                $result['hits']['hits'][0]['_type']
-            );
-
-            return $job;
+        $docs = [];
+        foreach ($indices as $index) {
+            $docs[] = [
+                '_index' => $index,
+                '_type' => 'jobs',
+                '_id' => $jobId
+            ];
         }
+
+        $i = 0;
+        $prevException = null;
+        while ($i < 5) {
+            try {
+                $result = $this->client->mget([
+                    'body' => ['docs' => $docs]
+                ]);
+
+                foreach ($result['docs'] as $doc) {
+                    if ($doc['found']) {
+                        return new Job($doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
+                    }
+                }
+            } catch (ServerErrorResponseException $e) {
+                // ES server error, try again
+                $this->log('error', 'Elastic server error response', [
+                    'attemptNo' => $i,
+                    'jobId' => $jobId,
+                    'exception' => $e
+                ]);
+
+                $prevException = $e;
+            }
+
+            sleep(1 + intval(pow(2, $i)/2));
+            $i++;
+        }
+
+        $this->log('alert', sprintf("Error getting job id '%s'", $jobId), [
+            'exception' => $prevException
+        ]);
+
         return null;
     }
 
@@ -151,16 +173,60 @@ class Search
         ];
 
         $results = [];
-        $hits = $this->client->search($params);
+        $i = 0;
+        $prevException = null;
+        while ($i < 5) {
+            try {
+                $hits = $this->client->search($params);
 
-        foreach ($hits['hits']['hits'] as $hit) {
-            $res = $hit['_source'];
-            $res['_index'] = $hit['_index'];
-            $res['_type'] = $hit['_type'];
-            $res['id'] = (int) $res['id'];
-            $results[] = $res;
+                foreach ($hits['hits']['hits'] as $hit) {
+                    $res = $hit['_source'];
+                    $res['_index'] = $hit['_index'];
+                    $res['_type'] = $hit['_type'];
+                    $res['id'] = (int) $res['id'];
+                    $results[] = $res;
+                }
+
+                return $results;
+            } catch (ServerErrorResponseException $e) {
+                // ES server error, try again
+                $this->log('error', 'Elastic server error response', [
+                    'attemptNo' => $i,
+                    'params' => $params,
+                    'exception' => $e
+                ]);
+
+                $prevException = $e;
+            }
+
+            sleep(1 + intval(pow(2, $i)/2));
+            $i++;
         }
 
-        return $results;
+        $this->log('alert', "Error in search for jobs", [
+            'exception' => $prevException,
+            'params' => $params
+        ]);
+
+        return [];
+    }
+
+    public function getIndices()
+    {
+        $indices = $this->client->indices()->get([
+            'index' => $this->indexPrefix . '_syrup*'
+        ]);
+        if (!empty($indices)) {
+            return array_keys($indices);
+        }
+        return [];
+    }
+
+    protected function log($level, $message, $context = [])
+    {
+        // do nothing if logger is null
+        if ($this->logger != null) {
+            $this->logger->$level($message, $context);
+        }
     }
 }

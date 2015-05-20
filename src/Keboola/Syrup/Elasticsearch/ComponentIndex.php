@@ -71,6 +71,13 @@ class ComponentIndex
         }
     }
 
+    public function getIndices()
+    {
+        return array_keys($this->client->indices()->getAlias([
+            'name'  => $this->getIndexName()
+        ]));
+    }
+
     public function createIndex($settings = null, $mappings = null)
     {
         // Assemble new index name
