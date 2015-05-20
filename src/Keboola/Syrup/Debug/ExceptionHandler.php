@@ -67,13 +67,33 @@ class ExceptionHandler extends BaseExceptionHandler
             'message' => $exception->getMessage(),
             'level' => $exception->getCode(),
             'channel' => 'app',
-            'datetime' => ['date' => date('Y-m-d H:i:s')],
             'app' => $appName,
-            'priority' => 'CRITICAL',
-            'file' => $exception->getFile(),
+            'priority' => $exception->getCode() < 500 ? 'ERROR' : 'CRITICAL',
             'pid' => getmypid(),
-            'exceptionId' => $exceptionId
+            'exceptionId' => $exceptionId,
+            'exception' => [
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine()
+            ]
         ];
+
+        if (php_sapi_name() == 'cli') {
+            if (!empty($_SERVER['argv'])) {
+                $logData['cliCommand'] = implode(' ', $_SERVER['argv']);
+            }
+        } else {
+            $logData['http'] = [
+                'url' => sprintf('[%s] [%s]', $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'])
+            ];
+            if (isset($_SERVER['REMOTE_ADDR'])) {
+                $logData['http']['ip'] = $_SERVER['REMOTE_ADDR'];
+            }
+            if (isset($_SERVER['HTTP_X_USER_AGENT'])) {
+                $logData['http']['userAgent'] = $_SERVER['HTTP_X_USER_AGENT'];
+            } elseif (isset($_SERVER['HTTP_USER_AGENT'])) {
+                $logData['http']['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
+            }
+        }
 
         // log to syslog
         syslog(LOG_ERR, json_encode($logData));
@@ -136,7 +156,7 @@ EOF;
                         $ind,
                         $total,
                         $class,
-                        $e['code'],
+                        isset($e['code']) ? $e['code'] : null,
                         $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']),
                         $message
                     );
