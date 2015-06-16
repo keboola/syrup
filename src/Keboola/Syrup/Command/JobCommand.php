@@ -16,6 +16,7 @@ use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Keboola\Syrup\Exception\JobException;
 use Keboola\Syrup\Exception\SyrupExceptionInterface;
@@ -57,6 +58,7 @@ class JobCommand extends ContainerAwareCommand
             ->setAliases(['syrup:run-job'])
             ->setDescription('Command to execute jobs')
             ->addArgument('jobId', InputArgument::REQUIRED, 'ID of the job')
+            ->addOption('force', '-f', InputOption::VALUE_NONE, 'Force run of a job not in waiting state')
         ;
     }
 
@@ -111,6 +113,7 @@ class JobCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $jobId = $input->getArgument('jobId');
+        $forceRun = $input->getOption('force');
 
         $this->logger = $this->getContainer()->get('logger');
 
@@ -134,6 +137,15 @@ class JobCommand extends ContainerAwareCommand
         if (!$this->lock->lock()) {
             return self::STATUS_LOCK;
         }
+
+        // check job status
+        $this->job = $this->jobMapper->get($jobId);
+
+        if (!in_array($this->job->getStatus(), [Job::STATUS_WAITING]) && !$forceRun) {
+            // job is not waiting
+            return self::STATUS_LOCK;
+        }
+
 
         $startTime = time();
 
