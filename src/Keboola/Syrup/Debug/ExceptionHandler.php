@@ -67,33 +67,13 @@ class ExceptionHandler extends BaseExceptionHandler
             'message' => $exception->getMessage(),
             'level' => $exception->getCode(),
             'channel' => 'app',
+            'datetime' => ['date' => date('Y-m-d H:i:s')],
             'app' => $appName,
-            'priority' => $exception->getCode() < 500 ? 'ERROR' : 'CRITICAL',
+            'priority' => 'CRITICAL',
+            'file' => $exception->getFile(),
             'pid' => getmypid(),
-            'exceptionId' => $exceptionId,
-            'exception' => [
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine()
-            ]
+            'exceptionId' => $exceptionId
         ];
-
-        if (php_sapi_name() == 'cli') {
-            if (!empty($_SERVER['argv'])) {
-                $logData['cliCommand'] = implode(' ', $_SERVER['argv']);
-            }
-        } else {
-            $logData['http'] = [
-                'url' => sprintf('[%s] [%s]', $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'])
-            ];
-            if (isset($_SERVER['REMOTE_ADDR'])) {
-                $logData['http']['ip'] = $_SERVER['REMOTE_ADDR'];
-            }
-            if (isset($_SERVER['HTTP_X_USER_AGENT'])) {
-                $logData['http']['userAgent'] = $_SERVER['HTTP_X_USER_AGENT'];
-            } elseif (isset($_SERVER['HTTP_USER_AGENT'])) {
-                $logData['http']['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
-            }
-        }
 
         // log to syslog
         syslog(LOG_ERR, json_encode($logData));
@@ -142,7 +122,7 @@ class ExceptionHandler extends BaseExceptionHandler
                 foreach ($exception->toArray() as $position => $e) {
                     $ind = $count - $position + 1;
                     $class = $this->formatClass($e['class']);
-                    $message = nl2br(self::utf8Htmlize($e['message']));
+                    $message = nl2br($this->escapeHtml($e['message']));
                     $contentTemplate = <<<EOF
                         <h2 class="block_exception clear_fix">
                             <span class="exception_counter">%d/%d</span>
@@ -156,7 +136,7 @@ EOF;
                         $ind,
                         $total,
                         $class,
-                        isset($e['code']) ? $e['code'] : null,
+                        $e['code'],
                         $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']),
                         $message
                     );
@@ -206,7 +186,7 @@ EOF;
 
     private function formatPath($path, $line)
     {
-        $path = self::utf8Htmlize($path);
+        $path = $this->escapeHtml($path);
         $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
 
         if ($linkFormat = $this->fileLinkFormat) {
@@ -227,7 +207,7 @@ EOF;
             } elseif ('array' === $item[0]) {
                 $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string' === $item[0]) {
-                $formattedValue = sprintf("'%s'", self::utf8Htmlize($item[1]));
+                $formattedValue = sprintf("'%s'", $this->escapeHtml($item[1]));
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
@@ -235,7 +215,7 @@ EOF;
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
             } else {
-                $formattedValue = str_replace("\n", '', var_export(self::utf8Htmlize((string) $item[1]), true));
+                $formattedValue = str_replace("\n", '', var_export($this->escapeHtml((string) $item[1]), true));
             }
 
             $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
@@ -244,7 +224,13 @@ EOF;
         return implode(', ', $result);
     }
 
-
+    /**
+     * HTML-encodes a string.
+     */
+    private function escapeHtml($str)
+    {
+        return htmlspecialchars($str, ENT_QUOTES | (PHP_VERSION_ID >= 50400 ? ENT_SUBSTITUTE : 0), 'UTF-8');
+    }
 
     public function getHtml(FlattenException $flattenException)
     {
