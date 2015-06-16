@@ -49,15 +49,12 @@ class SyrupExceptionListener
             'exceptionId' => $exceptionId,
         );
 
-        // SyrupExceptionInterface holds additional data
-        if ($exception instanceof SyrupExceptionInterface) {
-            $logData['data'] = $exception->getData();
-        }
-
         // exception is by default Application Exception
         $isUserException = false;
 
-        if ($exception instanceof HttpExceptionInterface) {
+        // SyrupExceptionInterface holds additional data
+        if ($exception instanceof SyrupExceptionInterface) {
+            $logData['data'] = $exception->getData();
             $isUserException = ($exception->getStatusCode() < 500);
         }
 
