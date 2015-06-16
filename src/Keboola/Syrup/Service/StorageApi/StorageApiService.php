@@ -60,12 +60,6 @@ class StorageApiService
                 'userAgent' => explode('/', $this->request->getPathInfo())[1],
             ]);
 
-            try {
-                $this->client->verifyToken();
-            } catch (ClientException $e) {
-                throw new SyrupComponentException(401, "Invalid Access Token", $e);
-            }
-
             if ($this->request->headers->has('X-KBC-RunId')) {
                 $kbcRunId = $this->client->generateRunId($this->request->headers->get('X-KBC-RunId'));
             } else {

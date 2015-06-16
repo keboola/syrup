@@ -3,6 +3,7 @@
 namespace Keboola\Syrup\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Keboola\Syrup\Controller\ApiController;
 use Keboola\Syrup\Test\WebTestCase;
@@ -22,6 +23,7 @@ class ApiControllerTest extends WebTestCase
     /** @var ApiController */
     protected $controller;
 
+    /** @var ContainerInterface */
     protected $container;
 
     public function setUp()
