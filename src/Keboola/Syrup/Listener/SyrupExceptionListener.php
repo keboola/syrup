@@ -54,8 +54,15 @@ class SyrupExceptionListener
             $logData['data'] = $exception->getData();
         }
 
+        // exception is by default Application Exception
+        $isUserException = false;
+
+        if ($exception instanceof HttpExceptionInterface) {
+            $isUserException = ($exception->getStatusCode() < 500);
+        }
+
         // Log exception
-        $method = ($exception instanceof UserException) ? 'error' : 'critical';
+        $method = ($isUserException) ? 'error' : 'critical';
         $this->logger->$method($exception->getMessage(), $logData);
     }
 
