@@ -9,7 +9,7 @@ namespace Keboola\Syrup\Exception;
 
 class UserException extends SyrupComponentException
 {
-    public function __construct($message, $previous = null, $data = [])
+    public function __construct($message, $previous = null, array $data = [])
     {
         parent::__construct(400, 'User error: ' . $message, $previous, $data);
     }
