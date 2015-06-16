@@ -110,14 +110,7 @@ class Job implements JobInterface
      */
     public function setProject(array $project)
     {
-        if (!isset($project['id'])) {
-            throw new ApplicationException("Missing project id");
-        }
-
-        if (!isset($project['name'])) {
-            throw new ApplicationException("Missing project name");
-        }
-
+        $this->checkArrayKeys($project, ['id', 'name']);
         $this->data['project'] = $project;
         return $this;
     }
@@ -129,19 +122,9 @@ class Job implements JobInterface
 
     public function setToken(array $token)
     {
-        if (!isset($token['id'])) {
-            throw new ApplicationException("Missing token id");
-        }
-
-        if (!isset($token['description'])) {
-            throw new ApplicationException("Missing token description");
-        }
-
-        if (!isset($token['token'])) {
-            throw new ApplicationException("Missing token");
-        }
-
+        $this->checkArrayKeys($token, ['id', 'description', 'token']);
         $this->data['token'] = $token;
+        return $this;
     }
 
     public function getCommand()
@@ -225,16 +208,8 @@ class Job implements JobInterface
 
     public function setProcess(array $process)
     {
-        if (!isset($process['host'])) {
-            throw new ApplicationException("Missing process host");
-        }
-
-        if (!isset($process['pid'])) {
-            throw new ApplicationException("Missing process pid");
-        }
-
+        $this->checkArrayKeys($process, ['host', ['pid']]);
         $this->data['process'] = $process;
-
         return $this;
     }
 
@@ -329,6 +304,15 @@ class Job implements JobInterface
                 . $this->getStatus() . "'. Job status must be one of ("
                 . implode(',', $allowedStatuses) . ")"
             );
+        }
+    }
+
+    protected function checkArrayKeys($array, $keys)
+    {
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $array)) {
+                throw new ApplicationException(sprintf("Missing key '%s'", $key));
+            }
         }
     }
 }
