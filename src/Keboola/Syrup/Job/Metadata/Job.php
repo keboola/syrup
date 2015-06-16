@@ -208,7 +208,7 @@ class Job implements JobInterface
 
     public function setProcess(array $process)
     {
-        $this->checkArrayKeys($process, ['host', ['pid']]);
+        $this->checkArrayKeys($process, ['host', 'pid']);
         $this->data['process'] = $process;
         return $this;
     }
