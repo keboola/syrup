@@ -54,7 +54,7 @@ class Job implements JobInterface
         'endTime' => null,
         'durationSeconds' => null,
         'waitSeconds' => null,
-        'nestingLevel' => 0,
+        'nestingLevel' => null,
         'error' => null,
         'errorNote' => null
     ];
