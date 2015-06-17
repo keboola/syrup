@@ -196,6 +196,7 @@ class JobCommand extends ContainerAwareCommand
                 'exceptionId'   => $exceptionId
             ];
             $jobStatus = Job::STATUS_ERROR;
+            $this->job->setError(Job::ERROR_USER);
             $status = self::STATUS_SUCCESS;
 
         } catch (JobException $e) {
@@ -224,6 +225,7 @@ class JobCommand extends ContainerAwareCommand
             ];
             $this->job->setStatus($jobStatus);
             $this->job->setResult($jobResult);
+            $this->job->setError(Job::ERROR_APPLICATION);
             $this->jobMapper->update($this->job);
 
             // try to log the exception

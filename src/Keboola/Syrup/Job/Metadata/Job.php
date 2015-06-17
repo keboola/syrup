@@ -20,6 +20,9 @@ class Job implements JobInterface
     const STATUS_TERMINATING = 'terminating';
     const STATUS_TERMINATED = 'terminated';
 
+    const ERROR_USER = 'user';
+    const ERROR_APPLICATION = 'application';
+
     protected $index;
     protected $version;
     protected $type;
@@ -50,7 +53,10 @@ class Job implements JobInterface
         'startTime' => null,
         'endTime' => null,
         'durationSeconds' => null,
-        'waitSeconds' => null
+        'waitSeconds' => null,
+        'nestingLevel' => 0,
+        'error' => null,
+        'errorNote' => null
     ];
 
     public function __construct(array $data = [], $index = null, $type = null, $version = null)
@@ -63,6 +69,10 @@ class Job implements JobInterface
 
         if (null == $this->data['lockName']) {
             $this->setLockName($this->getComponent() . '-' . $this->getProject()['id']);
+        }
+
+        if (null != $this->data['runId']) {
+            $this->data['nestingLevel'] = $this->calculateNestingLevel($this->data['runId']);
         }
 
         $this->index = $index;
@@ -179,6 +189,7 @@ class Job implements JobInterface
     public function setRunId($runId)
     {
         $this->data['runId'] = $runId;
+        $this->data['nestingLevel'] = $this->calculateNestingLevel($runId);
     }
 
     public function setLockName($lockName)
@@ -221,6 +232,7 @@ class Job implements JobInterface
     public function setCreatedTime($datetime)
     {
         $this->data['createdTime'] = $datetime;
+        return $this;
     }
 
     public function getStartTime()
@@ -231,6 +243,7 @@ class Job implements JobInterface
     public function setStartTime($datetime)
     {
         $this->data['startTime'] = $datetime;
+        return $this;
     }
 
     public function getEndTime()
@@ -241,6 +254,7 @@ class Job implements JobInterface
     public function setEndTime($datetime)
     {
         $this->data['endTime'] = $datetime;
+        return $this;
     }
 
     public function getDurationSeconds()
@@ -251,6 +265,7 @@ class Job implements JobInterface
     public function setDurationSeconds($seconds)
     {
         $this->data['durationSeconds'] = $seconds;
+        return $this;
     }
 
     public function getWaitSeconds()
@@ -261,11 +276,44 @@ class Job implements JobInterface
     public function setWaitSeconds($seconds)
     {
         $this->data['waitSeconds'] = $seconds;
+        return $this;
+    }
+
+    public function getNestingLevel()
+    {
+        return $this->data['nestingLevel'];
+    }
+
+    public function setError($error)
+    {
+        if (!in_array($error, [self::ERROR_USER, self::ERROR_APPLICATION])) {
+            throw new ApplicationException(sprintf("Error must be one of 'user' or 'application'. Provided '%s'", $error));
+        }
+
+        $this->data['error'] = $error;
+        return $this;
+    }
+
+    public function getError()
+    {
+        return $this->data['error'];
+    }
+
+    public function setErrorNote($note)
+    {
+        $this->data['errorNote'] = $note;
+        return $this;
+    }
+
+    public function getErrorNote()
+    {
+        return $this->data['errorNote'];
     }
 
     public function setAttribute($key, $value)
     {
         $this->data[$key] = $value;
+        return $this;
     }
 
     public function getAttribute($key)
@@ -314,5 +362,10 @@ class Job implements JobInterface
                 throw new ApplicationException(sprintf("Missing key '%s'", $key));
             }
         }
+    }
+
+    protected function calculateNestingLevel($runId)
+    {
+        return substr_count($runId, '.');
     }
 }

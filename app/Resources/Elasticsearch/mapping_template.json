@@ -86,6 +86,7 @@
                     "enabled": false
                 },
                 "status": {
+                    "index": "not_analyzed",
                     "type": "string"
                 },
                 "process": {
@@ -128,6 +129,16 @@
                 },
                 "waitSeconds": {
                     "type": "long"
+                },
+                "nestingLevel": {
+                    "type": "integer"
+                },
+                "error": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "errorNote": {
+                    "type": "string"
                 }
             }
         }
