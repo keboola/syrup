@@ -139,6 +139,9 @@
                 },
                 "errorNote": {
                     "type": "string"
+                },
+                "terminatedBy": {
+                    "type": "string"
                 }
             }
         }

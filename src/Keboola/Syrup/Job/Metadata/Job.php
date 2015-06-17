@@ -56,7 +56,8 @@ class Job implements JobInterface
         'waitSeconds' => null,
         'nestingLevel' => null,
         'error' => null,
-        'errorNote' => null
+        'errorNote' => null,
+        'terminatedBy' => null
     ];
 
     public function __construct(array $data = [], $index = null, $type = null, $version = null)
@@ -308,6 +309,17 @@ class Job implements JobInterface
     public function getErrorNote()
     {
         return $this->data['errorNote'];
+    }
+
+    public function setTerminatedBy($user)
+    {
+        $this->data['terminatedBy'] = $user;
+        return $this;
+    }
+
+    public function getTerminatedBy()
+    {
+        return $this->data['terminatedBy'];
     }
 
     public function setAttribute($key, $value)

@@ -94,4 +94,8 @@ interface JobInterface
     public function setErrorNote($note);
 
     public function getErrorNote();
+
+    public function setTerminatedBy($user);
+
+    public function getTerminatedBy();
 }
