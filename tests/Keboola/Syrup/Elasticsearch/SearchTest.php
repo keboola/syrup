@@ -105,6 +105,7 @@ class SearchTest extends WebTestCase
         $this->assertEquals($job->getToken()['description'], $resJob['token']['description']);
         $this->assertEquals($job->getToken()['token'], $resJob['token']['token']);
 
+        $this->assertEquals($job->getApp(), $resJob['app']);
         $this->assertEquals($job->getComponent(), $resJob['component']);
         $this->assertEquals($job->getStatus(), $resJob['status']);
     }

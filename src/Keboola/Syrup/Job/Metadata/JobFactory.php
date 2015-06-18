@@ -16,16 +16,17 @@ class JobFactory
      * @var Encryptor
      */
     protected $encryptor;
-    protected $componentName;
+    protected $appName;
+
     /**
      * @var Client
      */
     protected $storageApiClient;
 
-    public function __construct($componentName, Encryptor $encryptor)
+    public function __construct($appName, Encryptor $encryptor)
     {
         $this->encryptor = $encryptor;
-        $this->componentName = $componentName;
+        $this->appName = $appName;
     }
 
     public function setStorageApiClient(Client $storageApiClient)
@@ -37,6 +38,11 @@ class JobFactory
     {
         if (!$this->storageApiClient) {
             throw new \Exception('Storage API client must be set');
+        }
+
+        $component = $this->appName;
+        if (isset($params['component'])) {
+            $component = $params['component'];
         }
 
         $tokenData = $this->storageApiClient->verifyToken();
@@ -52,7 +58,8 @@ class JobFactory
                 'description' => $tokenData['description'],
                 'token' => $this->encryptor->encrypt($this->storageApiClient->getTokenString())
             ],
-            'component' => $this->componentName,
+            'app' => $this->appName,
+            'component' => $component,
             'command' => $command,
             'params' => $params,
             'process' => [
@@ -61,9 +68,11 @@ class JobFactory
             ],
             'createdTime' => date('c')
         ]);
+
         if ($lockName) {
             $job->setLockName($lockName);
         }
+
         return $job;
     }
 }

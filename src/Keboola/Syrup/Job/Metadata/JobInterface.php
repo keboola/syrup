@@ -13,6 +13,10 @@ interface JobInterface
 
     public function getData();
 
+    public function getApp();
+
+    public function setApp($app);
+
     public function getComponent();
 
     public function setComponent($component);

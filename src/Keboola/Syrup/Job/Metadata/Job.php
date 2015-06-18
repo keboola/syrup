@@ -40,6 +40,7 @@ class Job implements JobInterface
             'description' => null,
             'token' => null
         ],
+        'app' => null,
         'component' => null,
         'command' => null,
         'params' => [],
@@ -74,6 +75,10 @@ class Job implements JobInterface
 
         if (null != $this->data['runId']) {
             $this->data['nestingLevel'] = $this->calculateNestingLevel($this->data['runId']);
+        }
+
+        if (null == $this->data['app']) {
+            $this->data['app'] = $this->data['component'];
         }
 
         $this->index = $index;
@@ -160,15 +165,26 @@ class Job implements JobInterface
         return $this;
     }
 
-    public function getComponent()
+    public function setApp($app)
     {
-        return $this->data['component'];
+        $this->data['status'] = $app;
+        return $this;
+    }
+
+    public function getApp()
+    {
+        return $this->data['app'];
     }
 
     public function setComponent($component)
     {
         $this->data['component'] = $component;
         return $this;
+    }
+
+    public function getComponent()
+    {
+        return $this->data['component'];
     }
 
     public function setResult($result)
