@@ -13,12 +13,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CreateIndexCommand extends ContainerAwareCommand
+class IndexCreateCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('syrup:create-index')
+            ->setName('syrup:index:create')
+            ->setAliases(['syrup:create-index'])
             ->setDescription('Create new elasticsearch index')
             ->addOption('default', '-d', InputOption::VALUE_NONE, 'If set, default mapping wil be used, use this option
                 also when running command from syrup-component-bundle space.')

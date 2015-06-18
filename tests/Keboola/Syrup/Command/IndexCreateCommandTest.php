@@ -7,16 +7,16 @@
 
 namespace Keboola\Syrup\Tests\Command;
 
-use Keboola\Syrup\Command\CreateIndexCommand;
+use Keboola\Syrup\Command\IndexCreateCommand;
 use Keboola\Syrup\Test\CommandTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class CreateIndexCommandTest extends CommandTestCase
+class IndexCreateCommandTest extends CommandTestCase
 {
     protected function setUp()
     {
         parent::setUp();
-        $this->application->add(new CreateIndexCommand());
+        $this->application->add(new IndexCreateCommand());
     }
 
     public function testCreateIndex()
