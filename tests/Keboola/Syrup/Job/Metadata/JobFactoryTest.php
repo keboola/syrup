@@ -37,8 +37,6 @@ class JobFactoryTest extends \PHPUnit_Framework_TestCase
         $job = $jobFactory->create($command, ['param' => $param], $lock);
 
         $this->assertEquals($command, $job->getCommand());
-        $this->assertEquals(SYRUP_APP_NAME, $job->getComponent());
-        $this->assertEquals(SYRUP_APP_NAME, $job->getApp());
         $this->assertEquals($lock, $job->getLockName());
         $this->assertEquals(['param' => $param], $job->getParams());
         $this->assertArrayHasKey('id', $job->getProject());

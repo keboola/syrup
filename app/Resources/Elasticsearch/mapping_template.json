@@ -73,10 +73,6 @@
                         }
                     }
                 },
-                "app": {
-                    "index": "not_analyzed",
-                    "type": "string"
-                },
                 "component": {
                     "index": "not_analyzed",
                     "type": "string"
