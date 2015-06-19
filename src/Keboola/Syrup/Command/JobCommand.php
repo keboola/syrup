@@ -16,6 +16,7 @@ use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Keboola\Syrup\Exception\JobException;
 use Keboola\Syrup\Exception\SyrupExceptionInterface;
@@ -135,6 +136,14 @@ class JobCommand extends ContainerAwareCommand
             return self::STATUS_LOCK;
         }
 
+        // check job status
+        $this->job = $this->jobMapper->get($jobId);
+
+        if (!in_array($this->job->getStatus(), [Job::STATUS_WAITING, Job::STATUS_PROCESSING])) {
+            // job is not waiting or processing
+            return self::STATUS_LOCK;
+        }
+
         $startTime = time();
 
         // Update job status to 'processing'
@@ -184,6 +193,7 @@ class JobCommand extends ContainerAwareCommand
                 'exceptionId'   => $exceptionId
             ];
             $jobStatus = Job::STATUS_ERROR;
+            $this->job->setError(Job::ERROR_USER);
             $status = self::STATUS_SUCCESS;
 
         } catch (JobException $e) {
@@ -212,6 +222,7 @@ class JobCommand extends ContainerAwareCommand
             ];
             $this->job->setStatus($jobStatus);
             $this->job->setResult($jobResult);
+            $this->job->setError(Job::ERROR_APPLICATION);
             $this->jobMapper->update($this->job);
 
             // try to log the exception

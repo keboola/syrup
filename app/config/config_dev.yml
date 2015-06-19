@@ -17,9 +17,6 @@ monolog:
             level: debug
             channels: ["!request", "!event", "!doctrine"]
             formatter: syrup.monolog.formatter
-        signal:
-            type: service
-            id: syrup.monolog.signal_handler
         storage_api:
             type: service
             id: syrup.monolog.sapi_handler

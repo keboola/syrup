@@ -8,6 +8,8 @@
 namespace Keboola\Syrup\Service\StorageApi;
 
 use Keboola\StorageApi\Client;
+use Keboola\StorageApi\ClientException;
+use Keboola\Syrup\Exception\SyrupComponentException;
 use Symfony\Component\HttpFoundation\Request;
 use Keboola\Syrup\Exception\NoRequestException;
 use Keboola\Syrup\Exception\UserException;
@@ -57,8 +59,6 @@ class StorageApiService
                 'url' => $this->storageApiUrl,
                 'userAgent' => explode('/', $this->request->getPathInfo())[1],
             ]);
-
-            $this->client->verifyToken();
 
             if ($this->request->headers->has('X-KBC-RunId')) {
                 $kbcRunId = $this->client->generateRunId($this->request->headers->get('X-KBC-RunId'));

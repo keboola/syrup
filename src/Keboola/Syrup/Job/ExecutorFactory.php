@@ -39,12 +39,6 @@ class ExecutorFactory
         $jobExecutor->setStorageApi($storageApiService->getClient());
         $jobExecutor->setJob($job);
 
-        //@todo: remove this block - onTerminate method is deprecated
-        //register signal handler for SIGTERM if not on Win
-        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-            pcntl_signal(SIGTERM, [$jobExecutor, 'onTerminate']);
-        }
-
         return $jobExecutor;
     }
 }

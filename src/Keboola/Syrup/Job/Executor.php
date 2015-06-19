@@ -34,15 +34,6 @@ class Executor implements ExecutorInterface
         // do stuff
     }
 
-    /** @deprecated */
-    public function onTerminate()
-    {
-        $this->cleanup();
-        $e = new JobException(500, 'Job terminated by user');
-        $e->setStatus(Job::STATUS_TERMINATED);
-        throw $e;
-    }
-
     public function cleanup()
     {
 

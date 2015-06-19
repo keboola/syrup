@@ -9,7 +9,7 @@ namespace Keboola\Syrup\Exception;
 
 class ApplicationException extends SyrupComponentException
 {
-    public function __construct($message, $previous = null, $data = [])
+    public function __construct($message, $previous = null, array $data = [])
     {
         parent::__construct(500, 'Application error: ' . $message, $previous, $data);
     }

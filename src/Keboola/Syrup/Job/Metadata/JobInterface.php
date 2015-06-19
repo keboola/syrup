@@ -84,4 +84,18 @@ interface JobInterface
     public function getVersion();
 
     public function getLogData();
+
+    public function getNestingLevel();
+
+    public function setError($error);
+
+    public function getError();
+
+    public function setErrorNote($note);
+
+    public function getErrorNote();
+
+    public function setTerminatedBy(array $token);
+
+    public function getTerminatedBy();
 }

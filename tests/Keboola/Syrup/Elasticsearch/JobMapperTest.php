@@ -58,6 +58,8 @@ class JobMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($job->getComponent(), $resJob['component']);
         $this->assertEquals($job->getStatus(), $resJob['status']);
+
+        $this->assertEquals(substr_count($job->getRunId(), '.'), $resJob['nestingLevel']);
     }
 
     public function testCreateJob()

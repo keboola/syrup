@@ -107,7 +107,6 @@ class SyslogProcessor
             unset($record['context']);
         }
 
-
         $json = json_encode($record);
         if (strlen($json) > 1024) {
             $r = [

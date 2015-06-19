@@ -19,4 +19,6 @@ interface SyrupExceptionInterface
      * @param array $data
      */
     public function setData(array $data);
+
+    public function getStatusCode();
 }

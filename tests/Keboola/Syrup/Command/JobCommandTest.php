@@ -38,44 +38,6 @@ class JobCommandTest extends CommandTestCase
         $this->commandTester = new CommandTester($command);
     }
 
-    public function testSignalJob()
-    {
-        if (!extension_loaded('pcntl')) {
-            $this->markTestSkipped("No pcntl extension, skipping...");
-        }
-
-        // create and start the job
-        $jobId = $this->jobMapper->create($this->createJob());
-        $process = new Process(self::$kernel->getRootDir() . '/console syrup:run-job ' . $jobId . ' --env=test');
-        $process->setTimeout(60);
-        $process->setIdleTimeout(60);
-        $process->start();
-
-        // let it run for a while
-        sleep(10);
-        $job = $this->jobMapper->get($jobId);
-        $i=0;
-        while ($job->getStatus() != Job::STATUS_PROCESSING && $i<10) {
-            sleep(2);
-            $i++;
-        }
-
-        // make sure the job is in processing state
-        $this->assertEquals(Job::STATUS_PROCESSING, $job->getStatus());
-
-        // terminate the job
-        posix_kill($job->getProcess()['pid'], SIGTERM);
-
-        // waiting for process to finish
-        while ($process->isRunning()) {
-            sleep(2);
-        }
-
-        // get the job and check it
-        $job = $this->jobMapper->get($jobId);
-        $this->assertEquals(Job::STATUS_TERMINATED, $job->getStatus());
-    }
-
     public function testRunJob()
     {
         // job execution test
