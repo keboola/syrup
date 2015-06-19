@@ -58,7 +58,6 @@ class JobCommand extends ContainerAwareCommand
             ->setAliases(['syrup:run-job'])
             ->setDescription('Command to execute jobs')
             ->addArgument('jobId', InputArgument::REQUIRED, 'ID of the job')
-            ->addOption('force', '-f', InputOption::VALUE_NONE, 'Force run of a job not in waiting state')
         ;
     }
 
@@ -141,11 +140,10 @@ class JobCommand extends ContainerAwareCommand
         // check job status
         $this->job = $this->jobMapper->get($jobId);
 
-        if (!in_array($this->job->getStatus(), [Job::STATUS_WAITING]) && !$forceRun) {
-            // job is not waiting
+        if (!in_array($this->job->getStatus(), [Job::STATUS_WAITING, Job::STATUS_PROCESSING])) {
+            // job is not waiting or processing
             return self::STATUS_LOCK;
         }
-
 
         $startTime = time();
 
