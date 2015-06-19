@@ -112,7 +112,6 @@ class JobCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $jobId = $input->getArgument('jobId');
-        $forceRun = $input->getOption('force');
 
         $this->logger = $this->getContainer()->get('logger');
 
