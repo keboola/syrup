@@ -95,7 +95,7 @@ interface JobInterface
 
     public function getErrorNote();
 
-    public function setTerminatedBy($user);
+    public function setTerminatedBy(array $token);
 
     public function getTerminatedBy();
 }

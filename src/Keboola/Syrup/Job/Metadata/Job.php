@@ -311,9 +311,15 @@ class Job implements JobInterface
         return $this->data['errorNote'];
     }
 
-    public function setTerminatedBy($user)
+    /**
+     * @param array $token
+     *  - id
+     *  - description
+     * @return $this
+     */
+    public function setTerminatedBy(array $token)
     {
-        $this->data['terminatedBy'] = $user;
+        $this->data['terminatedBy'] = $token;
         return $this;
     }
 

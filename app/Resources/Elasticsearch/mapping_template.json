@@ -141,7 +141,21 @@
                     "type": "string"
                 },
                 "terminatedBy": {
-                    "type": "string"
+                    "dynamic": "strict",
+                    "properties": {
+                        "id": {
+                          "type": "long"
+                        },
+                        "description": {
+                            "type": "string",
+                            "fields": {
+                                "raw": {
+                                    "type": "string",
+                                    "index": "not_analyzed"
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
