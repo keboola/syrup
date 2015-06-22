@@ -41,4 +41,15 @@ class ComponentIndexTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('jobs', $mapping['mappings']);
         $this->assertArrayHasKey('properties', $mapping['mappings']['jobs']);
     }
+
+    public function testGetMapping()
+    {
+        $mapping = self::$index->getMapping();
+        $mapping = array_shift($mapping);
+
+        $this->assertNotNull($mapping);
+        $this->assertArrayHasKey('mappings', $mapping);
+        $this->assertArrayHasKey('jobs', $mapping['mappings']);
+        $this->assertArrayHasKey('properties', $mapping['mappings']['jobs']);
+    }
 }
