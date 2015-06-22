@@ -180,4 +180,12 @@ class ComponentIndex
 
         return $mapping;
     }
+
+    public function hasProperty($property)
+    {
+        $mapping = $this->getMapping();
+        $mappings = array_shift($mapping);
+
+        return isset($mappings['mappings']['jobs']['properties'][$property]);
+    }
 }

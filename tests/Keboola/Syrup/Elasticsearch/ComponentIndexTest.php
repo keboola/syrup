@@ -52,4 +52,11 @@ class ComponentIndexTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('jobs', $mapping['mappings']);
         $this->assertArrayHasKey('properties', $mapping['mappings']['jobs']);
     }
+
+    public function testHasProperty()
+    {
+        $this->assertTrue(self::$index->hasProperty('component'));
+        $this->assertTrue(self::$index->hasProperty('command'));
+        $this->assertFalse(self::$index->hasProperty('asdfgh'));
+    }
 }
