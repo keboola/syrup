@@ -41,6 +41,18 @@ class ComponentIndex
         return $params['index'];
     }
 
+    /**
+     * Return mapping from latest index
+     * @return array mapping resource
+     */
+    public function getMapping()
+    {
+        $params['index'] = $this->getLastIndexName();
+        $params['type'] = 'jobs';
+
+        return $this->client->indices()->getMapping($params);
+    }
+
     public function getIndexPrefix()
     {
         return $this->indexPrefix;
