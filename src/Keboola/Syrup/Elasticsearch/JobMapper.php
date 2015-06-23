@@ -215,7 +215,6 @@ class JobMapper
 
         foreach ($properties as $k => $v) {
             if (!isset($jobData[$k])) {
-
                 if (isset($v['properties'])) {
                     foreach (array_keys($v['properties']) as $kk) {
                         $jobData[$k][$kk] = null;
