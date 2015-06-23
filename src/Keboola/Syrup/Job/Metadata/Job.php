@@ -27,38 +27,7 @@ class Job implements JobInterface
     protected $version;
     protected $type;
 
-    protected $data = [
-        'id' => null,
-        'runId' => null,
-        'lockName' => null,
-        'project' => [
-            'id' => null,
-            'name' => null
-        ],
-        'token' => [
-            'id' => null,
-            'description' => null,
-            'token' => null
-        ],
-        'component' => null,
-        'command' => null,
-        'params' => [],
-        'result' => [],
-        'status' => null,
-        'process' => [
-            'host' => null,
-            'pid' => null
-        ],
-        'createdTime' => null,
-        'startTime' => null,
-        'endTime' => null,
-        'durationSeconds' => null,
-        'waitSeconds' => null,
-        'nestingLevel' => null,
-        'error' => null,
-        'errorNote' => null,
-        'terminatedBy' => null
-    ];
+    protected $data = [];
 
     public function __construct(array $data = [], $index = null, $type = null, $version = null)
     {
@@ -68,11 +37,11 @@ class Job implements JobInterface
         // make sure jobId is integer
         $this->setId($this->data['id']);
 
-        if (null == $this->data['lockName']) {
+        if (!isset($this->data['lockName'])) {
             $this->setLockName($this->getComponent() . '-' . $this->getProject()['id']);
         }
 
-        if (null != $this->data['runId']) {
+        if (null != $this->data['runId'] && array_key_exists('nestingLevel', $this->data)) {
             $this->data['nestingLevel'] = $this->calculateNestingLevel($this->data['runId']);
         }
 
@@ -96,7 +65,6 @@ class Job implements JobInterface
         return $this->version;
     }
 
-
     public function getId()
     {
         return (int) $this->data['id'];
@@ -110,7 +78,7 @@ class Job implements JobInterface
 
     public function getProject()
     {
-        return $this->data['project'];
+        return $this->getProperty('project');
     }
 
     /**
@@ -128,7 +96,7 @@ class Job implements JobInterface
 
     public function getToken()
     {
-        return $this->data['token'];
+        return $this->getProperty('token');
     }
 
     public function setToken(array $token)
@@ -140,7 +108,7 @@ class Job implements JobInterface
 
     public function getCommand()
     {
-        return $this->data['command'];
+        return $this->getProperty('command');
     }
 
     public function setCommand($cmd)
@@ -151,7 +119,7 @@ class Job implements JobInterface
 
     public function getStatus()
     {
-        return $this->data['status'];
+        return $this->getProperty('status');
     }
 
     public function setStatus($status)
@@ -162,7 +130,7 @@ class Job implements JobInterface
 
     public function getComponent()
     {
-        return $this->data['component'];
+        return $this->getProperty('component');
     }
 
     public function setComponent($component)
@@ -179,12 +147,12 @@ class Job implements JobInterface
 
     public function getResult()
     {
-        return $this->data['result'];
+        return $this->getProperty('result');
     }
 
     public function getRunId()
     {
-        return $this->data['runId'];
+        return $this->getProperty('runId');
     }
 
     public function setRunId($runId)
@@ -200,7 +168,7 @@ class Job implements JobInterface
 
     public function getLockName()
     {
-        return $this->data['lockName'];
+        return $this->getProperty('lockName');
     }
 
     public function setParams(array $params)
@@ -210,12 +178,12 @@ class Job implements JobInterface
 
     public function getParams()
     {
-        return $this->data['params'];
+        return $this->getProperty('params');
     }
 
     public function getProcess()
     {
-        return $this->data['process'];
+        return $this->getProperty('process');
     }
 
     public function setProcess(array $process)
@@ -227,7 +195,7 @@ class Job implements JobInterface
 
     public function getCreatedTime()
     {
-        return $this->data['createdTime'];
+        return $this->getProperty('createdTime');
     }
 
     public function setCreatedTime($datetime)
@@ -238,7 +206,7 @@ class Job implements JobInterface
 
     public function getStartTime()
     {
-        return $this->data['startTime'];
+        return $this->getProperty('startTime');
     }
 
     public function setStartTime($datetime)
@@ -249,7 +217,7 @@ class Job implements JobInterface
 
     public function getEndTime()
     {
-        return $this->data['endTime'];
+        return $this->getProperty('endTime');
     }
 
     public function setEndTime($datetime)
@@ -260,7 +228,7 @@ class Job implements JobInterface
 
     public function getDurationSeconds()
     {
-        return $this->data['durationSeconds'];
+        return $this->getProperty('durationSeconds');
     }
 
     public function setDurationSeconds($seconds)
@@ -271,7 +239,7 @@ class Job implements JobInterface
 
     public function getWaitSeconds()
     {
-        return $this->data['waitSeconds'];
+        return $this->getProperty('waitSeconds');
     }
 
     public function setWaitSeconds($seconds)
@@ -282,7 +250,7 @@ class Job implements JobInterface
 
     public function getNestingLevel()
     {
-        return $this->data['nestingLevel'];
+        return $this->getProperty('nestingLevel');
     }
 
     public function setError($error)
@@ -297,7 +265,7 @@ class Job implements JobInterface
 
     public function getError()
     {
-        return $this->data['error'];
+        return $this->getProperty('error');
     }
 
     public function setErrorNote($note)
@@ -308,7 +276,7 @@ class Job implements JobInterface
 
     public function getErrorNote()
     {
-        return $this->data['errorNote'];
+        return $this->getProperty('errorNote');
     }
 
     /**
@@ -325,7 +293,7 @@ class Job implements JobInterface
 
     public function getTerminatedBy()
     {
-        return $this->data['terminatedBy'];
+        return $this->getProperty('terminatedBy');
     }
 
     public function setAttribute($key, $value)
@@ -385,5 +353,13 @@ class Job implements JobInterface
     protected function calculateNestingLevel($runId)
     {
         return substr_count($runId, '.');
+    }
+
+    protected function getProperty($key)
+    {
+        if (array_key_exists($key, $this->data)) {
+            return $this->data[$key];
+        }
+        return null;
     }
 }

@@ -59,6 +59,7 @@ class JobFactory
                 'host' => gethostname(),
                 'pid' => getmypid()
             ],
+            'nestingLevel' => 0,
             'createdTime' => date('c')
         ]);
         if ($lockName) {

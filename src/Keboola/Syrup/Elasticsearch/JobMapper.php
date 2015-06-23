@@ -100,20 +100,12 @@ class JobMapper
     {
         $job->validate();
 
-        // ensure compatibility with older versions of Syrup,
-        // use only attributes available in components mapping
-        $jobData = $job->getData();
-        $mapping = $this->index->getMapping();
-        $mapping = array_shift($mapping);
-        $properties = array_keys($mapping['mappings']['jobs']['properties']);
-        $jobData = array_intersect_key($jobData, array_flip($properties));
-
         $params = [
             'index' => $job->getIndex(),
             'type'  => $job->getType(),
             'id'    => $job->getId(),
             'body'  => [
-                'doc'   => $jobData
+                'doc'   => $job->getData()
             ]
         ];
 

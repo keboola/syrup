@@ -66,7 +66,6 @@ class JobMapperTest extends \PHPUnit_Framework_TestCase
     {
         $job = self::$jobFactory->create(uniqid());
         $id = self::$jobMapper->create($job);
-
         $res = self::$client->get([
             'index' => self::$index->getIndexNameCurrent(),
             'type'  => 'jobs',
