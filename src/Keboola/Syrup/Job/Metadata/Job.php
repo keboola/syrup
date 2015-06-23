@@ -35,7 +35,9 @@ class Job implements JobInterface
         $this->data = array_merge($this->data, $data);
 
         // make sure jobId is integer
-        $this->setId($this->data['id']);
+        if (isset($this->data['id'])) {
+            $this->setId($this->data['id']);
+        }
 
         if (!isset($this->data['lockName'])) {
             $this->setLockName($this->getComponent() . '-' . $this->getProject()['id']);
@@ -67,7 +69,7 @@ class Job implements JobInterface
 
     public function getId()
     {
-        return (int) $this->data['id'];
+        return (int) $this->getProperty('id');
     }
 
     public function setId($id)
