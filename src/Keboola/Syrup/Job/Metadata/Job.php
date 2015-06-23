@@ -43,7 +43,7 @@ class Job implements JobInterface
             $this->setLockName($this->getComponent() . '-' . $this->getProject()['id']);
         }
 
-        if (null != $this->data['runId'] && array_key_exists('nestingLevel', $this->data)) {
+        if (isset($this->data['runId']) && isset($this->data['nestingLevel'])) {
             $this->data['nestingLevel'] = $this->calculateNestingLevel($this->data['runId']);
         }
 
