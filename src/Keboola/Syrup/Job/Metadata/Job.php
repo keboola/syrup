@@ -27,7 +27,34 @@ class Job implements JobInterface
     protected $version;
     protected $type;
 
-    protected $data = [];
+    protected $data = [
+        'id' => null,
+        'runId' => null,
+        'lockName' => null,
+        'project' => [
+            'id' => null,
+            'name' => null
+        ],
+        'token' => [
+            'id' => null,
+            'description' => null,
+            'token' => null
+        ],
+        'component' => null,
+        'command' => null,
+        'params' => [],
+        'result' => [],
+        'status' => null,
+        'process' => [
+            'host' => null,
+            'pid' => null
+        ],
+        'createdTime' => null,
+        'startTime' => null,
+        'endTime' => null,
+        'durationSeconds' => null,
+        'waitSeconds' => null
+    ];
 
     public function __construct(array $data = [], $index = null, $type = null, $version = null)
     {
