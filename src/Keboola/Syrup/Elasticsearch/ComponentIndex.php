@@ -19,12 +19,18 @@ class ComponentIndex
     protected $client;
     protected $indexPrefix;
     protected $componentName;
+    protected static $rootDir;
 
     public function __construct($componentName, $indexPrefix, Client $client)
     {
         $this->client = $client;
         $this->indexPrefix = $indexPrefix;
         $this->componentName = $componentName;
+    }
+
+    public static function setRootDir($rootDir)
+    {
+        self::$rootDir = $rootDir;
     }
 
     /**

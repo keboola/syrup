@@ -25,11 +25,14 @@ class JobMapper
     /** @var Logger */
     protected $logger;
 
-    public function __construct(Client $client, ComponentIndex $index, $logger = null)
+    protected $rootDir;
+
+    public function __construct(Client $client, ComponentIndex $index, $logger = null, $rootDir = null)
     {
         $this->client = $client;
         $this->index = $index;
         $this->logger = $logger;
+        $this->rootDir = $rootDir;
     }
 
     /**
@@ -44,7 +47,7 @@ class JobMapper
             'index' => $this->index->getIndexNameCurrent(),
             'type'  => 'jobs',
             'id'    => $job->getId(),
-            'body'  => $job->getData()
+            'body'  => $this->fillEmptyKeys($job->getData())
         ];
 
         $response = null;
@@ -200,5 +203,29 @@ class JobMapper
         if ($this->logger != null) {
             $this->logger->$level($message, $context);
         }
+    }
+
+    protected function fillEmptyKeys($jobData)
+    {
+        if ($this->rootDir == null) {
+            throw new ApplicationException("rootDir must be set");
+        }
+        $mapping = ComponentIndex::buildMapping($this->rootDir);
+        $properties = $mapping['mappings']['jobs']['properties'];
+
+        foreach ($properties as $k => $v) {
+            if (!isset($jobData[$k])) {
+
+                if (isset($v['properties'])) {
+                    foreach (array_keys($v['properties']) as $kk) {
+                        $jobData[$k][$kk] = null;
+                    }
+                } else {
+                    $jobData[$k] = null;
+                }
+            }
+        }
+
+        return $jobData;
     }
 }

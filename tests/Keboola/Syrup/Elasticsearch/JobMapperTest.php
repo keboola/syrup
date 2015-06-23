@@ -40,7 +40,7 @@ class JobMapperTest extends \PHPUnit_Framework_TestCase
         self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', self::$client);
         self::$jobFactory = new JobFactory(SYRUP_APP_NAME, new Encryptor(md5(uniqid())));
         self::$jobFactory->setStorageApiClient(new \Keboola\StorageApi\Client(['token' => SYRUP_SAPI_TEST_TOKEN]));
-        self::$jobMapper = new JobMapper(self::$client, self::$index);
+        self::$jobMapper = new JobMapper(self::$client, self::$index, null, realpath(__DIR__ . '/../../../../app'));
     }
 
     private function assertJob(JobInterface $job, $resJob)
@@ -59,7 +59,11 @@ class JobMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($job->getComponent(), $resJob['component']);
         $this->assertEquals($job->getStatus(), $resJob['status']);
 
+        $this->assertEquals($job->getParams(), $resJob['params']);
         $this->assertEquals(substr_count($job->getRunId(), '.'), $resJob['nestingLevel']);
+        $this->assertArrayHasKey('terminatedBy', $resJob);
+        $this->assertArrayHasKey('error', $resJob);
+        $this->assertArrayHasKey('errorNote', $resJob);
     }
 
     public function testCreateJob()
@@ -83,6 +87,7 @@ class JobMapperTest extends \PHPUnit_Framework_TestCase
         $job = self::$jobFactory->create(uniqid());
         $id = self::$jobMapper->create($job);
         $resJob = self::$jobMapper->get($id);
+
         $this->assertJob($job, $resJob->getData());
     }
 

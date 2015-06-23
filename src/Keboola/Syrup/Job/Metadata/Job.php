@@ -7,6 +7,7 @@
 
 namespace Keboola\Syrup\Job\Metadata;
 
+use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Exception\ApplicationException;
 
 class Job implements JobInterface
