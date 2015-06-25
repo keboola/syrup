@@ -14,4 +14,4 @@ monolog:
             id: syrup.monolog.sapi_handler
             ident: %app_name%
             level: info
-            channels: ["!request", "!event", "!doctrine"]
+            channels: ["!request", "!event", "!doctrine", "!php"]
