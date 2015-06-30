@@ -63,13 +63,17 @@ class ExceptionHandler extends BaseExceptionHandler
         $appName = $parameters['parameters']['app_name'];
         $exceptionId = $appName . '-' . md5(microtime());
 
+        $code = ($exception->getCode() >= 200 && $exception->getCode() < 600)?$exception->getCode():500;
+
+        $priority = ($code < 500)?'ERROR':'CRITICAL';
+
         $logData = [
             'message' => $exception->getMessage(),
             'level' => $exception->getCode(),
             'channel' => 'app',
             'datetime' => ['date' => date('Y-m-d H:i:s')],
             'app' => $appName,
-            'priority' => 'CRITICAL',
+            'priority' => $priority,
             'file' => $exception->getFile(),
             'pid' => getmypid(),
             'exceptionId' => $exceptionId
@@ -87,8 +91,6 @@ class ExceptionHandler extends BaseExceptionHandler
         if (in_array($this->env, ['dev','test'])) {
             $response['message'] = $exception->getMessage();
         }
-
-        $code = ($exception->getCode() >= 200 && $exception->getCode() < 600)?$exception->getCode():500;
 
         // nicely format for console - @todo create ConsoleExceptionHandler
         if (php_sapi_name() == 'cli') {
