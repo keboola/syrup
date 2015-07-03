@@ -22,6 +22,10 @@ Debug::enable('prod');
 require_once __DIR__.'/../app/AppKernel.php';
 //require_once __DIR__.'/../app/AppCache.php';
 
+// Because of ELB we need to trust to all incoming requests
+Request::setTrustedProxies(array($request->server->get('REMOTE_ADDR')));
+
+// Run
 $kernel = new AppKernel('prod', false);
 $kernel->loadClassCache();
 $request = Request::createFromGlobals();
