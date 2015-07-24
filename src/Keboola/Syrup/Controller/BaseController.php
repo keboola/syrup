@@ -56,7 +56,7 @@ class BaseController extends Controller
         return new Response($content, $status, $this->commonHeaders($headers));
     }
 
-    public function createJsonResponse(array $data, $status = '200', $headers = array())
+    public function createJsonResponse($data = null, $status = '200', $headers = array())
     {
         return new JsonResponse($data, $status, $this->commonHeaders($headers));
     }
