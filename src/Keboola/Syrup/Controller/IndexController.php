@@ -50,4 +50,14 @@ class IndexController extends Controller
             "documentation" => "http://documentation.keboola.com/syrup"
         ));
     }
+
+    public function notFoundAction()
+    {
+        return new JsonResponse(array(
+            'status' => 'error',
+            'error'  => 'User error',
+            'code' => 404,
+            'message' => 'Route not found'
+        ));
+    }
 }
