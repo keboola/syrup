@@ -85,7 +85,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('status', $result);
         $this->assertEquals('error', $result['status']);
         $this->assertArrayHasKey('code', $result);
-        $this->assertEquals(405, $result['code']);
+        $this->assertEquals(404, $result['code']);
     }
 
     public function testRunActionWithoutToken()
