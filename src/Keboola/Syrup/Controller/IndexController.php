@@ -8,6 +8,7 @@
 
 namespace Keboola\Syrup\Controller;
 
+use Keboola\Syrup\Exception\SyrupComponentException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
@@ -53,11 +54,6 @@ class IndexController extends Controller
 
     public function notFoundAction()
     {
-        return new JsonResponse(array(
-            'status' => 'error',
-            'error'  => 'User error',
-            'code' => 404,
-            'message' => 'Route not found'
-        ));
+        throw new SyrupComponentException(404, "Route not found");
     }
 }
