@@ -346,6 +346,12 @@ class Job implements JobInterface
     {
         $logData = $this->data;
         unset($logData['token']);
+        $logData['params'] = (object) $logData['params'];
+        $logData['result'] = (object) $logData['result'];
+        $logData['isFinished'] = $this->isFinished();
+        $logData['_index'] = $this->getIndex();
+        $logData['_type'] = $this->getType();
+
         return $logData;
     }
 
@@ -369,6 +375,17 @@ class Job implements JobInterface
                 . implode(',', $allowedStatuses) . ")"
             );
         }
+    }
+
+    public function isFinished()
+    {
+        $status = $this->getStatus();
+
+        return !in_array($status, [
+            self::STATUS_WAITING,
+            self::STATUS_PROCESSING,
+            self::STATUS_TERMINATING
+        ]);
     }
 
     protected function checkArrayKeys($array, $keys)

@@ -120,7 +120,7 @@ class ApiControllerTest extends WebTestCase
             ['HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token')],
             '{}'
         );
-
+        
         $res = json_decode(static::$client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('id', $res);
@@ -139,6 +139,9 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('durationSeconds', $res);
         $this->assertArrayHasKey('waitSeconds', $res);
         $this->assertArrayHasKey('nestingLevel', $res);
+        $this->assertArrayHasKey('isFinished', $res);
+        $this->assertArrayHasKey('_index', $res);
+        $this->assertArrayHasKey('_type', $res);
         $this->assertArrayHasKey('url', $res);
 
     }
