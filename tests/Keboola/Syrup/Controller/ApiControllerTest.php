@@ -124,8 +124,23 @@ class ApiControllerTest extends WebTestCase
         $res = json_decode(static::$client->getResponse()->getContent(), true);
 
         $this->assertArrayHasKey('id', $res);
-        $this->assertArrayHasKey('url', $res);
+        $this->assertArrayHasKey('runId', $res);
+        $this->assertArrayHasKey('lockName', $res);
+        $this->assertArrayHasKey('project', $res);
+        $this->assertArrayHasKey('component', $res);
+        $this->assertArrayHasKey('command', $res);
+        $this->assertArrayHasKey('params', $res);
+        $this->assertArrayHasKey('result', $res);
         $this->assertArrayHasKey('status', $res);
+        $this->assertArrayHasKey('process', $res);
+        $this->assertArrayHasKey('createdTime', $res);
+        $this->assertArrayHasKey('startTime', $res);
+        $this->assertArrayHasKey('endTime', $res);
+        $this->assertArrayHasKey('durationSeconds', $res);
+        $this->assertArrayHasKey('waitSeconds', $res);
+        $this->assertArrayHasKey('nestingLevel', $res);
+        $this->assertArrayHasKey('url', $res);
+
     }
 
     // test wrong parameter user error

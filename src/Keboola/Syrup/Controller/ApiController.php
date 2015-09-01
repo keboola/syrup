@@ -75,12 +75,11 @@ class ApiController extends BaseController
             'job' => $job->getLogData()
         ]);
 
+        $jobResource = $job->getLogData();
+        $jobResource['url'] = $this->getJobUrl($jobId);
+
         // Response with link to job resource
-        return $this->createJsonResponse([
-            'id'        => $jobId,
-            'url'       => $this->getJobUrl($jobId),
-            'status'    => $job->getStatus()
-        ], 202);
+        return $this->createJsonResponse($jobResource, 202);
     }
 
     public function optionsAction()
