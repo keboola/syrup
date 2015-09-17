@@ -7,7 +7,6 @@
 
 namespace Keboola\Syrup\Test;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Keboola\StorageApi\Client as StorageApiClient;
