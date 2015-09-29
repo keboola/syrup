@@ -7,6 +7,7 @@
 
 namespace Keboola\Syrup\Command;
 
+use Aws\CloudWatch\CloudWatchClient;
 use Keboola\Syrup\Service\Queue\QueueFactory;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -27,6 +28,7 @@ class QueueCreateCommand extends ContainerAwareCommand
             ->addArgument('secret_key', InputArgument::OPTIONAL)
             ->addArgument('region', InputArgument::OPTIONAL)
             ->addOption('register', 'r', InputOption::VALUE_NONE, 'If set the queue will be registerd to DB')
+            ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Add Cloudwatch alarm to this queue')
         ;
     }
 
@@ -37,6 +39,7 @@ class QueueCreateCommand extends ContainerAwareCommand
         $secretKey = $input->getArgument('secret_key');
         $region = $input->getArgument('region')?:'us-east-1';
         $register = $input->getOption('register');
+        $watch = $input->getOption('watch');
 
         /** @var $queueFactory QueueFactory */
         $queueFactory = $this->getContainer()->get('syrup.queue_factory');
@@ -53,6 +56,44 @@ class QueueCreateCommand extends ContainerAwareCommand
                 'secret_key' => $secretKey?:'',
                 'region' => $region?:'us-east-1',
                 'url' => $sqsQueue->get('QueueUrl')
+            ]);
+        }
+
+        if ($watch) {
+            $cwClient = CloudWatchClient::factory([
+                'region' => 'us-east-1'
+            ]);
+
+            $cwClient->putMetricAlarm([
+                // AlarmName is required
+                'AlarmName' => sprintf('Syrup %s queue is full', $name),
+                'ActionsEnabled' => true,
+                'AlarmActions' => [
+                    'arn:aws:sns:us-east-1:147946154733:Connection_SQS_Alerts'
+                ],
+                // MetricName is required
+                'MetricName' => 'ApproximateNumberOfMessagesVisible',
+                // Namespace is required
+                'Namespace' => 'AWS/SQS',
+                // Statistic is required
+                'Statistic' => 'Average',
+                'Dimensions' => [
+                        [
+                            // Name is required
+                            'Name' => 'QueueName',
+                            // Value is required
+                            'Value' => $name,
+                        ],
+                    ],
+                // Period is required
+                'Period' => 300,
+                'Unit' => 'Seconds',
+                // EvaluationPeriods is required
+                'EvaluationPeriods' => 1,
+                // Threshold is required
+                'Threshold' => 5,
+                // ComparisonOperator is required
+                'ComparisonOperator' => 'GreaterThanOrEqualToThreshold',
             ]);
         }
 
