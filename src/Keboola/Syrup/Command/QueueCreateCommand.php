@@ -60,9 +60,12 @@ class QueueCreateCommand extends ContainerAwareCommand
         }
 
         if (!$noWatch) {
-            $cwClient = CloudWatchClient::factory([
-                'region' => 'us-east-1'
-            ]);
+            $data['region'] = $region;
+            if ($accessKey != null && $secretKey != null) {
+                $data['key'] = $accessKey;
+                $data['secret'] = $secretKey;
+            }
+            $cwClient = CloudWatchClient::factory($data);
 
             $cwClient->putMetricAlarm([
                 // AlarmName is required
