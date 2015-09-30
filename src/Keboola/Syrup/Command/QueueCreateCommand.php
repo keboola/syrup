@@ -28,7 +28,7 @@ class QueueCreateCommand extends ContainerAwareCommand
             ->addArgument('secret_key', InputArgument::OPTIONAL)
             ->addArgument('region', InputArgument::OPTIONAL)
             ->addOption('register', 'r', InputOption::VALUE_NONE, 'If set the queue will be registerd to DB')
-            ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Add Cloudwatch alarm to this queue')
+            ->addOption('no-watch', 'nw', InputOption::VALUE_NONE, 'Do not add Cloudwatch alarm to this queue')
         ;
     }
 
@@ -39,7 +39,7 @@ class QueueCreateCommand extends ContainerAwareCommand
         $secretKey = $input->getArgument('secret_key');
         $region = $input->getArgument('region')?:'us-east-1';
         $register = $input->getOption('register');
-        $watch = $input->getOption('watch');
+        $noWatch = $input->getOption('no-watch');
 
         /** @var $queueFactory QueueFactory */
         $queueFactory = $this->getContainer()->get('syrup.queue_factory');
@@ -59,7 +59,7 @@ class QueueCreateCommand extends ContainerAwareCommand
             ]);
         }
 
-        if ($watch) {
+        if (!$noWatch) {
             $cwClient = CloudWatchClient::factory([
                 'region' => 'us-east-1'
             ]);
