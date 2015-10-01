@@ -14,61 +14,61 @@ class CryptoWrapper implements EncryptorInterface
     /** @var \Crypto */
     protected $encryptor;
 
-	/**
-	 * @var
-	 */
-	protected $key;
+    /**
+     * @var
+     */
+    protected $key;
 
 
     public function __construct($key)
     {
-	    if (strlen($key) >= 16) {
-		    $this->setKey(substr($key, 0, 16));
-	    } else {
-		    throw new ApplicationException("Encryption key too short. Minimum is 16 bytes.");
-	    }
+        if (strlen($key) >= 16) {
+            $this->setKey(substr($key, 0, 16));
+        } else {
+            throw new ApplicationException("Encryption key too short. Minimum is 16 bytes.");
+        }
 
-	    $this->setEncryptor(new \Crypto());
+        $this->setEncryptor(new \Crypto());
     }
 
 
-	/**
-	 * @return mixed
-	 */
-	protected function getKey()
-	{
-		return $this->key;
-	}
+    /**
+     * @return mixed
+     */
+    protected function getKey()
+    {
+        return $this->key;
+    }
 
-	/**
-	 * @param mixed $key
-	 * @return $this
-	 */
-	protected function setKey($key)
-	{
-		$this->key = $key;
+    /**
+     * @param mixed $key
+     * @return $this
+     */
+    protected function setKey($key)
+    {
+        $this->key = $key;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return \Crypto
-	 */
-	protected function getEncryptor()
-	{
-		return $this->encryptor;
-	}
+    /**
+     * @return \Crypto
+     */
+    protected function getEncryptor()
+    {
+        return $this->encryptor;
+    }
 
-	/**
-	 * @param \Crypto $encryptor
-	 * @return $this
-	 */
-	protected function setEncryptor($encryptor)
-	{
-		$this->encryptor = $encryptor;
+    /**
+     * @param \Crypto $encryptor
+     * @return $this
+     */
+    protected function setEncryptor($encryptor)
+    {
+        $this->encryptor = $encryptor;
 
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * @param $data string data to encrypt
