@@ -239,4 +239,44 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["finalKey"]);
         $this->assertEquals("test", $decrypted["key2"]["nestedKey2"]["finalKeyEncrypted"]);
     }
+
+    /**
+     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
+     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
+     */
+    public function testEncryptorNestedObjectWithArray()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+
+        $object = [
+            "key1" => "value1",
+            "key2" => [
+                ["nestedKey1" => "value2"],
+                ["nestedKey2" => ["#finalKey" => "value3"]]
+            ]
+        ];
+        $result = $encryptor->encrypt($object);
+        $this->assertArrayHasKey("key1", $result);
+        $this->assertArrayHasKey("key2", $result);
+        $this->assertCount(2, $result["key2"]);
+        $this->assertArrayHasKey("nestedKey1", $result["key2"][0]);
+        $this->assertArrayHasKey("nestedKey2", $result["key2"][1]);
+        $this->assertArrayHasKey("#finalKey", $result["key2"][1]["nestedKey2"]);
+        $this->assertEquals("value1", $result["key1"]);
+        $this->assertEquals("value2", $result["key2"][0]["nestedKey1"]);
+        $this->assertEquals("KBC::Encrypted==", substr($result["key2"][1]["nestedKey2"]["#finalKey"], 0, 16));
+
+        $decrypted = $encryptor->decrypt($result);
+        $this->assertArrayHasKey("key1", $decrypted);
+        $this->assertArrayHasKey("key2", $decrypted);
+        $this->assertCount(2, $result["key2"]);
+        $this->assertArrayHasKey("nestedKey1", $decrypted["key2"][0]);
+        $this->assertArrayHasKey("nestedKey2", $decrypted["key2"][1]);
+        $this->assertArrayHasKey("finalKey", $decrypted["key2"][1]["nestedKey2"]);
+        $this->assertEquals("value1", $decrypted["key1"]);
+        $this->assertEquals("value2", $decrypted["key2"][0]["nestedKey1"]);
+        $this->assertEquals("value3", $decrypted["key2"][1]["nestedKey2"]["finalKey"]);
+    }
 }
