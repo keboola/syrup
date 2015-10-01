@@ -110,3 +110,6 @@ services:
         class: Keboola\Syrup\Job\ExecutorFactory
         arguments: [@service_container]
 
+    syrup.object_encryptor:
+        class: Keboola\Syrup\Service\ObjectEncryptor
+        arguments: [@syrup.crypto_wrapper]
