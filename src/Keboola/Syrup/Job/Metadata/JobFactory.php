@@ -9,6 +9,7 @@ namespace Keboola\Syrup\Job\Metadata;
 
 use Keboola\StorageApi\Client;
 use Keboola\Syrup\Encryption\Encryptor;
+use Keboola\Syrup\Service\ObjectEncryptor;
 
 class JobFactory
 {
@@ -16,15 +17,26 @@ class JobFactory
      * @var Encryptor
      */
     protected $encryptor;
+
+    /**
+     * @var ObjectEncryptor
+     */
+    protected $configEncryptor;
+
+    /**
+     * @var
+     */
     protected $componentName;
+
     /**
      * @var Client
      */
     protected $storageApiClient;
 
-    public function __construct($componentName, Encryptor $encryptor)
+    public function __construct($componentName, Encryptor $encryptor, ObjectEncryptor $configEncryptor)
     {
         $this->encryptor = $encryptor;
+        $this->configEncryptor = $configEncryptor;
         $this->componentName = $componentName;
     }
 
@@ -54,7 +66,7 @@ class JobFactory
             ],
             'component' => $this->componentName,
             'command' => $command,
-            'params' => $params,
+            'params' => $this->configEncryptor->decrypt($params),
             'process' => [
                 'host' => gethostname(),
                 'pid' => getmypid()

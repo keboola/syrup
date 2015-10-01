@@ -10,10 +10,12 @@ namespace Keboola\Syrup\Tests\Elasticsearch;
 use Elasticsearch\Client;
 use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Elasticsearch\JobMapper;
+use Keboola\Syrup\Encryption\CryptoWrapper;
 use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Keboola\Syrup\Job\Metadata\JobInterface;
+use Keboola\Syrup\Service\ObjectEncryptor;
 
 class JobMapperTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,7 +40,7 @@ class JobMapperTest extends \PHPUnit_Framework_TestCase
     {
         self::$client = new Client(['hosts' => [SYRUP_ELASTICSEARCH_HOST]]);
         self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', self::$client);
-        self::$jobFactory = new JobFactory(SYRUP_APP_NAME, new Encryptor(md5(uniqid())));
+        self::$jobFactory = new JobFactory(SYRUP_APP_NAME, new Encryptor(md5(uniqid())), new ObjectEncryptor(new CryptoWrapper(md5(uniqid()))));
         self::$jobFactory->setStorageApiClient(new \Keboola\StorageApi\Client(['token' => SYRUP_SAPI_TEST_TOKEN]));
         self::$jobMapper = new JobMapper(self::$client, self::$index, null, realpath(__DIR__ . '/../../../../app'));
     }
