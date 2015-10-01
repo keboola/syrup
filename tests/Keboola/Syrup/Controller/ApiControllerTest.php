@@ -175,4 +175,162 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('message', $result);
         $this->assertArrayHasKey('runId', $result);
     }
+
+    public function testEncryptActionSimpleText()
+    {
+        static::$client->request(
+            'POST',
+            '/syrup/encrypt',
+            [],
+            [],
+            [
+                'HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token'),
+                'CONTENT_TYPE' => 'text/plain'
+            ],
+            'abcd'
+        );
+
+        $result = static::$client->getResponse()->getContent();
+        $this->assertEquals("KBC::Encrypted==", substr($result, 0, 16));
+    }
+
+    public function testEncryptActionSimpleTextAlreadyEncrypted()
+    {
+        static::$client->request(
+            'POST',
+            '/syrup/encrypt',
+            [],
+            [],
+            [
+                'HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token'),
+                'CONTENT_TYPE' => 'text/plain'
+            ],
+            'KBC::Encrypted==abcd'
+        );
+
+        $result = static::$client->getResponse()->getContent();
+        $this->assertEquals("KBC::Encrypted==abcd", $result);
+    }
+
+    public function testEncryptActionSimpleJson()
+    {
+        static::$client->request(
+            'POST',
+            '/syrup/encrypt',
+            [],
+            [],
+            [
+                'HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token'),
+                'CONTENT_TYPE' => 'application/json'
+            ],
+            '{"key1": "value1", "#key2": "value2"}'
+        );
+
+        $result = json_decode(static::$client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey("key1", $result);
+        $this->assertArrayHasKey("#key2", $result);
+        $this->assertEquals("value1", $result["key1"]);
+        $this->assertEquals("KBC::Encrypted==", substr($result["#key2"], 0, 16));
+    }
+
+    public function testEncryptActionSimpleJsonEncrypted()
+    {
+        static::$client->request(
+            'POST',
+            '/syrup/encrypt',
+            [],
+            [],
+            [
+                'HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token'),
+                'CONTENT_TYPE' => 'application/json'
+            ],
+            '{"key1": "value1", "#key2": "KBC::Encrypted==abcd", "#key3": "value3"}'
+        );
+
+        $result = json_decode(static::$client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey("key1", $result);
+        $this->assertArrayHasKey("#key2", $result);
+        $this->assertArrayHasKey("#key3", $result);
+        $this->assertEquals("value1", $result["key1"]);
+        $this->assertEquals("KBC::Encrypted==abcd", $result["#key2"]);
+        $this->assertEquals("KBC::Encrypted==", substr($result["#key3"], 0, 16));
+    }
+
+    public function testEncryptActionNestedJson()
+    {
+        static::$client->request(
+            'POST',
+            '/syrup/encrypt',
+            [],
+            [],
+            [
+                'HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token'),
+                'CONTENT_TYPE' => 'application/json'
+            ],
+            '{"key1": "value1", "key2": {"nestedKey1": "value2", "nestedKey2": {"#finalKey": "value3"}}}'
+        );
+
+        $result = json_decode(static::$client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey("key1", $result);
+        $this->assertArrayHasKey("key2", $result);
+        $this->assertArrayHasKey("nestedKey1", $result["key2"]);
+        $this->assertArrayHasKey("nestedKey2", $result["key2"]);
+        $this->assertArrayHasKey("#finalKey", $result["key2"]["nestedKey2"]);
+        $this->assertEquals("value1", $result["key1"]);
+        $this->assertEquals("value2", $result["key2"]["nestedKey1"]);
+        $this->assertEquals("KBC::Encrypted==", substr($result["key2"]["nestedKey2"]["#finalKey"], 0, 16));
+    }
+
+    public function testEncryptActionNestedJsonAlreadyEncrypted()
+    {
+        static::$client->request(
+            'POST',
+            '/syrup/encrypt',
+            [],
+            [],
+            [
+                'HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token'),
+                'CONTENT_TYPE' => 'application/json'
+            ],
+            '{"key1": "value1", "key2": {"nestedKey1": "value2", "nestedKey2": {"#finalKey": "value3", "#finalKeyEncrypted": "KBC::Encrypted==abcd"}}}'
+        );
+
+        $result = json_decode(static::$client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey("key1", $result);
+        $this->assertArrayHasKey("key2", $result);
+        $this->assertArrayHasKey("nestedKey1", $result["key2"]);
+        $this->assertArrayHasKey("nestedKey2", $result["key2"]);
+        $this->assertArrayHasKey("#finalKey", $result["key2"]["nestedKey2"]);
+        $this->assertEquals("value1", $result["key1"]);
+        $this->assertEquals("value2", $result["key2"]["nestedKey1"]);
+        $this->assertEquals("KBC::Encrypted==", substr($result["key2"]["nestedKey2"]["#finalKey"], 0, 16));
+        $this->assertEquals("KBC::Encrypted==abcd", $result["key2"]["nestedKey2"]["#finalKeyEncrypted"]);
+    }
+
+    public function testEncryptActionIncorrectContentType()
+    {
+        static::$client->request(
+            'POST',
+            '/syrup/encrypt',
+            [],
+            [],
+            [
+                'HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token'),
+                'CONTENT_TYPE' => 'aa/bb'
+            ],
+            'abcd'
+        );
+
+        $result = json_decode(static::$client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('error', $result['status']);
+        $this->assertArrayHasKey('error', $result);
+        $this->assertEquals('User error', $result['error']);
+        $this->assertArrayHasKey('code', $result);
+        $this->assertEquals(400, $result['code']);
+        $this->assertArrayHasKey('exceptionId', $result);
+        $this->assertArrayHasKey('message', $result);
+        $this->assertArrayHasKey('runId', $result);
+        $this->assertEquals('User error: Incorrect Content-Type.', $result["message"]);
+    }
 }
