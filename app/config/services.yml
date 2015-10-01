@@ -75,6 +75,10 @@ services:
         class: Keboola\Syrup\Encryption\Encryptor
         arguments: [%encryption_key%]
 
+    syrup.crypto_wrapper:
+        class: Keboola\Syrup\Encryption\CryptoWrapper
+        arguments: [%encryption_key%]
+
     syrup.elasticsearch.client:
         class: Elasticsearch\Client
         arguments: [%elasticsearch%]
