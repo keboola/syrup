@@ -40,6 +40,6 @@ class JobTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($command, $job->getCommand());
         $this->assertEquals($lock, $job->getLockName());
         $this->assertEquals("KBC::Encrypted==", substr($job->getData()["params"]["#key2"], 0, 16));
-        $this->assertEquals(["key1" => "value1", "key2" => "value2"], $job->getParams());
+        $this->assertEquals($param, $job->getParams());
     }
 }

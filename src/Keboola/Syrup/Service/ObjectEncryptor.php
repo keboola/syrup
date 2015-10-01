@@ -120,7 +120,7 @@ class ObjectEncryptor
                 if (is_string($value)) {
                     $result[$key] = $this->encryptValue($value);
                 } elseif (is_array($value)) {
-                    $result[$key] = $value;
+                    $result[$key] = $this->encryptArray($value);
                 } else {
                     throw new ApplicationException("Only arrays and strings are supported for encryption.");
                 }
@@ -147,9 +147,9 @@ class ObjectEncryptor
         foreach ($data as $key => $value) {
             if (substr($key, 0, 1) == '#') {
                 if (is_string($value)) {
-                    $result[substr($key, 1)] = $this->decryptValue($value);
+                    $result[$key] = $this->decryptValue($value);
                 } elseif (is_array($value)) {
-                    $result[$key] = $value;
+                    $result[$key] = $this->decryptArray($value);
                 } else {
                     throw new ApplicationException("Only arrays and strings are supported for decryption.");
                 }

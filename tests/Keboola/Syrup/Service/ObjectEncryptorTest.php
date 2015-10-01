@@ -77,9 +77,9 @@ class ObjectEncryptorTest extends WebTestCase
 
         $decrypted = $encryptor->decrypt($result);
         $this->assertArrayHasKey("key1", $decrypted);
-        $this->assertArrayHasKey("key2", $decrypted);
+        $this->assertArrayHasKey("#key2", $decrypted);
         $this->assertEquals("value1", $decrypted["key1"]);
-        $this->assertEquals("value2", $decrypted["key2"]);
+        $this->assertEquals("value2", $decrypted["#key2"]);
     }
 
     /**
@@ -104,9 +104,9 @@ class ObjectEncryptorTest extends WebTestCase
 
         $decrypted = $encryptor->decrypt($result);
         $this->assertArrayHasKey("key1", $decrypted);
-        $this->assertArrayHasKey("key2", $decrypted);
+        $this->assertArrayHasKey("#key2", $decrypted);
         $this->assertEquals("value1", $decrypted["key1"]);
-        $this->assertEquals("test", $decrypted["key2"]);
+        $this->assertEquals("test", $decrypted["#key2"]);
     }
 
     /**
@@ -143,10 +143,10 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertArrayHasKey("key2", $decrypted);
         $this->assertArrayHasKey("nestedKey1", $decrypted["key2"]);
         $this->assertArrayHasKey("nestedKey2", $decrypted["key2"]);
-        $this->assertArrayHasKey("finalKey", $decrypted["key2"]["nestedKey2"]);
+        $this->assertArrayHasKey("#finalKey", $decrypted["key2"]["nestedKey2"]);
         $this->assertEquals("value1", $decrypted["key1"]);
         $this->assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
-        $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["finalKey"]);
+        $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
     }
 
     /**
@@ -167,7 +167,8 @@ class ObjectEncryptorTest extends WebTestCase
                 ]
             ],
             "#key3" => [
-                "anotherNestedKey" => "someValue"
+                "anotherNestedKey" => "someValue",
+                "#encryptedNestedKey" => "someValue2"
             ]
         ];
         $result = $encryptor->encrypt($object);
@@ -181,6 +182,7 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value1", $result["key1"]);
         $this->assertEquals("value2", $result["key2"]["nestedKey1"]);
         $this->assertEquals("someValue", $result["#key3"]["anotherNestedKey"]);
+        $this->assertEquals("KBC::Encrypted==", substr($result["#key3"]["#encryptedNestedKey"], 0, 16));
         $this->assertEquals("KBC::Encrypted==", substr($result["key2"]["nestedKey2"]["#finalKey"], 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
@@ -189,11 +191,12 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertArrayHasKey("#key3", $decrypted);
         $this->assertArrayHasKey("nestedKey1", $decrypted["key2"]);
         $this->assertArrayHasKey("nestedKey2", $decrypted["key2"]);
-        $this->assertArrayHasKey("finalKey", $decrypted["key2"]["nestedKey2"]);
+        $this->assertArrayHasKey("#finalKey", $decrypted["key2"]["nestedKey2"]);
         $this->assertEquals("value1", $decrypted["key1"]);
         $this->assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
-        $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["finalKey"]);
+        $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
         $this->assertEquals("someValue", $decrypted["#key3"]["anotherNestedKey"]);
+        $this->assertEquals("someValue2", $decrypted["#key3"]["#encryptedNestedKey"]);
     }
 
     /**
@@ -233,11 +236,12 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertArrayHasKey("key2", $decrypted);
         $this->assertArrayHasKey("nestedKey1", $decrypted["key2"]);
         $this->assertArrayHasKey("nestedKey2", $decrypted["key2"]);
-        $this->assertArrayHasKey("finalKey", $decrypted["key2"]["nestedKey2"]);
+        $this->assertArrayHasKey("#finalKey", $decrypted["key2"]["nestedKey2"]);
+        $this->assertArrayHasKey("#finalKeyEncrypted", $decrypted["key2"]["nestedKey2"]);
         $this->assertEquals("value1", $decrypted["key1"]);
         $this->assertEquals("value2", $decrypted["key2"]["nestedKey1"]);
-        $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["finalKey"]);
-        $this->assertEquals("test", $decrypted["key2"]["nestedKey2"]["finalKeyEncrypted"]);
+        $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
+        $this->assertEquals("test", $decrypted["key2"]["nestedKey2"]["#finalKeyEncrypted"]);
     }
 
     /**
@@ -274,9 +278,9 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertCount(2, $result["key2"]);
         $this->assertArrayHasKey("nestedKey1", $decrypted["key2"][0]);
         $this->assertArrayHasKey("nestedKey2", $decrypted["key2"][1]);
-        $this->assertArrayHasKey("finalKey", $decrypted["key2"][1]["nestedKey2"]);
+        $this->assertArrayHasKey("#finalKey", $decrypted["key2"][1]["nestedKey2"]);
         $this->assertEquals("value1", $decrypted["key1"]);
         $this->assertEquals("value2", $decrypted["key2"][0]["nestedKey1"]);
-        $this->assertEquals("value3", $decrypted["key2"][1]["nestedKey2"]["finalKey"]);
+        $this->assertEquals("value3", $decrypted["key2"][1]["nestedKey2"]["#finalKey"]);
     }
 }
