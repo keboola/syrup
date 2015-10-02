@@ -90,7 +90,6 @@ class QueueCreateCommand extends ContainerAwareCommand
                     ],
                 // Period is required
                 'Period' => 300,
-                'Unit' => 'Seconds',
                 // EvaluationPeriods is required
                 'EvaluationPeriods' => 1,
                 // Threshold is required
