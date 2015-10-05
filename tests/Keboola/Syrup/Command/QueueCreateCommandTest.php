@@ -41,7 +41,8 @@ class QueueCreateCommandTest extends CommandTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'name' => $queueName,
-            '--register' => null
+            '--register' => null,
+            '--no-watch'
         ]);
 
         $this->assertEquals(0, $commandTester->getStatusCode());

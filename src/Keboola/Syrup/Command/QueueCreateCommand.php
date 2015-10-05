@@ -60,45 +60,50 @@ class QueueCreateCommand extends ContainerAwareCommand
         }
 
         if (!$noWatch) {
-            $data['region'] = $region;
-            if ($accessKey != null && $secretKey != null) {
-                $data['key'] = $accessKey;
-                $data['secret'] = $secretKey;
-            }
-            $cwClient = CloudWatchClient::factory($data);
-
-            $cwClient->putMetricAlarm([
-                // AlarmName is required
-                'AlarmName' => sprintf('Syrup %s queue is full', $name),
-                'ActionsEnabled' => true,
-                'AlarmActions' => [
-                    'arn:aws:sns:us-east-1:147946154733:Connection_SQS_Alerts'
-                ],
-                // MetricName is required
-                'MetricName' => 'ApproximateNumberOfMessagesVisible',
-                // Namespace is required
-                'Namespace' => 'AWS/SQS',
-                // Statistic is required
-                'Statistic' => 'Average',
-                'Dimensions' => [
-                        [
-                            // Name is required
-                            'Name' => 'QueueName',
-                            // Value is required
-                            'Value' => $name,
-                        ],
-                    ],
-                // Period is required
-                'Period' => 300,
-                // EvaluationPeriods is required
-                'EvaluationPeriods' => 1,
-                // Threshold is required
-                'Threshold' => 5,
-                // ComparisonOperator is required
-                'ComparisonOperator' => 'GreaterThanOrEqualToThreshold',
-            ]);
+            $this->addCloudwatchAlarm($name, $region, $accessKey, $secretKey);
         }
 
         return 0;
+    }
+
+    private function addCloudwatchAlarm($sqsName, $region, $accessKey, $secretKey)
+    {
+        $data['region'] = $region;
+        if ($accessKey != null && $secretKey != null) {
+            $data['key'] = $accessKey;
+            $data['secret'] = $secretKey;
+        }
+        $cwClient = CloudWatchClient::factory($data);
+
+        $cwClient->putMetricAlarm([
+            // AlarmName is required
+            'AlarmName' => sprintf('Syrup %s queue is full', $sqsName),
+            'ActionsEnabled' => true,
+            'AlarmActions' => [
+                'arn:aws:sns:us-east-1:147946154733:Connection_SQS_Alerts'
+            ],
+            // MetricName is required
+            'MetricName' => 'ApproximateNumberOfMessagesVisible',
+            // Namespace is required
+            'Namespace' => 'AWS/SQS',
+            // Statistic is required
+            'Statistic' => 'Average',
+            'Dimensions' => [
+                [
+                    // Name is required
+                    'Name' => 'QueueName',
+                    // Value is required
+                    'Value' => $sqsName,
+                ],
+            ],
+            // Period is required
+            'Period' => 300,
+            // EvaluationPeriods is required
+            'EvaluationPeriods' => 1,
+            // Threshold is required
+            'Threshold' => 5,
+            // ComparisonOperator is required
+            'ComparisonOperator' => 'GreaterThanOrEqualToThreshold',
+        ]);
     }
 }
