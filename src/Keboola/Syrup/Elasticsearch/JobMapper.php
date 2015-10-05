@@ -12,6 +12,7 @@ use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobInterface;
+use Keboola\Syrup\Service\ObjectEncryptor;
 use Monolog\Logger;
 
 class JobMapper
@@ -24,13 +25,18 @@ class JobMapper
 
     /** @var Logger */
     protected $logger;
+    /**
+     * @var ObjectEncryptor
+     */
+    protected $configEncryptor;
 
     protected $rootDir;
 
-    public function __construct(Client $client, ComponentIndex $index, $logger = null, $rootDir = null)
+    public function __construct(Client $client, ComponentIndex $index, ObjectEncryptor $configEncryptor, $logger = null, $rootDir = null)
     {
         $this->client = $client;
         $this->index = $index;
+        $this->configEncryptor = $configEncryptor;
         $this->logger = $logger;
         $this->rootDir = $rootDir;
     }
@@ -172,7 +178,7 @@ class JobMapper
 
                 foreach ($result['docs'] as $doc) {
                     if ($doc['found']) {
-                        return new Job($doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
+                        return new Job($this->configEncryptor, $doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
                     }
                 }
             } catch (ServerErrorResponseException $e) {

@@ -7,8 +7,10 @@
 namespace Keboola\Syrup\Tests\Job\Metadata;
 
 use Keboola\StorageApi\Client;
+use Keboola\Syrup\Encryption\CryptoWrapper;
 use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Job\Metadata\JobFactory;
+use Keboola\Syrup\Service\ObjectEncryptor;
 
 class JobFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +28,8 @@ class JobFactoryTest extends \PHPUnit_Framework_TestCase
 
         $key = md5(uniqid());
         $encryptor = new Encryptor($key);
-        $jobFactory = new JobFactory(SYRUP_APP_NAME, $encryptor);
+        $configEncryptor = new ObjectEncryptor(new CryptoWrapper($key));
+        $jobFactory = new JobFactory(SYRUP_APP_NAME, $encryptor, $configEncryptor);
         $jobFactory->setStorageApiClient($storageApiClient);
 
         $command = uniqid();

@@ -75,6 +75,10 @@ services:
         class: Keboola\Syrup\Encryption\Encryptor
         arguments: [%encryption_key%]
 
+    syrup.crypto_wrapper:
+        class: Keboola\Syrup\Encryption\CryptoWrapper
+        arguments: [%encryption_key%]
+
     syrup.elasticsearch.client:
         class: Elasticsearch\Client
         arguments: [%elasticsearch%]
@@ -85,11 +89,11 @@ services:
 
     syrup.elasticsearch.current_component_job_mapper:
         class: Keboola\Syrup\Elasticsearch\JobMapper
-        arguments: [@syrup.elasticsearch.client, @syrup.elasticsearch.current_component_index, @logger, %kernel.root_dir%]
+        arguments: [@syrup.elasticsearch.client, @syrup.elasticsearch.current_component_index, @syrup.object_encryptor, @logger, %kernel.root_dir%]
 
     syrup.elasticsearch.search:
         class: Keboola\Syrup\Elasticsearch\Search
-        arguments: [@syrup.elasticsearch.client, %elasticsearch.index_prefix%, @logger]
+        arguments: [@syrup.elasticsearch.client, %elasticsearch.index_prefix%, @syrup.object_encryptor, @logger]
 
     syrup.queue_factory:
         class: Keboola\Syrup\Service\Queue\QueueFactory
@@ -97,7 +101,7 @@ services:
 
     syrup.job_factory:
         class: Keboola\Syrup\Job\Metadata\JobFactory
-        arguments: [%app_name%, @syrup.encryptor]
+        arguments: [%app_name%, @syrup.encryptor, @syrup.object_encryptor]
 
     syrup.job_executor:
         class: Keboola\Syrup\Job\Executor
@@ -106,3 +110,6 @@ services:
         class: Keboola\Syrup\Job\ExecutorFactory
         arguments: [@service_container]
 
+    syrup.object_encryptor:
+        class: Keboola\Syrup\Service\ObjectEncryptor
+        arguments: [@syrup.crypto_wrapper]

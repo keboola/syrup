@@ -11,6 +11,8 @@ use Keboola\Encryption\EncryptorInterface;
 use Keboola\StorageApi\Client as SapiClient;
 use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Elasticsearch\Search;
+use Keboola\Syrup\Encryption\CryptoWrapper;
+use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Elasticsearch\JobMapper;
@@ -70,26 +72,26 @@ class SearchTest extends WebTestCase
     {
         $tokenData = self::$sapiClient->verifyToken();
 
-        return new Job([
-            'id'        => self::$sapiClient->generateId(),
-            'runId'     => self::$sapiClient->generateId(),
-            'project'   => [
-                'id'        => $tokenData['owner']['id'],
-                'name'      => $tokenData['owner']['name']
-            ],
-            'token'     => [
-                'id'            => $tokenData['id'],
-                'description'   => $tokenData['description'],
-                'token'         => self::$encryptor->encrypt(self::$sapiClient->getTokenString())
-            ],
-            'component' => SYRUP_APP_NAME,
-            'command'   => 'run',
-            'process'   => [
-                'host'  => 'test',
-                'pid'   => posix_getpid()
-            ],
-            'createdTime'   => date('c')
-        ]);
+        return new Job(new ObjectEncryptor(new CryptoWrapper(md5(uniqid()))), [
+                'id'        => self::$sapiClient->generateId(),
+                'runId'     => self::$sapiClient->generateId(),
+                'project'   => [
+                    'id'        => $tokenData['owner']['id'],
+                    'name'      => $tokenData['owner']['name']
+                ],
+                'token'     => [
+                    'id'            => $tokenData['id'],
+                    'description'   => $tokenData['description'],
+                    'token'         => self::$encryptor->encrypt(self::$sapiClient->getTokenString())
+                ],
+                'component' => SYRUP_APP_NAME,
+                'command'   => 'run',
+                'process'   => [
+                    'host'  => 'test',
+                    'pid'   => posix_getpid()
+                ],
+                'createdTime'   => date('c')
+            ], null, null, null);
     }
 
     private function assertJob(Job $job, $resJob)

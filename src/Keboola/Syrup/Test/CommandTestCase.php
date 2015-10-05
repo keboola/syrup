@@ -8,8 +8,10 @@
 namespace Keboola\Syrup\Test;
 
 use Keboola\Syrup\Elasticsearch\JobMapper;
+use Keboola\Syrup\Encryption\CryptoWrapper;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobFactory;
+use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Keboola\StorageApi\Client as StorageApiClient;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -64,26 +66,26 @@ class CommandTestCase extends WebTestCase
             ->get('syrup.encryptor')
             ->encrypt($this->storageApiToken);
 
-        return new Job([
-            'id' => $this->storageApiClient->generateId(),
-            'runId' => $this->storageApiClient->generateId(),
-            'project' => [
-                'id' => '123',
-                'name' => 'Syrup TEST'
-            ],
-            'token' => [
-                'id' => '123',
-                'description' => 'fake token',
-                'token' => $encryptedToken
-            ],
-            'component' => 'syrup',
-            'command' => 'run',
-            'params' => [],
-            'process' => [
-                'host' => gethostname(),
-                'pid' => getmypid()
-            ],
-            'createdTime' => date('c')
-        ]);
+        return new Job(new ObjectEncryptor(new CryptoWrapper(md5(uniqid()))), [
+                'id' => $this->storageApiClient->generateId(),
+                'runId' => $this->storageApiClient->generateId(),
+                'project' => [
+                    'id' => '123',
+                    'name' => 'Syrup TEST'
+                ],
+                'token' => [
+                    'id' => '123',
+                    'description' => 'fake token',
+                    'token' => $encryptedToken
+                ],
+                'component' => 'syrup',
+                'command' => 'run',
+                'params' => [],
+                'process' => [
+                    'host' => gethostname(),
+                    'pid' => getmypid()
+                ],
+                'createdTime' => date('c')
+            ], null, null, null);
     }
 }

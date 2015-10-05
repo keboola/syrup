@@ -9,6 +9,7 @@ namespace Keboola\Syrup\Elasticsearch;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Keboola\Syrup\Job\Metadata\Job;
+use Keboola\Syrup\Service\ObjectEncryptor;
 use Monolog\Logger;
 
 class Search
@@ -21,11 +22,16 @@ class Search
     /** @var Logger */
     protected $logger;
 
+    /**
+     * @var ObjectEncryptor
+     */
+    protected $configEncryptor;
 
-    public function __construct(Client $client, $indexPrefix, $logger = null)
+    public function __construct(Client $client, $indexPrefix, ObjectEncryptor $configEncryptor, $logger = null)
     {
         $this->client = $client;
         $this->indexPrefix = $indexPrefix;
+        $this->configEncryptor = $configEncryptor;
         $this->logger = $logger;
     }
 
@@ -53,7 +59,7 @@ class Search
 
                 foreach ($result['docs'] as $doc) {
                     if ($doc['found']) {
-                        return new Job($doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
+                        return new Job($this->configEncryptor, $doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
                     }
                 }
             } catch (ServerErrorResponseException $e) {

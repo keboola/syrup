@@ -9,6 +9,7 @@ namespace Keboola\Syrup\Job\Metadata;
 
 use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Exception\ApplicationException;
+use Keboola\Syrup\Service\ObjectEncryptor;
 
 class Job implements JobInterface
 {
@@ -27,6 +28,10 @@ class Job implements JobInterface
     protected $index;
     protected $version;
     protected $type;
+    /**
+     * @var ObjectEncryptor
+     */
+    protected $encryptor;
 
     protected $data = [
         'id' => null,
@@ -57,8 +62,9 @@ class Job implements JobInterface
         'waitSeconds' => null
     ];
 
-    public function __construct(array $data = [], $index = null, $type = null, $version = null)
+    public function __construct(ObjectEncryptor $encryptor, array $data = [], $index = null, $type = null, $version = null)
     {
+        $this->encryptor = $encryptor;
         $this->data['status'] = self::STATUS_WAITING;
         $this->data = array_merge($this->data, $data);
 
@@ -208,7 +214,7 @@ class Job implements JobInterface
 
     public function getParams()
     {
-        return $this->getProperty('params');
+        return $this->getEncryptor()->decrypt($this->getProperty('params'));
     }
 
     public function getProcess()
@@ -408,5 +414,24 @@ class Job implements JobInterface
             return $this->data[$key];
         }
         return null;
+    }
+
+    /**
+     * @return ObjectEncryptor
+     */
+    public function getEncryptor()
+    {
+        return $this->encryptor;
+    }
+
+    /**
+     * @param ObjectEncryptor $encryptor
+     * @return $this
+     */
+    public function setEncryptor($encryptor)
+    {
+        $this->encryptor = $encryptor;
+
+        return $this;
     }
 }

@@ -8,7 +8,9 @@
 namespace Keboola\Syrup\Job\Metadata;
 
 use Keboola\StorageApi\Client;
+use Keboola\Syrup\Encryption\CryptoWrapper;
 use Keboola\Syrup\Encryption\Encryptor;
+use Keboola\Syrup\Service\ObjectEncryptor;
 
 class JobFactory
 {
@@ -16,15 +18,23 @@ class JobFactory
      * @var Encryptor
      */
     protected $encryptor;
+
+    /**
+     * @var ObjectEncryptor
+     */
+    protected $configEncryptor;
+
     protected $componentName;
+
     /**
      * @var Client
      */
     protected $storageApiClient;
 
-    public function __construct($componentName, Encryptor $encryptor)
+    public function __construct($componentName, Encryptor $encryptor, ObjectEncryptor $configEncryptor)
     {
         $this->encryptor = $encryptor;
+        $this->configEncryptor = $configEncryptor;
         $this->componentName = $componentName;
     }
 
@@ -40,28 +50,28 @@ class JobFactory
         }
 
         $tokenData = $this->storageApiClient->verifyToken();
-        $job = new Job([
-            'id' => $this->storageApiClient->generateId(),
-            'runId' => $this->storageApiClient->getRunId(),
-            'project' => [
-                'id' => $tokenData['owner']['id'],
-                'name' => $tokenData['owner']['name']
-            ],
-            'token' => [
-                'id' => $tokenData['id'],
-                'description' => $tokenData['description'],
-                'token' => $this->encryptor->encrypt($this->storageApiClient->getTokenString())
-            ],
-            'component' => $this->componentName,
-            'command' => $command,
-            'params' => $params,
-            'process' => [
-                'host' => gethostname(),
-                'pid' => getmypid()
-            ],
-            'nestingLevel' => 0,
-            'createdTime' => date('c')
-        ]);
+        $job = new Job($this->configEncryptor, [
+                'id' => $this->storageApiClient->generateId(),
+                'runId' => $this->storageApiClient->getRunId(),
+                'project' => [
+                    'id' => $tokenData['owner']['id'],
+                    'name' => $tokenData['owner']['name']
+                ],
+                'token' => [
+                    'id' => $tokenData['id'],
+                    'description' => $tokenData['description'],
+                    'token' => $this->encryptor->encrypt($this->storageApiClient->getTokenString())
+                ],
+                'component' => $this->componentName,
+                'command' => $command,
+                'params' => $params,
+                'process' => [
+                    'host' => gethostname(),
+                    'pid' => getmypid()
+                ],
+                'nestingLevel' => 0,
+                'createdTime' => date('c')
+            ], null, null, null);
         if ($lockName) {
             $job->setLockName($lockName);
         }
