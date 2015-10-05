@@ -41,7 +41,8 @@
 
         "symfony/assetic-bundle": "~2.3",
         "symfony/swiftmailer-bundle": "~2.3",
-        "defuse/php-encryption": "~1.2.1"
+        "defuse/php-encryption": "~1.2.1",
+        "doctrine/doctrine-migrations-bundle": "^1.1"
     },
     "require-dev": {
         "symfony/var-dumper": "~2.6",

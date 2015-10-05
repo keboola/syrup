@@ -67,6 +67,12 @@ doctrine:
                 connection: default
                 auto_mapping: true
 
+doctrine_migrations:
+    dir_name: "%kernel.root_dir%/DoctrineMigrations"
+    namespace: Application\Migrations
+    table_name: migration_versions
+    name: Application Migrations
+
 swiftmailer:
     transport: %mailer_transport%
     host:      %mailer_host%
