@@ -75,7 +75,9 @@ class ExceptionHandler extends BaseExceptionHandler
             'app' => $appName,
             'priority' => $priority,
             'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
             'pid' => getmypid(),
+            'trace' => $this->getTrace($exception),
             'exceptionId' => $exceptionId
         ];
 
@@ -198,6 +200,20 @@ EOF;
         }
 
         return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', $path, $file, $line);
+    }
+
+    private function getTrace(FlattenException $exception)
+    {
+        $all = $exception->toArray();
+
+        $str = '';
+        foreach ($all as $e) {
+            $traces = $e['trace'];
+            foreach ($traces as $trace) {
+                $str .= "in file " . $trace['file'] . " on line " . $trace['line'] . PHP_EOL;
+            }
+        }
+        return $str;
     }
 
     private function formatArgs(array $args)
