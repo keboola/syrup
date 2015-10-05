@@ -37,6 +37,7 @@ $paramsYaml = \Symfony\Component\Yaml\Yaml::dump([
         'locks_db.user' => SYRUP_DATABASE_USER,
         'locks_db.password' => SYRUP_DATABASE_PASSWORD,
         'locks_db.name' => SYRUP_DATABASE_NAME,
+        'doctrine_migrations_dir' => __DIR__  . "/../DoctrineMigrations",
         'uploader' => [
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
