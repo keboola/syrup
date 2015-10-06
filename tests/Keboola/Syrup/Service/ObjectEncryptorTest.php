@@ -86,6 +86,41 @@ class ObjectEncryptorTest extends WebTestCase
      * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
      * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
      */
+    public function testEncryptorSimpleObjectScalars()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $object = [
+            "key1" => "value1",
+            "#key2" => "value2",
+            "#key3" => true,
+            "#key4" => 1,
+            "#key5" => 1.5
+        ];
+        $result = $encryptor->encrypt($object);
+        $this->assertArrayHasKey("key1", $result);
+        $this->assertArrayHasKey("#key2", $result);
+        $this->assertEquals("value1", $result["key1"]);
+        $this->assertEquals("KBC::Encrypted==", substr($result["#key2"], 0, 16));
+        $this->assertEquals("KBC::Encrypted==", substr($result["#key3"], 0, 16));
+        $this->assertEquals("KBC::Encrypted==", substr($result["#key4"], 0, 16));
+        $this->assertEquals("KBC::Encrypted==", substr($result["#key5"], 0, 16));
+
+        $decrypted = $encryptor->decrypt($result);
+        $this->assertArrayHasKey("key1", $decrypted);
+        $this->assertArrayHasKey("#key2", $decrypted);
+        $this->assertEquals("value1", $decrypted["key1"]);
+        $this->assertEquals("value2", $decrypted["#key2"]);
+        $this->assertEquals(true, $decrypted["#key3"]);
+        $this->assertEquals(1, $decrypted["#key4"]);
+        $this->assertEquals(1.5, $decrypted["#key5"]);
+    }
+
+    /**
+     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
+     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
+     */
     public function testEncryptorSimpleObjectEncrypted()
     {
         $client = static::createClient();
