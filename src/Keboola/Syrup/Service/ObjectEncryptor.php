@@ -50,7 +50,7 @@ class ObjectEncryptor
      */
     public function encrypt($data)
     {
-        if (is_string($data)) {
+        if (is_scalar($data)) {
             return $this->encryptValue($data);
         }
         if (is_array($data)) {
@@ -65,7 +65,7 @@ class ObjectEncryptor
      */
     public function decrypt($data)
     {
-        if (is_string($data)) {
+        if (is_scalar($data)) {
             return $this->decryptValue($data);
         }
         if (is_array($data)) {
@@ -117,20 +117,20 @@ class ObjectEncryptor
         $result = [];
         foreach ($data as $key => $value) {
             if (substr($key, 0, 1) == '#') {
-                if (is_string($value)) {
+                if (is_scalar($value) || is_null($value)) {
                     $result[$key] = $this->encryptValue($value);
                 } elseif (is_array($value)) {
                     $result[$key] = $this->encryptArray($value);
                 } else {
-                    throw new ApplicationException("Only arrays and strings are supported for encryption.");
+                    throw new ApplicationException("Only arrays and scalars are supported for encryption.");
                 }
             } else {
-                if (is_string($value)) {
+                if (is_scalar($value) || is_null($value)) {
                     $result[$key] = $value;
                 } elseif (is_array($value)) {
                     $result[$key] = $this->encryptArray($value);
                 } else {
-                    throw new ApplicationException("Only arrays and strings are supported for encryption.");
+                    throw new ApplicationException("Only arrays and scalars are supported for encryption.");
                 }
             }
         }
@@ -146,20 +146,20 @@ class ObjectEncryptor
         $result = [];
         foreach ($data as $key => $value) {
             if (substr($key, 0, 1) == '#') {
-                if (is_string($value)) {
+                if (is_scalar($value)) {
                     $result[$key] = $this->decryptValue($value);
                 } elseif (is_array($value)) {
                     $result[$key] = $this->decryptArray($value);
                 } else {
-                    throw new ApplicationException("Only arrays and strings are supported for decryption.");
+                    throw new ApplicationException("Only arrays and scalars are supported for decryption.");
                 }
             } else {
-                if (is_string($value)) {
+                if (is_scalar($value) || is_null($value)) {
                     $result[$key] = $value;
                 } elseif (is_array($value)) {
                     $result[$key] = $this->decryptArray($value);
                 } else {
-                    throw new ApplicationException("Only arrays and strings are supported for decryption.");
+                    throw new ApplicationException("Only arrays and scalars are supported for decryption.");
                 }
             }
         }
