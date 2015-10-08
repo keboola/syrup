@@ -96,7 +96,9 @@ class ObjectEncryptorTest extends WebTestCase
             "#key2" => "value2",
             "#key3" => true,
             "#key4" => 1,
-            "#key5" => 1.5
+            "#key5" => 1.5,
+            "#key6" => null,
+            "key7" => null
         ];
         $result = $encryptor->encrypt($object);
         $this->assertArrayHasKey("key1", $result);
@@ -106,6 +108,7 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("KBC::Encrypted==", substr($result["#key3"], 0, 16));
         $this->assertEquals("KBC::Encrypted==", substr($result["#key4"], 0, 16));
         $this->assertEquals("KBC::Encrypted==", substr($result["#key5"], 0, 16));
+        $this->assertEquals("KBC::Encrypted==", substr($result["#key6"], 0, 16));
 
         $decrypted = $encryptor->decrypt($result);
         $this->assertArrayHasKey("key1", $decrypted);
@@ -115,6 +118,8 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals(true, $decrypted["#key3"]);
         $this->assertEquals(1, $decrypted["#key4"]);
         $this->assertEquals(1.5, $decrypted["#key5"]);
+        $this->assertEquals(null, $decrypted["#key6"]);
+        $this->assertEquals(null, $decrypted["key7"]);
     }
 
     /**

@@ -117,7 +117,7 @@ class ObjectEncryptor
         $result = [];
         foreach ($data as $key => $value) {
             if (substr($key, 0, 1) == '#') {
-                if (is_scalar($value)) {
+                if (is_scalar($value) || is_null($value)) {
                     $result[$key] = $this->encryptValue($value);
                 } elseif (is_array($value)) {
                     $result[$key] = $this->encryptArray($value);
@@ -125,7 +125,7 @@ class ObjectEncryptor
                     throw new ApplicationException("Only arrays and scalars are supported for encryption.");
                 }
             } else {
-                if (is_scalar($value)) {
+                if (is_scalar($value) || is_null($value)) {
                     $result[$key] = $value;
                 } elseif (is_array($value)) {
                     $result[$key] = $this->encryptArray($value);
@@ -154,7 +154,7 @@ class ObjectEncryptor
                     throw new ApplicationException("Only arrays and scalars are supported for decryption.");
                 }
             } else {
-                if (is_scalar($value)) {
+                if (is_scalar($value) || is_null($value)) {
                     $result[$key] = $value;
                 } elseif (is_array($value)) {
                     $result[$key] = $this->decryptArray($value);
