@@ -40,6 +40,8 @@ doctrine:
                 charset:  UTF8
                 logging: false
                 profiling: false
+                mapping_types:
+                    enum: string
             syrup:
                 driver:   %syrup.driver%
                 host:     %syrup.host%
