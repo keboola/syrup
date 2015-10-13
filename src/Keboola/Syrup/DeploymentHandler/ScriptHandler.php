@@ -133,7 +133,10 @@ s - skip <info>(keep current file)</info>
             $bucket = 'keboola-configs-devel';
         }
 
-        $client = S3Client::factory();
+        $client = new S3Client(array(
+            'version' => '2006-03-01',
+            'region' => 'us-east-1',
+        ));
         $client->getObject(array(
             'Bucket' => $bucket,
             'Key'    => $key,
