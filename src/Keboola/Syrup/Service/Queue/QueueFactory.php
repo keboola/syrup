@@ -45,14 +45,17 @@ class QueueFactory
 
     public function create($name, $region = 'us-east-1', $key = null, $secret = null)
     {
-        $data['region'] = $region;
+        $data = [
+            'region' => $region,
+            'version' => '2012-11-05'
+        ];
 
         if ($key != null && $secret != null) {
             $data['key'] = $key;
             $data['secret'] = $secret;
         }
 
-        $sqsClient = SqsClient::factory($data);
+        $sqsClient = new SqsClient($data);
 
         $sqsQueue = $sqsClient->createQueue([
             'QueueName' => $name

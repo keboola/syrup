@@ -16,7 +16,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Keboola\Syrup\Command\JobCommand;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Tests\Job as TestExecutor;
-use Symfony\Component\Process\Process;
 
 /**
  * @covers \Keboola\Syrup\Command\JobCommand

@@ -73,7 +73,7 @@ class QueueCreateCommand extends ContainerAwareCommand
             $data['key'] = $accessKey;
             $data['secret'] = $secretKey;
         }
-        $cwClient = CloudWatchClient::factory($data);
+        $cwClient = new CloudWatchClient($data);
 
         $cwClient->putMetricAlarm([
             // AlarmName is required

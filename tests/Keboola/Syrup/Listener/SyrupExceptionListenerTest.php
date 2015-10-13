@@ -43,7 +43,8 @@ class SyrupExceptionListenerTest extends KernelTestCase
         $uploader = new Uploader([
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
-            's3-upload-path' => SYRUP_S3_BUCKET
+            's3-upload-path' => SYRUP_S3_BUCKET,
+            'aws-region' => SYRUP_AWS_REGION
         ]);
         $this->testLogHandler = new TestHandler();
         $this->testLogHandler->setFormatter(new JsonFormatter());

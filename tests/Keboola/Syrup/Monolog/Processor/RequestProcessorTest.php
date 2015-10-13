@@ -25,6 +25,7 @@ class RequestProcessorTest extends TestCase
         $s3Uploader = new Uploader([
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
+            'aws-region' => SYRUP_AWS_REGION,
             's3-upload-path' => SYRUP_S3_BUCKET
         ]);
 

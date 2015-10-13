@@ -53,7 +53,8 @@ class QueueCreateCommandTest extends CommandTestCase
         $queueUrlArr = explode('/', $dbQueue->getUrl());
         $this->assertEquals($queueName, array_pop($queueUrlArr));
 
-        $sqsClient = SqsClient::factory([
+        $sqsClient = new SqsClient([
+            'version' => '2012-11-05',
             'region' => 'us-east-1'
         ]);
         $sqsClient->deleteQueue([

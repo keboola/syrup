@@ -7,18 +7,17 @@
 
 namespace Keboola\Syrup\Aws\S3;
 
-use Aws\S3\Enum\CannedAcl;
-use Keboola\StorageApi\Aws\S3\S3Client;
-
 class Uploader
 {
     /**
-     * @var S3Client
+     * @var \Aws\S3\S3Client
      */
     private $client;
     private $awsKey;
     private $awsSecret;
+    private $awsRegion;
     protected $s3Bucket;
+    protected $s3KeyPrefix;
 
 
     public function __construct($config)
@@ -33,19 +32,36 @@ class Uploader
         }
         $this->awsSecret = $config['aws-secret-key'];
 
+        if (!isset($config['aws-region'])) {
+            throw new \Exception('Parameter \'aws-region\' is missing from config');
+        }
+        $this->awsRegion = $config['aws-region'];
+
         if (!isset($config['s3-upload-path'])) {
             throw new \Exception('Parameter \'s3-upload-path\' is missing from config');
         }
-        $this->s3Bucket = $config['s3-upload-path'];
+        $dashPos = strpos($config['s3-upload-path'], '/');
+        if ($dashPos === false) {
+            $this->s3Bucket = $config['s3-upload-path'];
+            $this->s3KeyPrefix = null;
+        } else {
+            $this->s3Bucket = substr($config['s3-upload-path'], 0, $dashPos);
+            $this->s3KeyPrefix = substr($config['s3-upload-path'], $dashPos+1);
+        }
     }
 
     protected function getClient()
     {
         if (!$this->client) {
-            $this->client = S3Client::factory(array(
-                'key' => $this->awsKey,
-                'secret' => $this->awsSecret
-            ));
+            $this->client = new \Aws\S3\S3Client([
+                'version' => '2006-03-01',
+                'region' => $this->awsRegion,
+                'retries' => 40,
+                'credentials' => [
+                    'key' => $this->awsKey,
+                    'secret' => $this->awsSecret
+                ]
+            ]);
         }
         return $this->client;
     }
@@ -84,9 +100,9 @@ class Uploader
 
         $this->getClient()->putObject(array(
             'Bucket' => $this->s3Bucket,
-            'Key' => $s3FileName,
+            'Key' => "$this->s3KeyPrefix/$s3FileName",
             'Body' => $content,
-            'ACL' => CannedAcl::PRIVATE_ACCESS,
+            'ACL' => 'private',
             'ContentType' => $contentType
         ));
 

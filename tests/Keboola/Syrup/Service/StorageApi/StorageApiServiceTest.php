@@ -7,7 +7,6 @@
 
 namespace Syrup\StorageApi;
 
-use Keboola\StorageApi\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;

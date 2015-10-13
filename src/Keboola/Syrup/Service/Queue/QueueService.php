@@ -22,7 +22,8 @@ class QueueService
     public function __construct(array $config, $componentName)
     {
         $data = [
-            'region' => $config['region']
+            'region' => $config['region'],
+            'version' => '2012-11-05'
         ];
 
         if (isset($config['access_key'])
@@ -33,7 +34,7 @@ class QueueService
             $data['secret'] = $config['secret_key'];
         }
 
-        $this->client = SqsClient::factory($data);
+        $this->client = new SqsClient($data);
         $this->queueUrl = $config['url'];
         $this->componentName = $componentName;
     }
