@@ -5,7 +5,6 @@ namespace Keboola\Syrup\DeploymentHandler;
 use Composer\Script\Event;
 use Composer\IO\IOInterface;
 use Aws\S3\S3Client;
-use Symfony\Component\EventDispatcher\Event;
 
 class ScriptHandler
 {
