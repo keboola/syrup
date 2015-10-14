@@ -6,6 +6,8 @@ use Composer\Script\Event;
 use Composer\IO\IOInterface;
 use Aws\S3\S3Client;
 
+require 'vendor/autoload.php';
+
 class ScriptHandler
 {
     const PARAMETERS_DIR = "vendor/keboola/syrup/app/config/";
