@@ -47,12 +47,15 @@ class QueueFactory
     {
         $data = [
             'region' => $region,
-            'version' => '2012-11-05'
+            'version' => '2012-11-05',
+            'retries' => 40
         ];
 
         if ($key != null && $secret != null) {
-            $data['key'] = $key;
-            $data['secret'] = $secret;
+            $data['credentials'] = [
+                'key' => $key,
+                'secret' => $secret
+            ];
         }
 
         $sqsClient = new SqsClient($data);

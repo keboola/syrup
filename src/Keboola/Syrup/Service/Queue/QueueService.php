@@ -23,15 +23,18 @@ class QueueService
     {
         $data = [
             'region' => $config['region'],
-            'version' => '2012-11-05'
+            'version' => '2012-11-05',
+            'retries' => 40
         ];
 
         if (isset($config['access_key'])
             && isset($config['secret_key'])
             && !empty($config['access_key'])
             && !empty($config['secret_key'])) {
-            $data['key'] = $config['access_key'];
-            $data['secret'] = $config['secret_key'];
+            $data['credentials'] = [
+                'key' => $config['access_key'],
+                'secret' => $config['secret_key']
+            ];
         }
 
         $this->client = new SqsClient($data);
