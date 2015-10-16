@@ -36,6 +36,7 @@ class JobTest extends \PHPUnit_Framework_TestCase
         $lock = uniqid();
 
         $job = $jobFactory->create($command, $configEncryptor->encrypt($param), $lock);
+        $job->setEncrypted(true);
 
         $this->assertEquals($command, $job->getCommand());
         $this->assertEquals($lock, $job->getLockName());

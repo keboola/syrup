@@ -10,6 +10,7 @@ namespace Keboola\Syrup\Job\Metadata;
 use Keboola\StorageApi\Client;
 use Keboola\Syrup\Encryption\CryptoWrapper;
 use Keboola\Syrup\Encryption\Encryptor;
+use Keboola\Syrup\Exception\UserException;
 use Keboola\Syrup\Service\ObjectEncryptor;
 
 class JobFactory
@@ -72,9 +73,31 @@ class JobFactory
                 'nestingLevel' => 0,
                 'createdTime' => date('c')
             ], null, null, null);
+
         if ($lockName) {
             $job->setLockName($lockName);
         }
+
+        $componentConfiguration = $this->getComponentConfiguration();
+        if (in_array("encrypt", $componentConfiguration["flags"])) {
+            $job->setEncrypted(true);
+        }
+
         return $job;
+    }
+
+    protected function getComponentConfiguration()
+    {
+        // Check list of components
+        $components = $this->storageApiClient->indexAction();
+
+        foreach ($components["components"] as $c) {
+            if ($c["id"] == $this->componentName) {
+                return $c;
+            }
+        }
+
+        // no component configuration found
+        return [];
     }
 }

@@ -28,6 +28,8 @@ class Job implements JobInterface
     protected $index;
     protected $version;
     protected $type;
+    protected $encrypted = false;
+
     /**
      * @var ObjectEncryptor
      */
@@ -115,6 +117,16 @@ class Job implements JobInterface
     public function getProject()
     {
         return $this->getProperty('project');
+    }
+
+    public function setEncrypted($bool)
+    {
+        $this->encrypted = $bool;
+    }
+
+    public function isEncrypted()
+    {
+        return $this->encrypted;
     }
 
     /**
@@ -214,7 +226,18 @@ class Job implements JobInterface
 
     public function getParams()
     {
-        return $this->getEncryptor()->decrypt($this->getProperty('params'));
+        $params = $this->getProperty('params');
+
+        if ($this->encrypted) {
+            return $this->getEncryptor()->decrypt($params);
+        }
+
+        return $params;
+    }
+
+    public function getRawParams()
+    {
+        return $this->getProperty('params');
     }
 
     public function getProcess()
