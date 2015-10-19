@@ -228,7 +228,7 @@ class Job implements JobInterface
     {
         $params = $this->getProperty('params');
 
-        if ($this->encrypted) {
+        if ($this->isEncrypted()) {
             return $this->getEncryptor()->decrypt($params);
         }
 
