@@ -84,7 +84,7 @@ class ObjectEncryptor
             throw new UserException("'{$value}' is not an encrypted value.");
         }
         try {
-            return $this->encryptor->decrypt(substr($value, 15));
+            return $this->encryptor->decrypt(substr($value, 16));
         } catch (\Exception $e) {
             throw new ApplicationException("Decryption failed: " . $e->getMessage(), $e, ["value" => $value]);
         }
