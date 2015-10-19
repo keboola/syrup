@@ -194,6 +194,24 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals("KBC::Encrypted==", substr($result, 0, 16));
     }
 
+    public function testEncryptActionSimpleTextContentType()
+    {
+        static::$client->request(
+            'POST',
+            '/syrup/encrypt',
+            [],
+            [],
+            [
+                'HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token'),
+                'CONTENT_TYPE' => 'text/plain;charset=UTF-8'
+            ],
+            'abcd'
+        );
+
+        $result = static::$client->getResponse()->getContent();
+        $this->assertEquals("KBC::Encrypted==", substr($result, 0, 16));
+    }
+
     public function testEncryptActionSimpleTextAlreadyEncrypted()
     {
         static::$client->request(
@@ -232,6 +250,29 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals("value1", $result["key1"]);
         $this->assertEquals("KBC::Encrypted==", substr($result["#key2"], 0, 16));
     }
+
+    public function testEncryptActionSimpleJsonContentType()
+    {
+        static::$client->request(
+            'POST',
+            '/syrup/encrypt',
+            [],
+            [],
+            [
+                'HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token'),
+                'CONTENT_TYPE' => 'application/json; Charset=utf-8'
+            ],
+            '{"key1": "value1", "#key2": "value2"}'
+        );
+
+        $result = json_decode(static::$client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey("key1", $result);
+        $this->assertArrayHasKey("#key2", $result);
+        $this->assertEquals("value1", $result["key1"]);
+        $this->assertEquals("KBC::Encrypted==", substr($result["#key2"], 0, 16));
+    }
+
+
 
     public function testEncryptActionSimpleJsonEncrypted()
     {
