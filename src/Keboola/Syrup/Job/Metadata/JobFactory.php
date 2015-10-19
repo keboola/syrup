@@ -79,7 +79,7 @@ class JobFactory
         }
 
         $componentConfiguration = $this->getComponentConfiguration();
-        if (in_array("encrypt", $componentConfiguration["flags"])) {
+        if (isset($componentConfiguration['flags']) && in_array('encrypt', $componentConfiguration['flags'])) {
             $job->setEncrypted(true);
         }
 
