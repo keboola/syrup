@@ -156,6 +156,10 @@
                             }
                         }
                     }
+                },
+                "encrypted": {
+                  "index": "not_analyzed",
+                  "type": "string"
                 }
             }
         }
