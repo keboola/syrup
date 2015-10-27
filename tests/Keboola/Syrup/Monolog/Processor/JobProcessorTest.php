@@ -29,7 +29,8 @@ class JobProcessorTest extends TestCase
     public function testProcessor()
     {
         $processor = new JobProcessor();
-        $configEncryptor = new ObjectEncryptor(self::$kernel->getContainer());
+        /** @var ObjectEncryptor $configEncryptor */
+        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
         $processor->setJob(new Job($configEncryptor, [
                 'id' => uniqid(),
                 'runId' => uniqid(),

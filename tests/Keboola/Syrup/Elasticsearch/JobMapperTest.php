@@ -39,11 +39,13 @@ class JobMapperTest extends KernelTestCase
     public static function setUpBeforeClass()
     {
         static::bootKernel();
+        /** @var ObjectEncryptor $configEncryptor */
+        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
         self::$client = new Client(['hosts' => [SYRUP_ELASTICSEARCH_HOST]]);
         self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', self::$client);
-        self::$jobFactory = new JobFactory(SYRUP_APP_NAME, new Encryptor(md5(uniqid())), new ObjectEncryptor(self::$kernel->getContainer()));
+        self::$jobFactory = new JobFactory(SYRUP_APP_NAME, new Encryptor(md5(uniqid())), $configEncryptor);
         self::$jobFactory->setStorageApiClient(new \Keboola\StorageApi\Client(['token' => SYRUP_SAPI_TEST_TOKEN]));
-        self::$jobMapper = new JobMapper(self::$client, self::$index, new ObjectEncryptor(self::$kernel->getContainer()), null, realpath(__DIR__ . '/../../../../app'));
+        self::$jobMapper = new JobMapper(self::$client, self::$index, $configEncryptor, null, realpath(__DIR__ . '/../../../../app'));
     }
 
     private function assertJob(JobInterface $job, $resJob)

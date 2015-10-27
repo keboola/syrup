@@ -75,8 +75,9 @@ class SearchTest extends WebTestCase
     private function createJob()
     {
         $tokenData = self::$sapiClient->verifyToken();
-
-        return new Job(new ObjectEncryptor(self::$kernel->getContainer()), [
+        /** @var ObjectEncryptor $configEncryptor */
+        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
+        return new Job($configEncryptor, [
                 'id'        => self::$sapiClient->generateId(),
                 'runId'     => self::$sapiClient->generateId(),
                 'project'   => [

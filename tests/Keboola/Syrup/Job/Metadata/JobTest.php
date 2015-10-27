@@ -32,7 +32,8 @@ class JobTest extends KernelTestCase
 
         $key = md5(uniqid());
         $encryptor = new Encryptor($key);
-        $configEncryptor = new ObjectEncryptor(self::$kernel->getContainer());
+        /** @var ObjectEncryptor $configEncryptor */
+        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
         $jobFactory = new JobFactory(SYRUP_APP_NAME, $encryptor, $configEncryptor);
         $jobFactory->setStorageApiClient($storageApiClient);
 
