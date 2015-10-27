@@ -6,10 +6,9 @@
 
 namespace Keboola\Syrup\Encryption;
 
-use Keboola\Encryption\EncryptorInterface;
 use Keboola\Syrup\Exception\ApplicationException;
 
-class BaseWrapper implements EncryptorInterface
+class BaseWrapper implements CryptoWrapperInterface
 {
     /** @var \Crypto */
     protected $encryptor;
@@ -89,7 +88,7 @@ class BaseWrapper implements EncryptorInterface
     }
 
     /**
-     * Return a prefix for the encrypted string identifying this wrapper
+     * @inheritdoc
      */
     public function getPrefix()
     {
