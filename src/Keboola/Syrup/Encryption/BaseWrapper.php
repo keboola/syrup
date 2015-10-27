@@ -87,4 +87,12 @@ class BaseWrapper implements EncryptorInterface
     {
         return $this->getEncryptor()->Decrypt(base64_decode($encryptedData), $this->getKey());
     }
+
+    /**
+     * Return a prefix for the encrypted string identifying this wrapper
+     */
+    public function getPrefix()
+    {
+        return 'KBC::Encrypted==';
+    }
 }

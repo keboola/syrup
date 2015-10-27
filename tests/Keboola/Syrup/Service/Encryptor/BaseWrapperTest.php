@@ -6,10 +6,23 @@
 
 namespace Keboola\Syrup\Tests\Service\Encryptor;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Keboola\Syrup\Encryption\BaseWrapper;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class BaseWrapperTest extends WebTestCase
+class BaseWrapperTest extends KernelTestCase
 {
+    public function setUp()
+    {
+        static::bootKernel();
+    }
+
+    public function testPrefix()
+    {
+        /** @var BaseWrapper $wrapper */
+        $wrapper = self::$kernel->getContainer()->get('syrup.encryption.base_wrapper');
+        $this->assertEquals('KBC::Encrypted==', $wrapper->getPrefix());
+    }
+
 
     /**
      * @covers \Keboola\Syrup\Encryption\BaseWrapper::encrypt
@@ -17,13 +30,8 @@ class BaseWrapperTest extends WebTestCase
      */
     public function testEncryptor()
     {
-        $client = static::createClient();
-        $container = $client->getContainer();
-
-        $encryptor = $container->get('syrup.encryption.base_wrapper');
-
-        $encrypted = $encryptor->encrypt('secret');
-
-        $this->assertEquals('secret', $encryptor->decrypt($encrypted));
+        $wrapper = self::$kernel->getContainer()->get('syrup.encryption.base_wrapper');
+        $encrypted = $wrapper->encrypt('secret');
+        $this->assertEquals('secret', $wrapper->decrypt($encrypted));
     }
 }
