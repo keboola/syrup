@@ -2,9 +2,7 @@
 
 namespace Keboola\Syrup\Encryption;
 
-use Keboola\Encryption\EncryptorInterface;
-
-interface CryptoWrapperInterface extends EncryptorInterface
+interface CryptoWrapperInterface
 {
     /**
      * Return a prefix for the encrypted string identifying this wrapper.

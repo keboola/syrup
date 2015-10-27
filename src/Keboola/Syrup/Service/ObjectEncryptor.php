@@ -22,8 +22,6 @@ class ObjectEncryptor
      */
     protected $container;
 
-    const PREFIX = 'KBC::Encrypted==';
-
     /**
      * List of known wrappers.
      * @var CryptoWrapperInterface[]
