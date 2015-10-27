@@ -34,6 +34,11 @@ class SearchTest extends WebTestCase
     /** @var JobMapper */
     protected static $jobMapper;
 
+    public function setUp()
+    {
+        self::bootKernel();
+    }
+
     public static function setUpBeforeClass()
     {
         self::$kernel = static::createKernel();
