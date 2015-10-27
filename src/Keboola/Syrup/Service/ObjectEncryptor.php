@@ -7,54 +7,40 @@
 
 namespace Keboola\Syrup\Service;
 
+use Keboola\Syrup\Encryption\BaseWrapper;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Exception\UserException;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ObjectEncryptor
 {
-    /** @var \Keboola\Syrup\Encryption\CryptoWrapper */
-    protected $encryptor;
+    protected $container;
 
     const PREFIX = 'KBC::Encrypted==';
 
     /**
-     * @param $encryptor
+     * @param ContainerInterface $container DI container
      */
-    public function __construct($encryptor)
+    public function __construct(ContainerInterface $container)
     {
-        $this->setEncryptor($encryptor);
+        $this->container = $container;
     }
 
     /**
-     * @return \Keboola\Syrup\Encryption\CryptoWrapper
-     */
-    protected function getEncryptor()
-    {
-        return $this->encryptor;
-    }
-
-    /**
-     * @param \Keboola\Syrup\Encryption\CryptoWrapper $encryptor
-     * @return $this
-     */
-    protected function setEncryptor($encryptor)
-    {
-        $this->encryptor = $encryptor;
-
-        return $this;
-    }
-
-    /**
-     * @param mixed $data
+     * @param string|array $data Data to encrypt
+     * @param string $wrapperName Service name of encryptor wrapper
      * @return mixed
      */
-    public function encrypt($data)
+    public function encrypt($data, $wrapperName = 'syrup.encryption.base_wrapper')
     {
+        /** @var BaseWrapper $wrapper */
+        $wrapper = $this->container->get($wrapperName);
         if (is_scalar($data)) {
-            return $this->encryptValue($data);
+            return $this->encryptValue($data, $wrapper);
         }
         if (is_array($data)) {
-            return $this->encryptArray($data);
+            return $this->encryptArray($data, $wrapper);
         }
         throw new ApplicationException("Only arrays and strings are supported for encryption.");
     }
@@ -74,17 +60,31 @@ class ObjectEncryptor
         throw new ApplicationException("Only arrays and strings are supported for decryption.");
     }
 
+
+    /**
+     * Find a wrapper to decrypt a given cipher.
+     * @param string $value Cipher text
+     * @return BaseWrapper
+     */
+    protected function findWrapper($value)
+    {
+        if (substr($value, 0, 16) != self::PREFIX) {
+            throw new UserException("'{$value}' is not an encrypted value.");
+        } else {
+            $wrapper = $this->container->get('syrup.encryption.base_wrapper');
+        }
+        return $wrapper;
+    }
+
     /**
      * @param $value
      * @return string
      */
     protected function decryptValue($value)
     {
-        if (substr($value, 0, 16) != self::PREFIX) {
-            throw new UserException("'{$value}' is not an encrypted value.");
-        }
+        $wrapper = $this->findWrapper($value);
         try {
-            return $this->encryptor->decrypt(substr($value, 16));
+            return $wrapper->decrypt(substr($value, 16));
         } catch (\InvalidCiphertextException $e) {
             // the key or cipher text is wrong - return the original one
             return $value;
@@ -95,10 +95,11 @@ class ObjectEncryptor
     }
 
     /**
-     * @param $value
+     * @param string $value
+     * @param BaseWrapper $wrapper
      * @return string
      */
-    protected function encryptValue($value)
+    protected function encryptValue($value, BaseWrapper $wrapper)
     {
         // return self if already encrypted
         if (substr($value, 0, 16) == self::PREFIX) {
@@ -106,25 +107,26 @@ class ObjectEncryptor
         }
 
         try {
-            return self::PREFIX . $this->encryptor->encrypt($value);
+            return self::PREFIX . $wrapper->encrypt($value);
         } catch (\Exception $e) {
             throw new ApplicationException("Encryption failed: " . $e->getMessage(), $e, ["value" => $value]);
         }
     }
 
     /**
-     * @param $data
+     * @param array $data
+     * @param BaseWrapper $wrapper
      * @return array
      */
-    protected function encryptArray($data)
+    protected function encryptArray(array $data, BaseWrapper $wrapper)
     {
         $result = [];
         foreach ($data as $key => $value) {
             if (substr($key, 0, 1) == '#') {
                 if (is_scalar($value) || is_null($value)) {
-                    $result[$key] = $this->encryptValue($value);
+                    $result[$key] = $this->encryptValue($value, $wrapper);
                 } elseif (is_array($value)) {
-                    $result[$key] = $this->encryptArray($value);
+                    $result[$key] = $this->encryptArray($value, $wrapper);
                 } else {
                     throw new ApplicationException("Only arrays and scalars are supported for encryption.");
                 }
@@ -132,7 +134,7 @@ class ObjectEncryptor
                 if (is_scalar($value) || is_null($value)) {
                     $result[$key] = $value;
                 } elseif (is_array($value)) {
-                    $result[$key] = $this->encryptArray($value);
+                    $result[$key] = $this->encryptArray($value, $wrapper);
                 } else {
                     throw new ApplicationException("Only arrays and scalars are supported for encryption.");
                 }

@@ -11,7 +11,6 @@ use Keboola\Encryption\EncryptorInterface;
 use Keboola\StorageApi\Client as SapiClient;
 use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Elasticsearch\Search;
-use Keboola\Syrup\Encryption\BaseWrapper;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Keboola\Syrup\Job\Metadata\Job;
@@ -72,7 +71,7 @@ class SearchTest extends WebTestCase
     {
         $tokenData = self::$sapiClient->verifyToken();
 
-        return new Job(new ObjectEncryptor(new BaseWrapper(md5(uniqid()))), [
+        return new Job(new ObjectEncryptor(self::$kernel->getContainer()), [
                 'id'        => self::$sapiClient->generateId(),
                 'runId'     => self::$sapiClient->generateId(),
                 'project'   => [

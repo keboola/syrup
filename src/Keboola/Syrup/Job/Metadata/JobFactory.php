@@ -8,9 +8,7 @@
 namespace Keboola\Syrup\Job\Metadata;
 
 use Keboola\StorageApi\Client;
-use Keboola\Syrup\Encryption\CryptoWrapper;
 use Keboola\Syrup\Encryption\Encryptor;
-use Keboola\Syrup\Exception\UserException;
 use Keboola\Syrup\Service\ObjectEncryptor;
 
 class JobFactory

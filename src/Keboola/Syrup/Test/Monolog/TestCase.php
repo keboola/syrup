@@ -8,8 +8,9 @@
 namespace Keboola\Syrup\Test\Monolog;
 
 use Monolog\Logger;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class TestCase extends \PHPUnit_Framework_TestCase
+class TestCase extends KernelTestCase
 {
 
     protected function getRecord($level = Logger::WARNING, $message = 'test', $context = array())

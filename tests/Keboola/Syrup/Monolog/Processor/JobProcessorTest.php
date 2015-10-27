@@ -16,6 +16,11 @@ use Keboola\Syrup\Test\Monolog\TestCase;
 class JobProcessorTest extends TestCase
 {
 
+    public static function setUpBeforeClass()
+    {
+        static::bootKernel();
+    }
+
     /**
      * @covers \Keboola\Syrup\Monolog\Processor\JobProcessor::__invoke
      * @covers \Keboola\Syrup\Monolog\Processor\JobProcessor::processRecord
@@ -24,7 +29,7 @@ class JobProcessorTest extends TestCase
     public function testProcessor()
     {
         $processor = new JobProcessor();
-        $configEncryptor = new ObjectEncryptor(new BaseWrapper(md5(uniqid())));
+        $configEncryptor = new ObjectEncryptor(self::$kernel->getContainer());
         $processor->setJob(new Job($configEncryptor, [
                 'id' => uniqid(),
                 'runId' => uniqid(),
