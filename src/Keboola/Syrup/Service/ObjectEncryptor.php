@@ -7,17 +7,28 @@
 
 namespace Keboola\Syrup\Service;
 
-use Guzzle\Service\Exception\ServiceNotFoundException;
 use Keboola\Syrup\Encryption\BaseWrapper;
+use Keboola\Syrup\Encryption\CryptoWrapperInterface;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Exception\UserException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 class ObjectEncryptor
 {
+    /**
+     * DI service container.
+     * @var ContainerInterface
+     */
     protected $container;
 
     const PREFIX = 'KBC::Encrypted==';
+
+    /**
+     * List of known wrappers.
+     * @var CryptoWrapperInterface[]
+     */
+    private $wrappers;
 
     /**
      * @param ContainerInterface $container DI container
@@ -64,20 +75,32 @@ class ObjectEncryptor
         throw new ApplicationException("Only arrays and strings are supported for decryption.");
     }
 
+    /**
+     * Add a known crypto wrapper.
+     * @param CryptoWrapperInterface $wrapper
+     */
+    public function pushWrapper(CryptoWrapperInterface $wrapper)
+    {
+        if (isset($this->wrappers[$wrapper->getPrefix()])) {
+            throw new ApplicationException("Cryptowrapper prefix " . $wrapper->getPrefix() . " is not unique.");
+        }
+        $this->wrappers[$wrapper->getPrefix()] = $wrapper;
+    }
 
     /**
      * Find a wrapper to decrypt a given cipher.
      * @param string $value Cipher text
-     * @return BaseWrapper
+     * @return CryptoWrapperInterface|null
      */
     protected function findWrapper($value)
     {
-        if (substr($value, 0, 16) != self::PREFIX) {
-            throw new UserException("'{$value}' is not an encrypted value.");
-        } else {
-            $wrapper = $this->container->get('syrup.encryption.base_wrapper');
+        $selectedWrapper = null;
+        foreach ($this->wrappers as $wrapper) {
+            if (substr($value, 0, mb_strlen($wrapper->getPrefix())) == $wrapper->getPrefix()) {
+                $selectedWrapper = $wrapper;
+            }
         }
-        return $wrapper;
+        return $selectedWrapper;
     }
 
     /**
@@ -87,6 +110,9 @@ class ObjectEncryptor
     protected function decryptValue($value)
     {
         $wrapper = $this->findWrapper($value);
+        if (!$wrapper) {
+            throw new UserException("'{$value}' is not an encrypted value.");
+        }
         try {
             return $wrapper->decrypt(substr($value, 16));
         } catch (\InvalidCiphertextException $e) {
@@ -100,18 +126,19 @@ class ObjectEncryptor
 
     /**
      * @param string $value
-     * @param BaseWrapper $wrapper
+     * @param CryptoWrapperInterface $wrapper
      * @return string
      */
-    protected function encryptValue($value, BaseWrapper $wrapper)
+    protected function encryptValue($value, CryptoWrapperInterface $wrapper)
     {
-        // return self if already encrypted
-        if (substr($value, 0, 16) == self::PREFIX) {
+        // return self if already encrypted with the same wrapper
+        $selectedWrapper = $this->findWrapper($value);
+        if ($selectedWrapper == $wrapper) {
             return $value;
         }
 
         try {
-            return self::PREFIX . $wrapper->encrypt($value);
+            return $wrapper->getPrefix() . $wrapper->encrypt($value);
         } catch (\Exception $e) {
             throw new ApplicationException("Encryption failed: " . $e->getMessage(), $e, ["value" => $value]);
         }
@@ -119,10 +146,10 @@ class ObjectEncryptor
 
     /**
      * @param array $data
-     * @param BaseWrapper $wrapper
+     * @param CryptoWrapperInterface $wrapper
      * @return array
      */
-    protected function encryptArray(array $data, BaseWrapper $wrapper)
+    protected function encryptArray(array $data, CryptoWrapperInterface $wrapper)
     {
         $result = [];
         foreach ($data as $key => $value) {

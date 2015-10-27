@@ -74,8 +74,6 @@ services:
     syrup.encryptor:
         class: Keboola\Syrup\Encryption\Encryptor
         arguments: [%encryption_key%]
-        tags:
-            - { name: syrup.encryption.wrapper }
 
     syrup.encryption.base_wrapper:
         class: Keboola\Syrup\Encryption\BaseWrapper

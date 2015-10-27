@@ -7,16 +7,13 @@
 namespace Keboola\Syrup\Tests\Service;
 
 use Keboola\Syrup\Exception\ApplicationException;
-use MyProject\Proxies\__CG__\stdClass;
+use Keboola\Syrup\Service\ObjectEncryptor;
+use Keboola\Syrup\Test\MockCryptoWrapper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ObjectEncryptorTest extends WebTestCase
 {
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
     public function testEncryptorScalar()
     {
         $client = static::createClient();
@@ -50,10 +47,18 @@ class ObjectEncryptorTest extends WebTestCase
         $encryptor->decrypt('test');
     }
 
-    public function testEncryptorFail()
+    public function testEncryptorUnsupportedInput()
     {
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $unsupportedInput = new \stdClass();
+        try {
+            $encryptor->encrypt($unsupportedInput);
+            $this->fail("Encryption of invalid data should fail.");
+        } catch (ApplicationException $e) {
+        }
+
         $unsupportedInput = [
             'key' => 'value',
             'key2' => new \stdClass(),
@@ -63,12 +68,52 @@ class ObjectEncryptorTest extends WebTestCase
             $this->fail("Encryption of invalid data should fail.");
         } catch (ApplicationException $e) {
         }
+
+        $unsupportedInput = [
+            'key' => 'value',
+            '#key2' => new \stdClass(),
+        ];
+        try {
+            $encryptor->encrypt($unsupportedInput);
+            $this->fail("Encryption of invalid data should fail.");
+        } catch (ApplicationException $e) {
+        }
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
-    public function testDecryptorFail()
+    public function testDecryptorUnsupportedInput()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $unsupportedInput = new \stdClass();
+        try {
+            $encryptor->decrypt($unsupportedInput);
+            $this->fail("Encryption of invalid data should fail.");
+        } catch (ApplicationException $e) {
+        }
+
+        $unsupportedInput = [
+            'key' => 'value',
+            'key2' => new \stdClass(),
+        ];
+        try {
+            $encryptor->decrypt($unsupportedInput);
+            $this->fail("Encryption of invalid data should fail.");
+        } catch (ApplicationException $e) {
+        }
+
+        $unsupportedInput = [
+            'key' => 'value',
+            '#key2' => new \stdClass(),
+        ];
+        try {
+            $encryptor->decrypt($unsupportedInput);
+            $this->fail("Encryption of invalid data should fail.");
+        } catch (ApplicationException $e) {
+        }
+    }
+
+    public function testDecryptorInvalidCipherText()
     {
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
@@ -77,11 +122,7 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
-    public function testEncryptorScalarAlreadyEncrypted()
+    public function testEncryptorAlreadyEncrypted()
     {
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
@@ -93,10 +134,41 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("test", $encryptor->decrypt($encrypted));
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
+    public function testEncryptorAlreadyEncryptedWrapper()
+    {
+        $client = static::createClient();
+
+        /** @var ObjectEncryptor $encryptor */
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+        $wrapper = new MockCryptoWrapper();
+        $client->getContainer()->set('mock.crypto.wrapper', $wrapper);
+        $encryptor->pushWrapper($wrapper);
+
+        $secret = 'secret';
+        $encryptedValue = $encryptor->encrypt($secret, 'mock.crypto.wrapper');
+        $this->assertEquals("KBC::MockCryptoWrapper==" . $secret, $encryptedValue);
+
+        $encryptedSecond = $encryptor->encrypt($encryptedValue);
+        $this->assertEquals("KBC::Encrypted==", substr($encryptedSecond, 0, 16));
+        $this->assertEquals($encryptedValue, $encryptor->decrypt($encryptedSecond));
+    }
+
+    public function testInvalidWrapper()
+    {
+        $client = static::createClient();
+
+        /** @var ObjectEncryptor $encryptor */
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+        $wrapper = new MockCryptoWrapper();
+        $client->getContainer()->set('mock.crypto.wrapper', $wrapper);
+        $encryptor->pushWrapper($wrapper);
+        try {
+            $encryptor->pushWrapper($wrapper);
+            $this->fail("Adding crypto wrapper with same prefix must fail.");
+        } catch (ApplicationException $e) {
+        }
+    }
+
     public function testEncryptorSimpleObject()
     {
         $client = static::createClient();
@@ -119,10 +191,6 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value2", $decrypted["#key2"]);
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
     public function testEncryptorSimpleObjectScalars()
     {
         $client = static::createClient();
@@ -159,10 +227,6 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals(null, $decrypted["key7"]);
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
     public function testEncryptorSimpleObjectEncrypted()
     {
         $client = static::createClient();
@@ -186,10 +250,6 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("test", $decrypted["#key2"]);
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
     public function testEncryptorNestedObject()
     {
         $client = static::createClient();
@@ -226,10 +286,6 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
     public function testEncryptorNestedObjectWithArrayKeyHashmark()
     {
         $client = static::createClient();
@@ -276,10 +332,6 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("someValue2", $decrypted["#key3"]["#encryptedNestedKey"]);
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
     public function testEncryptorNestedObjectEncrypted()
     {
         $client = static::createClient();
