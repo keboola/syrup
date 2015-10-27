@@ -8,7 +8,7 @@
 namespace Keboola\Syrup\Test;
 
 use Keboola\Syrup\Elasticsearch\JobMapper;
-use Keboola\Syrup\Encryption\CryptoWrapper;
+use Keboola\Syrup\Encryption\BaseWrapper;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Keboola\Syrup\Service\ObjectEncryptor;
@@ -66,7 +66,7 @@ class CommandTestCase extends WebTestCase
             ->get('syrup.encryptor')
             ->encrypt($this->storageApiToken);
 
-        return new Job(new ObjectEncryptor(new CryptoWrapper(md5(uniqid()))), [
+        return new Job(new ObjectEncryptor(new BaseWrapper(md5(uniqid()))), [
                 'id' => $this->storageApiClient->generateId(),
                 'runId' => $this->storageApiClient->generateId(),
                 'project' => [

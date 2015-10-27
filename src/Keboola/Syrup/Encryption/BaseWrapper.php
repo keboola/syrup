@@ -9,7 +9,7 @@ namespace Keboola\Syrup\Encryption;
 use Keboola\Encryption\EncryptorInterface;
 use Keboola\Syrup\Exception\ApplicationException;
 
-class CryptoWrapper implements EncryptorInterface
+class BaseWrapper implements EncryptorInterface
 {
     /** @var \Crypto */
     protected $encryptor;
