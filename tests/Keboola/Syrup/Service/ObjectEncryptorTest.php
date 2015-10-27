@@ -6,6 +6,8 @@
 
 namespace Keboola\Syrup\Tests\Service;
 
+use Keboola\Syrup\Exception\ApplicationException;
+use MyProject\Proxies\__CG__\stdClass;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ObjectEncryptorTest extends WebTestCase
@@ -26,6 +28,17 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
 
+    public function testEncryptorInvalidService()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+        try {
+            $encryptor->encrypt('secret', 'fooBar');
+            $this->fail("Invalid crypto wrapper must throw exception");
+        } catch (ApplicationException $e) {
+        }
+    }
+
     /**
      * @expectedException \Keboola\Syrup\Exception\UserException
      * @expectedExceptionMessage 'test' is not an encrypted value.
@@ -35,6 +48,21 @@ class ObjectEncryptorTest extends WebTestCase
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
         $encryptor->decrypt('test');
+    }
+
+    public function testEncryptorFail()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+        $unsupportedInput = [
+            'key' => 'value',
+            'key2' => new \stdClass(),
+        ];
+        try {
+            $encryptor->encrypt($unsupportedInput);
+            $this->fail("Encryption of invalid data should fail.");
+        } catch (ApplicationException $e) {
+        }
     }
 
     /**

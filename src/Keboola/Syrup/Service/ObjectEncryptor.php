@@ -7,10 +7,10 @@
 
 namespace Keboola\Syrup\Service;
 
+use Guzzle\Service\Exception\ServiceNotFoundException;
 use Keboola\Syrup\Encryption\BaseWrapper;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Exception\UserException;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ObjectEncryptor
@@ -35,7 +35,11 @@ class ObjectEncryptor
     public function encrypt($data, $wrapperName = 'syrup.encryption.base_wrapper')
     {
         /** @var BaseWrapper $wrapper */
-        $wrapper = $this->container->get($wrapperName);
+        try {
+            $wrapper = $this->container->get($wrapperName);
+        } catch (ServiceNotFoundException $e) {
+            throw new ApplicationException("Invalid crypto wrapper " . $wrapperName, $e);
+        }
         if (is_scalar($data)) {
             return $this->encryptValue($data, $wrapper);
         }
