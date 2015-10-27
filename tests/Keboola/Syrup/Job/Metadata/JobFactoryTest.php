@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class JobFactoryTest extends KernelTestCase
 {
-    public static function setUpBeforeClass()
+    public function setUp()
     {
         static::bootKernel();
     }

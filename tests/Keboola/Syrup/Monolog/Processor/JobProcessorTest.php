@@ -16,7 +16,7 @@ use Keboola\Syrup\Test\Monolog\TestCase;
 class JobProcessorTest extends TestCase
 {
 
-    public static function setUpBeforeClass()
+    public function setUp()
     {
         static::bootKernel();
     }
