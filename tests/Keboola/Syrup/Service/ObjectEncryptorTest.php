@@ -11,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class ObjectEncryptorTest extends WebTestCase
 {
 
+    // TODO failed decryption test
+
     /**
      * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
      * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
@@ -26,6 +28,7 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
 
+    //
     /**
      * @expectedException \Keboola\Syrup\Exception\UserException
      * @expectedExceptionMessage 'test' is not an encrypted value.
@@ -35,18 +38,6 @@ class ObjectEncryptorTest extends WebTestCase
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
         $encryptor->decrypt('test');
-    }
-
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
-    public function testDecryptorFail()
-    {
-        $client = static::createClient();
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
-
-        $encrypted = 'KBC::Encrypted==yI0sawoJw0tzwkxgROiCwgq+iQwXOglFPRcTlnRnr1muMztO0AMYmsjwbcJSA7zAOSpLFjUJN2Jg==';
-        $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
     }
 
     /**

@@ -85,11 +85,7 @@ class ObjectEncryptor
         }
         try {
             return $this->encryptor->decrypt(substr($value, 16));
-        } catch (\InvalidCiphertextException $e) {
-            // the key or cipher text is wrong - return the original one
-            return $value;
         } catch (\Exception $e) {
-            // decryption failed for more serious reasons
             throw new ApplicationException("Decryption failed: " . $e->getMessage(), $e, ["value" => $value]);
         }
     }
