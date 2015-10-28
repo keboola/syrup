@@ -8,6 +8,7 @@ namespace Keboola\Syrup\Tests\Service;
 
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Service\ObjectEncryptor;
+use Keboola\Syrup\Test\AnotherCryptoWrapper;
 use Keboola\Syrup\Test\MockCryptoWrapper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -411,5 +412,31 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value1", $decrypted["key1"]);
         $this->assertEquals("value2", $decrypted["key2"][0]["nestedKey1"]);
         $this->assertEquals("value3", $decrypted["key2"][1]["nestedKey2"]["#finalKey"]);
+    }
+
+    public function testMixedCryptoWrappersDecrypt()
+    {
+        $client = static::createClient();
+        /**
+         * @var $encryptor ObjectEncryptor
+         */
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+        $wrapper = new AnotherCryptoWrapper(md5(uniqid()));
+        $client->getContainer()->set('another.crypto.wrapper', $wrapper);
+        $encryptor->pushWrapper($wrapper);
+
+        $object = [
+            "#key1" => $encryptor->encrypt("value1"),
+            "#key2" => $encryptor->encrypt("value2", 'another.crypto.wrapper')
+        ];
+        $this->assertEquals("KBC::Encrypted==", substr($object["#key1"], 0, 16));
+        $this->assertEquals("KBC::AnotherCryptoWrapper==", substr($object["#key2"], 0, 27));
+
+        $decrypted = $encryptor->decrypt($object);
+        $this->assertArrayHasKey("#key1", $decrypted);
+        $this->assertArrayHasKey("#key2", $decrypted);
+        $this->assertCount(2, $decrypted);
+        $this->assertEquals("value1", $decrypted["#key1"]);
+        $this->assertEquals("value2", $decrypted["#key2"]);
     }
 }
