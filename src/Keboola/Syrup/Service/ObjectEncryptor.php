@@ -116,7 +116,7 @@ class ObjectEncryptor
             throw new UserException("'{$value}' is not an encrypted value.");
         }
         try {
-            return $wrapper->decrypt(substr($value, 16));
+            return $wrapper->decrypt(substr($value, mb_strlen($wrapper->getPrefix())));
         } catch (\InvalidCiphertextException $e) {
             throw new UserException("Invalid cipher text: $value", $e, ["value" => $value]);
         } catch (\Exception $e) {
