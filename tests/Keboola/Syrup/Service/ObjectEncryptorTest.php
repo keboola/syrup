@@ -412,4 +412,15 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value2", $decrypted["key2"][0]["nestedKey1"]);
         $this->assertEquals("value3", $decrypted["key2"][1]["nestedKey2"]["#finalKey"]);
     }
+
+    public function testEncryptorNoWrappers()
+    {
+        $client = static::createClient();
+        $encryptor = new ObjectEncryptor($client->getContainer());
+        try {
+            $encryptor->encrypt("test");
+            $this->fail("Misconfigured object encryptor must raise exception.");
+        } catch (ApplicationException $e) {
+        }
+    }
 }

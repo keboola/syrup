@@ -26,7 +26,7 @@ class ObjectEncryptor
      * List of known wrappers.
      * @var CryptoWrapperInterface[]
      */
-    private $wrappers;
+    private $wrappers = [];
 
     /**
      * @param ContainerInterface $container DI container
@@ -74,7 +74,8 @@ class ObjectEncryptor
     }
 
     /**
-     * Add a known crypto wrapper.
+     * Manually add a known crypto wrapper. Generally, wrappers should be added to services.yml with tag
+     * 'syrup.encryption.wrapper' - that way, they will be added automatically.
      * @param CryptoWrapperInterface $wrapper
      */
     public function pushWrapper(CryptoWrapperInterface $wrapper)
@@ -93,6 +94,9 @@ class ObjectEncryptor
     protected function findWrapper($value)
     {
         $selectedWrapper = null;
+        if (empty($this->wrappers)) {
+            throw new ApplicationException("There are no wrappers registered for the encryptor.");
+        }
         foreach ($this->wrappers as $wrapper) {
             if (substr($value, 0, mb_strlen($wrapper->getPrefix())) == $wrapper->getPrefix()) {
                 $selectedWrapper = $wrapper;
