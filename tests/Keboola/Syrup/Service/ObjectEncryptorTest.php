@@ -7,6 +7,7 @@
 namespace Keboola\Syrup\Tests\Service;
 
 use Keboola\Syrup\Exception\ApplicationException;
+use Keboola\Syrup\Exception\UserException;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Keboola\Syrup\Test\MockCryptoWrapper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -118,9 +119,32 @@ class ObjectEncryptorTest extends WebTestCase
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
-        $encrypted = 'KBC::Encrypted==yI0sawoJw0tzwkxgROiCwgq+iQwXOglFPRcTlnRnr1muMztO0AMYmsjwbcJSA7zAOSpLFjUJN2Jg==';
-        $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
+        $encrypted = 'KBC::Encrypted==yI0sawothis is not a valid cipher lnRnr1muMztO0AMYmsjwbcJSA7zAOSpLFjUJN2Jg==';
+        try {
+            $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
+            $this->fail("Invalid cipher text must raise exception");
+        } catch (UserException $e) {
+        }
     }
+
+    public function testDecryptorInvalidCipherStructure()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $encrypted = [
+            'key1' => 'somevalue',
+            'key2' => [
+                '#anotherKey' => 'KBC::Encrypted==yI0sawothis is not a valid cipher lnRnr1muMmsjwbcJSA7zAOSpLFjUJN2Jg=='
+            ]
+        ];
+        try {
+            $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
+            $this->fail("Invalid cipher text must raise exception");
+        } catch (UserException $e) {
+        }
+    }
+
 
     public function testEncryptorAlreadyEncrypted()
     {

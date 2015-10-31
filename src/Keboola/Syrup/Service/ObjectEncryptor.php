@@ -118,8 +118,7 @@ class ObjectEncryptor
         try {
             return $wrapper->decrypt(substr($value, 16));
         } catch (\InvalidCiphertextException $e) {
-            // the key or cipher text is wrong - return the original one
-            return $value;
+            throw new UserException("Invalid cipher text: $value", $e, ["value" => $value]);
         } catch (\Exception $e) {
             // decryption failed for more serious reasons
             throw new ApplicationException("Decryption failed: " . $e->getMessage(), $e, ["value" => $value]);
@@ -161,7 +160,9 @@ class ObjectEncryptor
                 } elseif (is_array($value)) {
                     $result[$key] = $this->encryptArray($value, $wrapper);
                 } else {
-                    throw new ApplicationException("Only arrays and scalars are supported for encryption.");
+                    throw new ApplicationException(
+                        "Invalid item $key - only arrays and scalars are supported for encryption."
+                    );
                 }
             } else {
                 if (is_scalar($value) || is_null($value)) {
@@ -169,7 +170,9 @@ class ObjectEncryptor
                 } elseif (is_array($value)) {
                     $result[$key] = $this->encryptArray($value, $wrapper);
                 } else {
-                    throw new ApplicationException("Only arrays and scalars are supported for encryption.");
+                    throw new ApplicationException(
+                        "Invalid item $key - only arrays and scalars are supported for encryption."
+                    );
                 }
             }
         }
@@ -190,7 +193,9 @@ class ObjectEncryptor
                 } elseif (is_array($value)) {
                     $result[$key] = $this->decryptArray($value);
                 } else {
-                    throw new ApplicationException("Only arrays and scalars are supported for decryption.");
+                    throw new ApplicationException(
+                        "Invalid item $key - only arrays and scalars are supported for decryption."
+                    );
                 }
             } else {
                 if (is_scalar($value) || is_null($value)) {
@@ -198,7 +203,9 @@ class ObjectEncryptor
                 } elseif (is_array($value)) {
                     $result[$key] = $this->decryptArray($value);
                 } else {
-                    throw new ApplicationException("Only arrays and scalars are supported for decryption.");
+                    throw new ApplicationException(
+                        "Invalid item $key - only arrays and scalars are supported for decryption."
+                    );
                 }
             }
         }
