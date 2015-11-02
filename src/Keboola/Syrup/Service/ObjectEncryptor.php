@@ -65,7 +65,11 @@ class ObjectEncryptor
     public function decrypt($data)
     {
         if (is_scalar($data)) {
-            return $this->decryptValue($data);
+            try {
+                return $this->decryptValue($data);
+            } catch (\InvalidCiphertextException $e) {
+                throw new UserException("Invalid cipher text", $e);
+            }
         }
         if (is_array($data)) {
             return $this->decryptArray($data);
@@ -108,6 +112,7 @@ class ObjectEncryptor
     /**
      * @param $value
      * @return string
+     * @throws \InvalidCiphertextException
      */
     protected function decryptValue($value)
     {
@@ -118,7 +123,8 @@ class ObjectEncryptor
         try {
             return $wrapper->decrypt(substr($value, mb_strlen($wrapper->getPrefix())));
         } catch (\InvalidCiphertextException $e) {
-            throw new UserException("Invalid cipher text: $value", $e, ["value" => $value]);
+            // bubble this exception
+            throw $e;
         } catch (\Exception $e) {
             // decryption failed for more serious reasons
             throw new ApplicationException("Decryption failed: " . $e->getMessage(), $e, ["value" => $value]);
@@ -187,26 +193,30 @@ class ObjectEncryptor
     {
         $result = [];
         foreach ($data as $key => $value) {
-            if (substr($key, 0, 1) == '#') {
-                if (is_scalar($value)) {
-                    $result[$key] = $this->decryptValue($value);
-                } elseif (is_array($value)) {
-                    $result[$key] = $this->decryptArray($value);
+            try {
+                if (substr($key, 0, 1) == '#') {
+                    if (is_scalar($value)) {
+                        $result[$key] = $this->decryptValue($value);
+                    } elseif (is_array($value)) {
+                        $result[$key] = $this->decryptArray($value);
+                    } else {
+                        throw new ApplicationException(
+                            "Invalid item $key - only arrays and scalars are supported for decryption."
+                        );
+                    }
                 } else {
-                    throw new ApplicationException(
-                        "Invalid item $key - only arrays and scalars are supported for decryption."
-                    );
+                    if (is_scalar($value) || is_null($value)) {
+                        $result[$key] = $value;
+                    } elseif (is_array($value)) {
+                        $result[$key] = $this->decryptArray($value);
+                    } else {
+                        throw new ApplicationException(
+                            "Invalid item $key - only arrays and scalars are supported for decryption."
+                        );
+                    }
                 }
-            } else {
-                if (is_scalar($value) || is_null($value)) {
-                    $result[$key] = $value;
-                } elseif (is_array($value)) {
-                    $result[$key] = $this->decryptArray($value);
-                } else {
-                    throw new ApplicationException(
-                        "Invalid item $key - only arrays and scalars are supported for decryption."
-                    );
-                }
+            } catch (\InvalidCiphertextException $e) {
+                throw new UserException("Invalid cipher text for key $key", $e);
             }
         }
         return $result;

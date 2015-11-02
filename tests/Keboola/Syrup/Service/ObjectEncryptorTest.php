@@ -125,6 +125,7 @@ class ObjectEncryptorTest extends WebTestCase
             $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
             $this->fail("Invalid cipher text must raise exception");
         } catch (UserException $e) {
+            $this->assertNotContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
         }
     }
 
@@ -143,6 +144,8 @@ class ObjectEncryptorTest extends WebTestCase
             $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
             $this->fail("Invalid cipher text must raise exception");
         } catch (UserException $e) {
+            $this->assertNotContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
+            $this->assertContains('#anotherKey', $e->getMessage());
         }
     }
 
