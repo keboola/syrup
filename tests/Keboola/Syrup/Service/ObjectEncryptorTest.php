@@ -38,16 +38,6 @@ class ObjectEncryptorTest extends WebTestCase
         }
     }
 
-    /**
-     * @expectedException \Keboola\Syrup\Exception\UserException
-     * @expectedExceptionMessage 'test' is not an encrypted value.
-     */
-    public function testDecryptorScalarException()
-    {
-        $client = static::createClient();
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
-        $encryptor->decrypt('test');
-    }
 
     public function testEncryptorUnsupportedInput()
     {
@@ -120,14 +110,30 @@ class ObjectEncryptorTest extends WebTestCase
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
-        $encrypted = 'KBC::Encrypted==yI0sawothis is not a valid cipher lnRnr1muMztO0AMYmsjwbcJSA7zAOSpLFjUJN2Jg==';
+        $encrypted = 'KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg==';
         try {
             $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
             $this->fail("Invalid cipher text must raise exception");
         } catch (UserException $e) {
-            $this->assertNotContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
+            $this->assertContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
         }
     }
+
+
+    public function testDecryptorInvalidCipherText2()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $encrypted = 'this does not even look like a cipher text';
+        try {
+            $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
+            $this->fail("Invalid cipher text must raise exception");
+        } catch (UserException $e) {
+            $this->assertNotContains('this does not even look like a cipher text', $e->getMessage());
+        }
+    }
+
 
     public function testDecryptorInvalidCipherStructure()
     {
@@ -137,14 +143,35 @@ class ObjectEncryptorTest extends WebTestCase
         $encrypted = [
             'key1' => 'somevalue',
             'key2' => [
-                '#anotherKey' => 'KBC::Encrypted==yI0sawothis is not a valid cipher lnRnr1muMmsjwbcJSA7zAOSpLFjUJN2Jg=='
+                '#anotherKey' => 'KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg=='
             ]
         ];
         try {
             $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
             $this->fail("Invalid cipher text must raise exception");
         } catch (UserException $e) {
-            $this->assertNotContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
+            $this->assertContains('KBC::Encrypted==yI0sawothis', $e->getMessage());
+            $this->assertContains('#anotherKey', $e->getMessage());
+        }
+    }
+
+
+    public function testDecryptorInvalidCipherStructure2()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $encrypted = [
+            'key1' => 'somevalue',
+            'key2' => [
+                '#anotherKey' => 'this does not even look like a cipher text'
+            ]
+        ];
+        try {
+            $this->assertEquals($encrypted, $encryptor->decrypt($encrypted));
+            $this->fail("Invalid cipher text must raise exception");
+        } catch (UserException $e) {
+            $this->assertNotContains('this does not even look like a cipher text', $e->getMessage());
             $this->assertContains('#anotherKey', $e->getMessage());
         }
     }

@@ -68,7 +68,7 @@ class ObjectEncryptor
             try {
                 return $this->decryptValue($data);
             } catch (\InvalidCiphertextException $e) {
-                throw new UserException("Invalid cipher text", $e);
+                throw new UserException($e->getMessage(), $e);
             }
         }
         if (is_array($data)) {
@@ -118,13 +118,12 @@ class ObjectEncryptor
     {
         $wrapper = $this->findWrapper($value);
         if (!$wrapper) {
-            throw new UserException("'{$value}' is not an encrypted value.");
+            throw new \InvalidCiphertextException("Value is not an encrypted value.");
         }
         try {
             return $wrapper->decrypt(substr($value, mb_strlen($wrapper->getPrefix())));
         } catch (\InvalidCiphertextException $e) {
-            // bubble this exception
-            throw $e;
+            throw new \InvalidCiphertextException("Value $value is not an encrypted value.");
         } catch (\Exception $e) {
             // decryption failed for more serious reasons
             throw new ApplicationException("Decryption failed: " . $e->getMessage(), $e, ["value" => $value]);
@@ -216,7 +215,7 @@ class ObjectEncryptor
                     }
                 }
             } catch (\InvalidCiphertextException $e) {
-                throw new UserException("Invalid cipher text for key $key", $e);
+                throw new UserException("Invalid cipher text for key $key " . $e->getMessage(), $e);
             }
         }
         return $result;
