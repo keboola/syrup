@@ -7,7 +7,7 @@
 
 namespace Keboola\Syrup\Tests\Monolog\Processor;
 
-use Keboola\Syrup\Encryption\CryptoWrapper;
+use Keboola\Syrup\Encryption\BaseWrapper;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Monolog\Processor\JobProcessor;
 use Keboola\Syrup\Service\ObjectEncryptor;
@@ -15,6 +15,11 @@ use Keboola\Syrup\Test\Monolog\TestCase;
 
 class JobProcessorTest extends TestCase
 {
+
+    public function setUp()
+    {
+        static::bootKernel();
+    }
 
     /**
      * @covers \Keboola\Syrup\Monolog\Processor\JobProcessor::__invoke
@@ -24,7 +29,8 @@ class JobProcessorTest extends TestCase
     public function testProcessor()
     {
         $processor = new JobProcessor();
-        $configEncryptor = new ObjectEncryptor(new CryptoWrapper(md5(uniqid())));
+        /** @var ObjectEncryptor $configEncryptor */
+        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
         $processor->setJob(new Job($configEncryptor, [
                 'id' => uniqid(),
                 'runId' => uniqid(),

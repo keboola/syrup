@@ -11,7 +11,6 @@ use Keboola\Encryption\EncryptorInterface;
 use Keboola\StorageApi\Client as SapiClient;
 use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Elasticsearch\Search;
-use Keboola\Syrup\Encryption\CryptoWrapper;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Keboola\Syrup\Job\Metadata\Job;
@@ -34,6 +33,11 @@ class SearchTest extends WebTestCase
     protected static $index;
     /** @var JobMapper */
     protected static $jobMapper;
+
+    public function setUp()
+    {
+        self::bootKernel();
+    }
 
     public static function setUpBeforeClass()
     {
@@ -71,8 +75,9 @@ class SearchTest extends WebTestCase
     private function createJob()
     {
         $tokenData = self::$sapiClient->verifyToken();
-
-        return new Job(new ObjectEncryptor(new CryptoWrapper(md5(uniqid()))), [
+        /** @var ObjectEncryptor $configEncryptor */
+        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
+        return new Job($configEncryptor, [
                 'id'        => self::$sapiClient->generateId(),
                 'runId'     => self::$sapiClient->generateId(),
                 'project'   => [

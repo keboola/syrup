@@ -75,9 +75,11 @@ services:
         class: Keboola\Syrup\Encryption\Encryptor
         arguments: [%encryption_key%]
 
-    syrup.crypto_wrapper:
-        class: Keboola\Syrup\Encryption\CryptoWrapper
+    syrup.encryption.base_wrapper:
+        class: Keboola\Syrup\Encryption\BaseWrapper
         arguments: [%encryption_key%]
+        tags:
+            - { name: syrup.encryption.wrapper }
 
     syrup.elasticsearch.client:
         class: Elasticsearch\Client
@@ -112,4 +114,4 @@ services:
 
     syrup.object_encryptor:
         class: Keboola\Syrup\Service\ObjectEncryptor
-        arguments: [@syrup.crypto_wrapper]
+        arguments: [@service_container]

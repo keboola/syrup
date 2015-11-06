@@ -8,13 +8,11 @@
 namespace Keboola\Syrup\Test;
 
 use Keboola\Syrup\Elasticsearch\JobMapper;
-use Keboola\Syrup\Encryption\CryptoWrapper;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Keboola\StorageApi\Client as StorageApiClient;
-use Symfony\Component\Console\Tester\CommandTester;
 
 class CommandTestCase extends WebTestCase
 {
@@ -66,7 +64,9 @@ class CommandTestCase extends WebTestCase
             ->get('syrup.encryptor')
             ->encrypt($this->storageApiToken);
 
-        return new Job(new ObjectEncryptor(new CryptoWrapper(md5(uniqid()))), [
+        /** @var ObjectEncryptor $configEncryptor */
+        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
+        return new Job($configEncryptor, [
                 'id' => $this->storageApiClient->generateId(),
                 'runId' => $this->storageApiClient->generateId(),
                 'project' => [

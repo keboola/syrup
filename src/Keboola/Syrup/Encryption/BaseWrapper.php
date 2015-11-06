@@ -6,10 +6,9 @@
 
 namespace Keboola\Syrup\Encryption;
 
-use Keboola\Encryption\EncryptorInterface;
 use Keboola\Syrup\Exception\ApplicationException;
 
-class CryptoWrapper implements EncryptorInterface
+class BaseWrapper implements CryptoWrapperInterface
 {
     /** @var \Crypto */
     protected $encryptor;
@@ -86,5 +85,13 @@ class CryptoWrapper implements EncryptorInterface
     public function decrypt($encryptedData)
     {
         return $this->getEncryptor()->Decrypt(base64_decode($encryptedData), $this->getKey());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPrefix()
+    {
+        return 'KBC::Encrypted==';
     }
 }
