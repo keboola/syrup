@@ -137,9 +137,8 @@ class ObjectEncryptor
      */
     protected function encryptValue($value, CryptoWrapperInterface $wrapper)
     {
-        // return self if already encrypted with the same wrapper
-        $selectedWrapper = $this->findWrapper($value);
-        if ($selectedWrapper == $wrapper) {
+        // return self if already encrypted with any wrapper
+        if ($this->findWrapper($value)) {
             return $value;
         }
 

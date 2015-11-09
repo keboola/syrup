@@ -204,8 +204,8 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("KBC::MockCryptoWrapper==" . $secret, $encryptedValue);
 
         $encryptedSecond = $encryptor->encrypt($encryptedValue);
-        $this->assertEquals("KBC::Encrypted==", substr($encryptedSecond, 0, 16));
-        $this->assertEquals($encryptedValue, $encryptor->decrypt($encryptedSecond));
+        $this->assertEquals("KBC::MockCryptoWrapper==" . $secret, $encryptedSecond);
+        $this->assertEquals($secret, $encryptor->decrypt($encryptedSecond));
     }
 
     public function testInvalidWrapper()
