@@ -372,6 +372,6 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('exceptionId', $result);
         $this->assertArrayHasKey('message', $result);
         $this->assertArrayHasKey('runId', $result);
-        $this->assertEquals('User error: Incorrect Content-Type.', $result["message"]);
+        $this->assertEquals('Incorrect Content-Type.', $result["message"]);
     }
 }
