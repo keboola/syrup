@@ -2,6 +2,7 @@
 
 namespace Keboola\Syrup\Monolog\Processor;
 
+use Keboola\StorageApi\Exception as SapiException;
 use Keboola\Syrup\Debug\Exception\FlattenException;
 use Keboola\Syrup\Debug\ExceptionHandler;
 use Keboola\Syrup\Aws\S3\Uploader;
@@ -33,6 +34,7 @@ class SyslogProcessor
             $this->tokenData = $storageApiClient->getLogData();
             $this->runId = $storageApiClient->getRunId();
         } catch (SyrupComponentException $e) {
+        } catch (SapiException $e) {
         }
     }
 
