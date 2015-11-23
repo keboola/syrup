@@ -111,23 +111,10 @@ class SyslogProcessor
 
         $json = json_encode($record);
         if (strlen($json) > 1024) {
-            $r = [
-                'message' => strlen($record['message']) > 256 ? substr($record['message'], 0, 256) . '...' : $record['message'],
-                'component' => $this->componentName,
-                'runId' => $this->runId,
-                'pid' => getmypid(),
-                'priority' => $record['level_name'],
-                'level_name' => $record['level_name'],
-                'level' => $record['level'],
-                'attachment' => $this->s3Uploader->uploadString('log', $json, 'text/json')
-            ];
-            if (isset($record['exceptionId'])) {
-                $r['exceptionId'] = $record['exceptionId'];
+            if (strlen($record['message']) > 256) {
+                $record['message'] = mb_substr($record['message'], 0, 256);
             }
-            if (isset($record['app'])) {
-                $r['app'] = $record['app'];
-            }
-            $record = $r;
+            $record['attachment'] = $this->s3Uploader->uploadString('log', $json, 'text/json');
         }
 
         return $record;
