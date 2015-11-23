@@ -90,13 +90,15 @@ class SyslogProcessorTest extends TestCase
         $storageApiService = new StorageApiService();
         $storageApiService->setRequest($request);
 
-        $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000));
+        $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000), ['exceptionId' => '1234']);
         $record['runId'] = '123456789';
         $record['component'] = 'fooBar';
         $processor = new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
         $newRecord = $processor($record);
         $this->assertArrayHasKey('attachment', $newRecord);
         $this->assertEquals($record['component'], $newRecord['component']);
+        $this->assertNotEmpty($newRecord['runId']);
+        $this->assertEquals('1234', $newRecord['exceptionId']);
         $this->assertLessThan(strlen($record['message']), strlen($newRecord['message']));
     }
 
