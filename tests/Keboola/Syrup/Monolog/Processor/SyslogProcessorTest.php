@@ -75,4 +75,23 @@ class SyslogProcessorTest extends TestCase
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertEquals('fooBar', $newRecord['component']);
     }
+
+    public function testProcessorInitInvalidToken()
+    {
+        $s3Uploader = new Uploader([
+            'aws-access-key' => SYRUP_AWS_KEY,
+            'aws-secret-key' => SYRUP_AWS_SECRET,
+            'aws-region' => SYRUP_AWS_REGION,
+            's3-upload-path' => SYRUP_S3_BUCKET
+        ]);
+
+        $request = new Request();
+        $request->headers->add(['x-storageapi-token' => 'invalid']);
+        $storageApiService = new StorageApiService();
+        $storageApiService->setRequest($request);
+
+        $record = $this->getRecord();
+        $record['component'] = 'fooBar';
+        new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
+    }
 }

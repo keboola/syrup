@@ -237,6 +237,14 @@ class StorageApiHandlerTest extends TestCase
         $this->assertEquals('', $event['description']);
     }
 
+    public function testInitInvalidToken()
+    {
+        $request = new Request();
+        $request->headers->add(['x-storageapi-token' => 'invalid']);
+        $storageApiService = new StorageApiService();
+        $storageApiService->setRequest($request);
+        new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);
+    }
 
     private function initHandlerAndClient()
     {
