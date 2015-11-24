@@ -8,6 +8,7 @@
 namespace Keboola\Syrup\Tests\Monolog\Processor;
 
 use Keboola\Syrup\Aws\S3\Uploader;
+use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Keboola\Syrup\Monolog\Processor\SyslogProcessor;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
@@ -52,7 +53,6 @@ class SyslogProcessorTest extends TestCase
 
     /**
      * Test that explicitly provided component name is honored.
-     * @covers \Keboola\Syrup\Monolog\Processor\SyslogProcessor::processRecord
      */
     public function testProcessorExplicitComponent()
     {
@@ -75,6 +75,33 @@ class SyslogProcessorTest extends TestCase
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertEquals('fooBar', $newRecord['component']);
     }
+
+    public function testProcessorLongMessage()
+    {
+        $s3Uploader = new Uploader([
+            'aws-access-key' => SYRUP_AWS_KEY,
+            'aws-secret-key' => SYRUP_AWS_SECRET,
+            'aws-region' => SYRUP_AWS_REGION,
+            's3-upload-path' => SYRUP_S3_BUCKET
+        ]);
+
+        $request = new Request();
+        $request->headers->add(['x-storageapi-token' => SYRUP_SAPI_TEST_TOKEN]);
+        $storageApiService = new StorageApiService();
+        $storageApiService->setRequest($request);
+
+        $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000), ['exceptionId' => '1234']);
+        $record['runId'] = '123456789';
+        $record['component'] = 'fooBar';
+        $processor = new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
+        $newRecord = $processor($record);
+        $this->assertArrayHasKey('attachment', $newRecord);
+        $this->assertEquals($record['component'], $newRecord['component']);
+        $this->assertNotEmpty($newRecord['runId']);
+        $this->assertEquals('1234', $newRecord['exceptionId']);
+        $this->assertLessThan(strlen($record['message']), strlen($newRecord['message']));
+    }
+
 
     public function testProcessorInitInvalidToken()
     {
