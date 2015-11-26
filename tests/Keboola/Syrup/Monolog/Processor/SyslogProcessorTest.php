@@ -265,4 +265,17 @@ class SyslogProcessorTest extends TestCase
         $this->assertEquals('fooBar', $newRecord['component']);
         $this->assertEquals('baz', $newRecord['app']);
     }
+
+    public function testProcessorExplicitComponentLong()
+    {
+        $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000));
+        $record['component'] = 'fooBar';
+        $record['app'] = 'baz';
+        $processor = $this->getSysLogProcessor();
+        $newRecord = $processor($record);
+        $this->assertArrayHasKey('component', $newRecord);
+        $this->assertArrayHasKey('app', $newRecord);
+        $this->assertEquals('fooBar', $newRecord['component']);
+        $this->assertEquals('baz', $newRecord['app']);
+    }
 }

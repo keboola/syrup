@@ -106,7 +106,7 @@ class SyslogProcessor
                 $record['message'] = mb_substr($record['message'], 0, 256);
             }
             $allowedFields = ['message', 'component', 'runId', 'pid', 'priority', 'level', 'attachment',
-                'exception', 'exceptionId', 'token', 'cliCommand', 'http', 'job'];
+                'exception', 'exceptionId', 'token', 'cliCommand', 'http', 'job', 'app'];
             foreach (array_keys($record) as $fieldName) {
                 if (!in_array($fieldName, $allowedFields)) {
                     unset($record[$fieldName]);
