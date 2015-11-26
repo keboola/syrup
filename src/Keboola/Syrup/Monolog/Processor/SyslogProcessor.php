@@ -80,12 +80,10 @@ class SyslogProcessor
 
         if (isset($record['context']['exceptionId'])) {
             $record['exceptionId'] = $record['context']['exceptionId'];
-            unset($record['context']['exceptionId']);
         }
         if (isset($record['context']['exception'])) {
             /** @var \Exception $e */
             $e = $record['context']['exception'];
-            unset($record['context']['exception']);
             if ($e instanceof \Exception) {
                 $flattenException = FlattenException::create($e);
                 $eHandler = new ExceptionHandler(true);
@@ -99,24 +97,38 @@ class SyslogProcessor
             }
         }
 
-        if (isset($record['context']['data']) && !count($record['context']['data'])) {
-            unset($record['context']['data']);
-        }
-        if (!count($record['extra'])) {
-            unset($record['extra']);
-        }
-        if (!count($record['context'])) {
-            unset($record['context']);
-        }
-
         $json = json_encode($record);
-        if (strlen($json) > 1024) {
-            if (strlen($record['message']) > 256) {
+        if (strlen($json) < 1024) {
+            return $record;
+        } else {
+            $record['attachment'] = $this->s3Uploader->uploadString('log', $json, 'text/json');
+            if (mb_strlen($record['message']) > 256) {
                 $record['message'] = mb_substr($record['message'], 0, 256);
             }
-            $record['attachment'] = $this->s3Uploader->uploadString('log', $json, 'text/json');
+            $allowedFields = ['message', 'component', 'runId', 'pid', 'priority', 'level', 'attachment',
+                'exception', 'exceptionId', 'token', 'cliCommand', 'http', 'job'];
+            foreach (array_keys($record) as $fieldName) {
+                if (!in_array($fieldName, $allowedFields)) {
+                    unset($record[$fieldName]);
+                }
+            }
+            if (isset($record['http'])) {
+                $allowedFields = ['url', 'userAgent', 'ip'];
+                foreach (array_keys($record['http']) as $fieldName) {
+                    if (!in_array($fieldName, $allowedFields)) {
+                        unset($record['http'][$fieldName]);
+                    }
+                }
+            }
+            if (isset($record['job'])) {
+                $allowedFields = ['id'];
+                foreach (array_keys($record['job']) as $fieldName) {
+                    if (!in_array($fieldName, $allowedFields)) {
+                        unset($record['job'][$fieldName]);
+                    }
+                }
+            }
+            return $record;
         }
-
-        return $record;
     }
 }
