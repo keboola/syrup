@@ -223,7 +223,6 @@ class JobCommand extends ContainerAwareCommand
             $this->job->setStatus($jobStatus);
             $this->job->setResult($jobResult);
             $this->job->setError(Job::ERROR_APPLICATION);
-            $this->jobMapper->update($this->job);
 
             // try to log the exception
             $exceptionId = $this->logException('critical', $e);
