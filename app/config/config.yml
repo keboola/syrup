@@ -62,6 +62,16 @@ doctrine:
                 charset:  UTF8
                 logging: false
                 profiling: false
+            limit_lock:
+                driver:   %locks_db.driver%
+                host:     %locks_db.host%
+                port:     %locks_db.port%
+                dbname:   %locks_db.name%
+                user:     %locks_db.user%
+                password: %locks_db.password%
+                charset:  UTF8
+                logging: false
+                profiling: false
     orm:
         default_entity_manager: ~
         entity_managers:

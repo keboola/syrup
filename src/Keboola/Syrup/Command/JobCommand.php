@@ -10,8 +10,10 @@ namespace Keboola\Syrup\Command;
 
 use Doctrine\DBAL\Connection;
 use Keboola\Encryption\EncryptorInterface;
+use Keboola\Syrup\Elasticsearch\Search;
 use Keboola\Syrup\Exception\MaintenanceException;
 use Keboola\Syrup\Job\ExecutorFactory;
+use Keboola\Syrup\Service\StorageApi\Limits;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,6 +30,7 @@ use Keboola\Syrup\Job\HookExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\Db\Lock;
 use Keboola\Syrup\Elasticsearch\JobMapper;
+use Keboola\Syrup\Service\StorageApi\Limits as StorageApiLimits;
 
 class JobCommand extends ContainerAwareCommand
 {
@@ -136,6 +139,37 @@ class JobCommand extends ContainerAwareCommand
             return self::STATUS_LOCK;
         }
 
+        /** @var Connection $checkConn */
+        $checkConn = null;
+        /** @var Lock $validationLock */
+        $validationLock = null;
+        if (StorageApiLimits::hasParallelLimit($this->sapiClient)) {
+            try {
+                $checkConn = $this->getContainer()->get('doctrine.dbal.limit_lock_connection');
+                $checkConn->exec('SET wait_timeout = 31536000;');
+
+                $validationLock = new Lock(
+                    $checkConn,
+                    sprintf('syrup-%s-job-limit-check', $this->job->getProject()['id'])
+                );
+
+                if (!$validationLock->lock(3)) {
+                    throw new \RuntimeException('Could not lock for parallel validation');
+                }
+
+                if ($this->isParallelLimitExceeded()) {
+                    throw new \RuntimeException('Exceeded parallel processing limit');
+                }
+            } catch (\Exception $e) {
+                if (!$e instanceof \RuntimeException) {
+                    $this->logException('error', $e);
+                }
+
+                return self::STATUS_LOCK;
+            }
+        }
+
+
         // check job status
         $this->job = $this->jobMapper->get($jobId);
 
@@ -169,6 +203,11 @@ class JobCommand extends ContainerAwareCommand
 
         // Execute job
         try {
+            if (StorageApiLimits::hasParallelLimit($this->sapiClient)) {
+                $validationLock->unlock();
+                $checkConn->close();
+            }
+
             $jobResult = $jobExecutor->execute($this->job);
             $jobStatus = Job::STATUS_SUCCESS;
             $status = self::STATUS_SUCCESS;
@@ -283,5 +322,65 @@ class JobCommand extends ContainerAwareCommand
         $this->logger->$level($exception->getMessage(), $logData);
 
         return $exceptionId;
+    }
+
+    private function isParallelLimitExceeded()
+    {
+        // skip validation for components without limit
+        if (in_array($this->job->getComponent(), Limits::unlimitedComponents())) {
+            return false;
+        }
+
+        $maxLimit = Limits::getParallelLimit($this->sapiClient);
+
+        /** @var Search $elasticSearch */
+        $elasticSearch = $this->getContainer()->get('syrup.elasticsearch.search');
+
+        $jobs = array_filter(
+            $elasticSearch->getJobs(array(
+                'projectId' => $this->job->getProject()['id'],
+                'query' => sprintf(
+                    'status:%s OR status:%s',
+                    Job::STATUS_PROCESSING,
+                    Job::STATUS_TERMINATING
+                ),
+            )),
+            function ($job) {
+                return !in_array($job['component'], Limits::unlimitedComponents());
+            }
+        );
+
+        if (count($jobs) < $maxLimit) {
+            return false;
+        }
+
+        if ($this->job->getNestingLevel() >= 1) {
+            $runIds = explode('.', $this->job->getRunId());
+            unset($runIds[count($runIds) - 1]);
+
+            $jobs = array_filter(
+                $elasticSearch->getJobs(array(
+                    'projectId' => $this->job->getProject()['id'],
+                    'query' => sprintf(
+                        '(status:%s OR status:%s) AND runId:%s.* AND nestingLevel:%s',
+                        Job::STATUS_PROCESSING,
+                        Job::STATUS_TERMINATING,
+                        implode('.', $runIds),
+                        $this->job->getNestingLevel()
+                    ),
+                )),
+                function ($job) {
+                    return !in_array($job['component'], Limits::unlimitedComponents());
+                }
+            );
+
+            if (!count($jobs)) {
+                return false;
+            }
+
+            //@FIXME log validation
+        }
+
+        return true;
     }
 }
