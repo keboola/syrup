@@ -321,10 +321,9 @@ class JobCommand extends ContainerAwareCommand
 
     private function isParallelLimitExceeded()
     {
-        $this->logger->debug('isParallelLimitExceeded');
         // skip validation for components without limit
         if (in_array($this->job->getComponent(), Limits::unlimitedComponents())) {
-            $this->logger->debug('isParallelLimitExceeded - OK - unlimited component');
+            $this->logger->debug('isParallelLimitExceeded - NO - unlimited component');
             return false;
         }
 
@@ -348,7 +347,7 @@ class JobCommand extends ContainerAwareCommand
         );
 
         if (count($jobs) < $maxLimit) {
-            $this->logger->debug('isParallelLimitExceeded - OK - free workers ' . ($maxLimit - count($jobs)));
+            $this->logger->debug('isParallelLimitExceeded - NO - free workers ' . ($maxLimit - count($jobs)));
             return false;
         }
 
@@ -375,13 +374,11 @@ class JobCommand extends ContainerAwareCommand
             );
 
             if (!count($jobs)) {
-                $this->logger->debug('isParallelLimitExceeded - OK - free at nesting level');
+                $this->logger->debug('isParallelLimitExceeded - NO - free at nesting level');
                 return false;
             }
-
-            //@FIXME log validation
         }
-        $this->logger->debug('isParallelLimitExceeded - DONE - any free worker');
+        $this->logger->debug('isParallelLimitExceeded - YES - any free worker');
 
         return true;
     }
