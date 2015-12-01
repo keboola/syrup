@@ -39,6 +39,8 @@ class JobCommand extends ContainerAwareCommand
     const STATUS_LOCK = 64;
     const STATUS_RETRY = 65;
 
+    const PARALLEL_LIMIT_LOCK_TIMEOUT = 3;
+
     /** @var Job */
     protected $job;
 
@@ -148,18 +150,14 @@ class JobCommand extends ContainerAwareCommand
                     sprintf('syrup-%s-job-limit-check', $this->job->getProject()['id'])
                 );
 
-                if (!$validationLock->lock(3)) {
+                if (!$validationLock->lock(self::PARALLEL_LIMIT_LOCK_TIMEOUT)) {
                     throw new \RuntimeException('Could not lock for parallel validation');
                 }
 
                 if ($this->isParallelLimitExceeded()) {
                     throw new \RuntimeException('Exceeded parallel processing limit');
                 }
-            } catch (\Exception $e) {
-                if (!$e instanceof \RuntimeException) {
-                    $this->logException('error', $e);
-                }
-
+            } catch (\RuntimeException $e) {
                 return self::STATUS_LOCK;
             }
         }
@@ -332,19 +330,23 @@ class JobCommand extends ContainerAwareCommand
         /** @var Search $elasticSearch */
         $elasticSearch = $this->getContainer()->get('syrup.elasticsearch.search');
 
-        $jobs = array_filter(
-            $elasticSearch->getJobs(array(
-                'projectId' => $this->job->getProject()['id'],
-                'query' => sprintf(
+        $jobs = $elasticSearch->getJobs(array(
+            'projectId' => $this->job->getProject()['id'],
+            'query' => sprintf(
+                '(%s) AND (%s)',
+                sprintf(
                     'status:%s OR status:%s',
                     Job::STATUS_PROCESSING,
                     Job::STATUS_TERMINATING
                 ),
-            )),
-            function ($job) {
-                return !in_array($job['component'], Limits::unlimitedComponents());
-            }
-        );
+                implode(' OR ', array_map(
+                    function ($name) {
+                        return '-component:' . $name;
+                    },
+                    Limits::unlimitedComponents()
+                ))
+            ),
+        ));
 
         if (count($jobs) < $maxLimit) {
             $this->logger->debug('isParallelLimitExceeded - NO - free workers ' . ($maxLimit - count($jobs)));
@@ -357,21 +359,31 @@ class JobCommand extends ContainerAwareCommand
             $runIds = explode('.', $this->job->getRunId());
             unset($runIds[count($runIds) - 1]);
 
-            $jobs = array_filter(
-                $elasticSearch->getJobs(array(
-                    'projectId' => $this->job->getProject()['id'],
-                    'query' => sprintf(
-                        '(status:%s OR status:%s) AND runId:%s.* AND nestingLevel:%s',
+            $jobs = $elasticSearch->getJobs(array(
+                'projectId' => $this->job->getProject()['id'],
+                'query' => sprintf(
+                    '(%s) AND (%s) AND (%s) AND (%s)',
+                    sprintf(
+                        'status:%s OR status:%s',
                         Job::STATUS_PROCESSING,
-                        Job::STATUS_TERMINATING,
-                        implode('.', $runIds),
-                        $this->job->getNestingLevel()
+                        Job::STATUS_TERMINATING
                     ),
-                )),
-                function ($job) {
-                    return !in_array($job['component'], Limits::unlimitedComponents());
-                }
-            );
+                    implode(' OR ', array_map(
+                        function ($name) {
+                            return '-component:' . $name;
+                        },
+                        Limits::unlimitedComponents()
+                    )),
+                    sprintf(
+                        'runId:%s.*',
+                        implode('.', $runIds)
+                    ),
+                    sprintf(
+                        'nestingLevel:%s',
+                        $this->job->getNestingLevel()
+                    )
+                ),
+            ));
 
             if (!count($jobs)) {
                 $this->logger->debug('isParallelLimitExceeded - NO - free at nesting level');
