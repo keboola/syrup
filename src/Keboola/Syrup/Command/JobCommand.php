@@ -344,7 +344,7 @@ class JobCommand extends ContainerAwareCommand
                     Job::STATUS_PROCESSING,
                     Job::STATUS_TERMINATING
                 ),
-                implode(' OR ', array_map(
+                implode(' AND ', array_map(
                     function ($name) {
                         return '-component:' . $name;
                     },
@@ -373,7 +373,7 @@ class JobCommand extends ContainerAwareCommand
                         Job::STATUS_PROCESSING,
                         Job::STATUS_TERMINATING
                     ),
-                    implode(' OR ', array_map(
+                    implode(' AND ', array_map(
                         function ($name) {
                             return '-component:' . $name;
                         },
