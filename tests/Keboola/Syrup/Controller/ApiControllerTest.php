@@ -34,7 +34,6 @@ class ApiControllerTest extends WebTestCase
         $request = Request::create('/syrup/run', 'POST');
         $request->headers->set('X-StorageApi-Token', $container->getParameter('storage_api.test.token'));
 
-        $container->enterScope('request');
         $container->set('request', $request);
 
         $this->controller = new ApiController();

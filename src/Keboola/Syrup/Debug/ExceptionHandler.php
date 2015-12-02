@@ -250,10 +250,17 @@ EOF;
         return htmlspecialchars($str, ENT_QUOTES | (PHP_VERSION_ID >= 50400 ? ENT_SUBSTITUTE : 0), 'UTF-8');
     }
 
-    public function getHtml(FlattenException $flattenException)
+    /**
+     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
+     */
+    public function getHtml($exception)
     {
-        $css = $this->getStylesheet($flattenException);
-        $content = $this->getContent($flattenException);
+        if (!$exception instanceof FlattenException) {
+            $exception = FlattenException::create($exception);
+        }
+
+        $css = $this->getStylesheet($exception);
+        $content = $this->getContent($exception);
         return <<<EOF
 <!DOCTYPE html>
 <html>
