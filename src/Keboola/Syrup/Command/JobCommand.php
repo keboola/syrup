@@ -97,7 +97,6 @@ class JobCommand extends ContainerAwareCommand
         $logProcessor->setRunId($this->job->getRunId());
         $logProcessor->setTokenData($this->sapiClient->getLogData());
 
-
         // Lock DB
         /** @var Connection $conn */
         $conn = $this->getContainer()->get('doctrine.dbal.lock_connection');

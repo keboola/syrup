@@ -70,10 +70,6 @@ class JobCleanupCommand extends ContainerAwareCommand
         $storageApiService = $this->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient($this->sapiClient);
 
-        /** @var \Keboola\Syrup\Monolog\Handler\StorageApiHandler $logHandler */
-        $logHandler = $this->getContainer()->get('syrup.monolog.sapi_handler');
-        $logHandler->setStorageApiClient($this->sapiClient);
-
         /** @var \Keboola\Syrup\Monolog\Processor\JobProcessor $logProcessor */
         $logProcessor = $this->getContainer()->get('syrup.monolog.job_processor');
         $logProcessor->setJob($this->job);
@@ -82,7 +78,6 @@ class JobCleanupCommand extends ContainerAwareCommand
         $logProcessor = $this->getContainer()->get('syrup.monolog.syslog_processor');
         $logProcessor->setRunId($this->job->getRunId());
         $logProcessor->setTokenData($this->sapiClient->getLogData());
-
 
         // Lock DB
         /** @var Connection $conn */

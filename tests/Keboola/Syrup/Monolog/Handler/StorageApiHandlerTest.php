@@ -32,14 +32,14 @@ class StorageApiHandlerTest extends TestCase
         $request->headers->add(['x-storageapi-token' => SYRUP_SAPI_TEST_TOKEN]);
         $requestStack = new RequestStack();
         $requestStack->push($request);
+
         $storageApiService = new StorageApiService('https://connection.keboola.com', $requestStack);
         $client = $storageApiService->getClient();
         $events = $client->listEvents(['q' => 'message: infoMessage + runId:' . $client->getRunId()]);
         // nothing is logged, because SAPI client was not initialized
         $this->assertEquals(0, count($events));
 
-        $handler->setStorageApiClient($storageApiService->getClient());
-
+        $handler = new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);
         $record = $this->getRecord(Logger::INFO, 'infoMessage', ['exceptionId' => '123', 'job' => '345']);
         $record['component'] = 'fooBar';
         $record['http'] = 'fooBaz';
