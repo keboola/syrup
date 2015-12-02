@@ -87,7 +87,7 @@ class ApiController extends BaseController
         $response = new Response();
         $response->headers->set('Accept', 'application/json');
         $response->headers->set('Access-Control-Allow-Origin', '*');
-        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'content-type, x-requested-with, x-requested-by, '
             . 'x-storageapi-url, x-storageapi-token, x-kbc-runid, x-user-agent');
         $response->headers->set('Access-Control-Max-Age', '86400');
@@ -107,12 +107,11 @@ class ApiController extends BaseController
     public function encryptAction(Request $request)
     {
         $encryptor = $this->container->get("syrup.object_encryptor");
-        $contentType = $request->headers->get('Content-type');
-        $contentType = strtolower(trim(explode(';', $contentType)[0]));
-        if ($contentType == "text/plain") {
+
+        if ($request->headers->contains("Content-Type", "text/plain")) {
             $encryptedValue = $encryptor->encrypt($request->getContent());
             return $this->createResponse($encryptedValue, 200, ["Content-Type" => "text/plain"]);
-        } elseif ($contentType == "application/json") {
+        } elseif ($request->headers->contains("Content-Type", "application/json")) {
             $params = $this->getPostJson($request);
             $encryptedValue = $encryptor->encrypt($params);
             return $this->createJsonResponse($encryptedValue, 200, ["Content-Type" => "application/json"]);
