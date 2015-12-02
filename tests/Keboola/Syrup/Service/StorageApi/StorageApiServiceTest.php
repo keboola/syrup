@@ -23,7 +23,7 @@ class StorageApiServiceTest extends WebTestCase
 
         $request = Request::create('/ex-dummy/run', 'POST');
         $request->headers->set('X-StorageApi-Token', $container->getParameter('storage_api.test.token'));
-        $container->set('request', $request);
+        $container->get('request_stack')->push($request);
 
         /** @var StorageApiService $storageApiService */
         $storageApiService = $container->get('syrup.storage_api');

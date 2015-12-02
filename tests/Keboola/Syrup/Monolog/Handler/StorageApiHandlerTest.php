@@ -13,6 +13,7 @@ use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
 use Keboola\Syrup\Test\Monolog\TestCase;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class StorageApiHandlerTest extends TestCase
 {
@@ -29,8 +30,9 @@ class StorageApiHandlerTest extends TestCase
 
         $request = new Request();
         $request->headers->add(['x-storageapi-token' => SYRUP_SAPI_TEST_TOKEN]);
-        $storageApiService = new StorageApiService();
-        $storageApiService->setRequest($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $storageApiService = new StorageApiService('https://connection.keboola.com', $requestStack);
         $client = $storageApiService->getClient();
         $events = $client->listEvents(['q' => 'message: infoMessage + runId:' . $client->getRunId()]);
         // nothing is logged, because SAPI client was not initialized
@@ -241,8 +243,9 @@ class StorageApiHandlerTest extends TestCase
     {
         $request = new Request();
         $request->headers->add(['x-storageapi-token' => 'invalid']);
-        $storageApiService = new StorageApiService();
-        $storageApiService->setRequest($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $storageApiService = new StorageApiService('https://connection.keboola.com', $requestStack);
         new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);
     }
 
@@ -250,10 +253,10 @@ class StorageApiHandlerTest extends TestCase
     {
         $request = new Request();
         $request->headers->add(['x-storageapi-token' => SYRUP_SAPI_TEST_TOKEN]);
-        $storageApiService = new StorageApiService();
-        $storageApiService->setRequest($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $storageApiService = new StorageApiService('https://connection.keboola.com', $requestStack);
         $client = $storageApiService->getClient();
-
         $handler = new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);
         return [$client, $handler];
     }

@@ -8,11 +8,10 @@
 namespace Keboola\Syrup\Service\StorageApi;
 
 use Keboola\StorageApi\Client;
-use Keboola\StorageApi\ClientException;
-use Keboola\Syrup\Exception\SyrupComponentException;
 use Symfony\Component\HttpFoundation\Request;
 use Keboola\Syrup\Exception\NoRequestException;
 use Keboola\Syrup\Exception\UserException;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class StorageApiService
 {
@@ -24,12 +23,20 @@ class StorageApiService
 
     protected $storageApiUrl;
 
-    public function __construct($storageApiUrl = 'https://connection.keboola.com')
+    public function __construct($storageApiUrl = 'https://connection.keboola.com', RequestStack $requestStack = null)
     {
         $this->storageApiUrl = $storageApiUrl;
+        if ($requestStack == null) {
+            $requestStack = new RequestStack();
+        }
+        $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function setRequest($request = null)
+    /**
+     * @deprecated request should be injected via requestStack in constructor
+     * @param $request
+     */
+    public function setRequest($request)
     {
         $this->request = $request;
     }

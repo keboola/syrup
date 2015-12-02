@@ -9,6 +9,7 @@ namespace Keboola\Syrup\Tests\Listener;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Keboola\Syrup\Controller\ApiController;
@@ -26,7 +27,10 @@ class SyrupControllerListenerTest extends WebTestCase
 
         $request = Request::create('/syrup/run', 'POST');
         $request->headers->set('X-StorageApi-Token', SYRUP_SAPI_TEST_TOKEN);
-        $client->getContainer()->set('request', $request);
+
+        /** @var RequestStack $requestStack */
+        $requestStack = $client->getContainer()->get('request_stack');
+        $requestStack->push($request);
 
         $controller = new ApiController();
         $controller->setContainer($client->getContainer());
