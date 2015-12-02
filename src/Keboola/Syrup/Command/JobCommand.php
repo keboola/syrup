@@ -10,8 +10,10 @@ namespace Keboola\Syrup\Command;
 
 use Doctrine\DBAL\Connection;
 use Keboola\Encryption\EncryptorInterface;
+use Keboola\Syrup\Elasticsearch\Search;
 use Keboola\Syrup\Exception\MaintenanceException;
 use Keboola\Syrup\Job\ExecutorFactory;
+use Keboola\Syrup\Service\StorageApi\Limits;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,6 +30,7 @@ use Keboola\Syrup\Job\HookExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\Db\Lock;
 use Keboola\Syrup\Elasticsearch\JobMapper;
+use Keboola\Syrup\Service\StorageApi\Limits as StorageApiLimits;
 
 class JobCommand extends ContainerAwareCommand
 {
@@ -35,6 +38,8 @@ class JobCommand extends ContainerAwareCommand
     const STATUS_ERROR = 1;
     const STATUS_LOCK = 64;
     const STATUS_RETRY = 65;
+
+    const PARALLEL_LIMIT_LOCK_TIMEOUT = 3;
 
     /** @var Job */
     protected $job;
@@ -131,6 +136,33 @@ class JobCommand extends ContainerAwareCommand
             return self::STATUS_LOCK;
         }
 
+        /** @var Connection $checkConn */
+        $checkConn = null;
+        /** @var Lock $validationLock */
+        $validationLock = null;
+        if (StorageApiLimits::hasParallelLimit($this->sapiClient)) {
+            try {
+                $checkConn = $this->getContainer()->get('doctrine.dbal.limit_lock_connection');
+                $checkConn->exec('SET wait_timeout = 31536000;');
+
+                $validationLock = new Lock(
+                    $checkConn,
+                    sprintf('syrup-%s-job-limit-check', $this->job->getProject()['id'])
+                );
+
+                if (!$validationLock->lock(self::PARALLEL_LIMIT_LOCK_TIMEOUT)) {
+                    throw new \RuntimeException('Could not lock for parallel validation');
+                }
+
+                if ($this->isParallelLimitExceeded()) {
+                    throw new \RuntimeException('Exceeded parallel processing limit');
+                }
+            } catch (\RuntimeException $e) {
+                return self::STATUS_LOCK;
+            }
+        }
+
+
         // check job status
         $this->job = $this->jobMapper->get($jobId);
 
@@ -164,6 +196,11 @@ class JobCommand extends ContainerAwareCommand
 
         // Execute job
         try {
+            if (StorageApiLimits::hasParallelLimit($this->sapiClient)) {
+                $validationLock->unlock();
+                $checkConn->close();
+            }
+
             $jobResult = $jobExecutor->execute($this->job);
             $jobStatus = Job::STATUS_SUCCESS;
             $status = self::STATUS_SUCCESS;
@@ -278,5 +315,83 @@ class JobCommand extends ContainerAwareCommand
         $this->logger->$level($exception->getMessage(), $logData);
 
         return $exceptionId;
+    }
+
+    private function isParallelLimitExceeded()
+    {
+        // skip validation for components without limit
+        if (in_array($this->job->getComponent(), Limits::unlimitedComponents())) {
+            $this->logger->debug('isParallelLimitExceeded - NO - unlimited component');
+            return false;
+        }
+
+        $maxLimit = Limits::getParallelLimit($this->sapiClient);
+
+        /** @var Search $elasticSearch */
+        $elasticSearch = $this->getContainer()->get('syrup.elasticsearch.search');
+
+        $jobs = $elasticSearch->getJobs(array(
+            'projectId' => $this->job->getProject()['id'],
+            'query' => sprintf(
+                '(%s) AND (%s)',
+                sprintf(
+                    'status:%s OR status:%s',
+                    Job::STATUS_PROCESSING,
+                    Job::STATUS_TERMINATING
+                ),
+                implode(' AND ', array_map(
+                    function ($name) {
+                        return '-component:' . $name;
+                    },
+                    Limits::unlimitedComponents()
+                ))
+            ),
+        ));
+
+        if (count($jobs) < $maxLimit) {
+            $this->logger->debug('isParallelLimitExceeded - NO - free workers ' . ($maxLimit - count($jobs)));
+            return false;
+        }
+
+        $this->logger->debug('isParallelLimitExceeded - full workers ' . ($maxLimit - count($jobs)));
+
+        if ($this->job->getNestingLevel() >= 1) {
+            $runIds = explode('.', $this->job->getRunId());
+            unset($runIds[count($runIds) - 1]);
+
+            $jobs = $elasticSearch->getJobs(array(
+                'projectId' => $this->job->getProject()['id'],
+                'query' => sprintf(
+                    '(%s) AND (%s) AND (%s) AND (%s)',
+                    sprintf(
+                        'status:%s OR status:%s',
+                        Job::STATUS_PROCESSING,
+                        Job::STATUS_TERMINATING
+                    ),
+                    implode(' AND ', array_map(
+                        function ($name) {
+                            return '-component:' . $name;
+                        },
+                        Limits::unlimitedComponents()
+                    )),
+                    sprintf(
+                        'runId:%s.*',
+                        implode('.', $runIds)
+                    ),
+                    sprintf(
+                        'nestingLevel:%s',
+                        $this->job->getNestingLevel()
+                    )
+                ),
+            ));
+
+            if (!count($jobs)) {
+                $this->logger->debug('isParallelLimitExceeded - NO - free at nesting level');
+                return false;
+            }
+        }
+        $this->logger->debug('isParallelLimitExceeded - YES - any free worker');
+
+        return true;
     }
 }
