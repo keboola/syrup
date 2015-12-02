@@ -17,17 +17,25 @@ use Keboola\Syrup\Service\StorageApi\StorageApiService;
 
 class StorageApiHandler extends \Monolog\Handler\AbstractHandler
 {
-    /**
-     * @var \Keboola\StorageApi\Client
-     */
+    /** @var \Keboola\StorageApi\Client */
     protected $storageApiClient;
+
+    /** @var  StorageApiService */
+    protected $storageApiService;
+
     protected $appName;
 
     public function __construct($appName, StorageApiService $storageApiService)
     {
         $this->appName = $appName;
+        $this->storageApiService = $storageApiService;
+        parent::__construct();
+    }
+
+    protected function initStorageApiClient()
+    {
         try {
-            $this->storageApiClient = $storageApiService->getClient();
+            $this->storageApiClient = $this->storageApiService->getClient();
         } catch (NoRequestException $e) {
             // Ignore when no SAPI client setup
         } catch (UserException $e) {
@@ -37,6 +45,7 @@ class StorageApiHandler extends \Monolog\Handler\AbstractHandler
         }
     }
 
+    /** @deprecated StorageApiClient should be obtained via StorageApiService */
     public function setStorageApiClient(Client $client)
     {
         $this->storageApiClient = $client;
@@ -44,6 +53,8 @@ class StorageApiHandler extends \Monolog\Handler\AbstractHandler
 
     public function handle(array $record)
     {
+        $this->initStorageApiClient();
+
         if (!$this->storageApiClient || $record['level'] == Logger::DEBUG) {
             return false;
         }
