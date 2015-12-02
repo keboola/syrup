@@ -107,11 +107,12 @@ class ApiController extends BaseController
     public function encryptAction(Request $request)
     {
         $encryptor = $this->container->get("syrup.object_encryptor");
-
-        if ($request->headers->contains("Content-Type", "text/plain")) {
+        $contentType = $request->headers->get('Content-type');
+        $contentType = strtolower(trim(explode(';', $contentType)[0]));
+        if ($contentType == "text/plain") {
             $encryptedValue = $encryptor->encrypt($request->getContent());
             return $this->createResponse($encryptedValue, 200, ["Content-Type" => "text/plain"]);
-        } elseif ($request->headers->contains("Content-Type", "application/json")) {
+        } elseif ($contentType == "application/json") {
             $params = $this->getPostJson($request);
             $encryptedValue = $encryptor->encrypt($params);
             return $this->createJsonResponse($encryptedValue, 200, ["Content-Type" => "application/json"]);
