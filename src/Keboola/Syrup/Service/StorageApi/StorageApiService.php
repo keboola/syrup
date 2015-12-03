@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class StorageApiService
 {
+    /** @var RequestStack */
+    protected $requestStack;
+
     /** @var Request */
     protected $request;
 
@@ -29,7 +32,7 @@ class StorageApiService
         if ($requestStack == null) {
             $requestStack = new RequestStack();
         }
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -48,27 +51,33 @@ class StorageApiService
 
     public function getClient()
     {
+        if ($this->request != null) {
+            $request = $this->request;
+        } else {
+            $request = $this->requestStack->getCurrentRequest();
+        }
+
         if ($this->client == null) {
-            if ($this->request == null) {
+            if ($request == null) {
                 throw new NoRequestException();
             }
 
-            if (!$this->request->headers->has('X-StorageApi-Token')) {
+            if (!$request->headers->has('X-StorageApi-Token')) {
                 throw new UserException('Missing StorageAPI token');
             }
 
-            if ($this->request->headers->has('X-StorageApi-Url')) {
-                $this->storageApiUrl = $this->request->headers->get('X-StorageApi-Url');
+            if ($request->headers->has('X-StorageApi-Url')) {
+                $this->storageApiUrl = $request->headers->get('X-StorageApi-Url');
             }
 
             $this->client = new Client([
-                'token' => $this->request->headers->get('X-StorageApi-Token'),
+                'token' => $request->headers->get('X-StorageApi-Token'),
                 'url' => $this->storageApiUrl,
-                'userAgent' => explode('/', $this->request->getPathInfo())[1],
+                'userAgent' => explode('/', $request->getPathInfo())[1],
             ]);
 
-            if ($this->request->headers->has('X-KBC-RunId')) {
-                $kbcRunId = $this->client->generateRunId($this->request->headers->get('X-KBC-RunId'));
+            if ($request->headers->has('X-KBC-RunId')) {
+                $kbcRunId = $this->client->generateRunId($request->headers->get('X-KBC-RunId'));
             } else {
                 $kbcRunId = $this->client->generateRunId();
             }
