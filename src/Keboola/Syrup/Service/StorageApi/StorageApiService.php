@@ -87,10 +87,6 @@ class StorageApiService
                 throw new UserException('Missing StorageAPI token');
             }
 
-            if ($request->headers->has('X-StorageApi-Url')) {
-                $this->storageApiUrl = $request->headers->get('X-StorageApi-Url');
-            }
-
             $this->setClient(new Client([
                 'token' => $request->headers->get('X-StorageApi-Token'),
                 'url' => $this->storageApiUrl,
