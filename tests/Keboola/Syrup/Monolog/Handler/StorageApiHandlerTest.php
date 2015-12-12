@@ -259,6 +259,7 @@ class StorageApiHandlerTest extends TestCase
         $requestStack->push($request);
         $storageApiService = new StorageApiService('https://connection.keboola.com', $requestStack);
         $client = $storageApiService->getClient();
+        $client->setRunId(uniqid());
         $handler = new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);
         return [$client, $handler];
     }
