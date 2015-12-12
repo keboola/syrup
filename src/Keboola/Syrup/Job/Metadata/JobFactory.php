@@ -51,7 +51,7 @@ class JobFactory
         $tokenData = $this->storageApiClient->verifyToken();
         $job = new Job($this->configEncryptor, [
                 'id' => $this->storageApiClient->generateId(),
-                'runId' => $this->storageApiClient->getRunId(),
+                'runId' => $this->storageApiClient->generateRunId($this->storageApiClient->getRunId()),
                 'project' => [
                     'id' => $tokenData['owner']['id'],
                     'name' => $tokenData['owner']['name']

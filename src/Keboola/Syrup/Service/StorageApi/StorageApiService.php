@@ -98,12 +98,9 @@ class StorageApiService
             ]));
 
             if ($request->headers->has('X-KBC-RunId')) {
-                $kbcRunId = $this->client->generateRunId($request->headers->get('X-KBC-RunId'));
-            } else {
-                $kbcRunId = $this->client->generateRunId();
+                $this->client->setRunId($request->headers->get('X-KBC-RunId'));
             }
 
-            $this->client->setRunId($kbcRunId);
         }
 
         return $this->client;
