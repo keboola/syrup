@@ -35,6 +35,7 @@ class StorageApiHandlerTest extends TestCase
 
         $storageApiService = new StorageApiService('https://connection.keboola.com', $requestStack);
         $client = $storageApiService->getClient();
+        $client->setRunId(uniqid());
         $events = $client->listEvents(['q' => 'message: infoMessage + runId:' . $client->getRunId()]);
         // nothing is logged, because SAPI client was not initialized
         $this->assertEquals(0, count($events));
@@ -258,6 +259,7 @@ class StorageApiHandlerTest extends TestCase
         $requestStack->push($request);
         $storageApiService = new StorageApiService('https://connection.keboola.com', $requestStack);
         $client = $storageApiService->getClient();
+        $client->setRunId(uniqid());
         $handler = new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);
         return [$client, $handler];
     }
