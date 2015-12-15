@@ -60,8 +60,7 @@ class Job implements JobInterface
         'startTime' => null,
         'endTime' => null,
         'durationSeconds' => null,
-        'waitSeconds' => null,
-        'encrypted' => null
+        'waitSeconds' => null
     ];
 
     public function __construct(ObjectEncryptor $encryptor, array $data = [], $index = null, $type = null, $version = null)
@@ -81,10 +80,6 @@ class Job implements JobInterface
 
         if (isset($this->data['runId']) && isset($this->data['nestingLevel'])) {
             $this->data['nestingLevel'] = $this->calculateNestingLevel($this->data['runId']);
-        }
-
-        if (!isset($this->data['encrypted'])) {
-            $this->setEncrypted(false);
         }
 
         $this->index = $index;
@@ -130,7 +125,7 @@ class Job implements JobInterface
 
     public function isEncrypted()
     {
-        return $this->getProperty('encrypted');
+        return (bool) $this->getProperty('encrypted');
     }
 
     /**
