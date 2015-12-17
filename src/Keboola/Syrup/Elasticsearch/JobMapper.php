@@ -82,8 +82,6 @@ class JobMapper
             ]);
         }
 
-        //@todo: remove sleep in next (major) release
-        sleep(1);
         $i = 0;
         while ($i < 5) {
             $resJob = $this->get($job->getId());
@@ -137,8 +135,6 @@ class JobMapper
             $i++;
         }
 
-        //@todo: remove sleep in next (major) release
-        sleep(1);
         $i = 0;
         while ($i < 5) {
             $resJob = $this->get($job->getId());
@@ -169,7 +165,6 @@ class JobMapper
         }
 
         $i = 0;
-        $prevException = null;
         while ($i < 5) {
             try {
                 $result = $this->client->mget([
@@ -181,6 +176,8 @@ class JobMapper
                         return new Job($this->configEncryptor, $doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
                     }
                 }
+
+                return null;
             } catch (ServerErrorResponseException $e) {
                 // ES server error, try again
                 $this->log('error', 'Elastic server error response', [
@@ -188,17 +185,11 @@ class JobMapper
                     'jobId' => $jobId,
                     'exception' => $e
                 ]);
-
-                $prevException = $e;
             }
 
             sleep(1 + intval(pow(2, $i)/2));
             $i++;
         }
-
-        $this->log('alert', sprintf("Error getting job id '%s'", $jobId), [
-            'exception' => $prevException
-        ]);
 
         return null;
     }
