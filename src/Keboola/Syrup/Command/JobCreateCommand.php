@@ -64,7 +64,6 @@ class JobCreateCommand extends ContainerAwareCommand
         // Create new job
         /** @var JobFactory $jobFactory */
         $jobFactory = $this->getContainer()->get('syrup.job_factory');
-        $jobFactory->setStorageApiClient($this->storageApi);
         $job = $jobFactory->create($command, $params);
 
         // Add job to Elasticsearch

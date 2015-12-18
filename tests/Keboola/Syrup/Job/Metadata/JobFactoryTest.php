@@ -10,6 +10,7 @@ use Keboola\StorageApi\Client;
 use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Keboola\Syrup\Service\ObjectEncryptor;
+use Keboola\Syrup\Service\StorageApi\StorageApiService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class JobFactoryTest extends KernelTestCase
@@ -34,8 +35,10 @@ class JobFactoryTest extends KernelTestCase
         $encryptor = new Encryptor($key);
         /** @var ObjectEncryptor $configEncryptor */
         $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
-        $jobFactory = new JobFactory(SYRUP_APP_NAME, $encryptor, $configEncryptor);
-        $jobFactory->setStorageApiClient($storageApiClient);
+        /** @var StorageApiService $storageApiService */
+        $storageApiService = self::$kernel->getContainer()->get('syrup.storage_api');
+        $storageApiService->setClient($storageApiClient);
+        $jobFactory = new JobFactory(SYRUP_APP_NAME, $encryptor, $configEncryptor, $storageApiService);
 
         $command = uniqid();
         $param = uniqid();

@@ -10,33 +10,42 @@ namespace Keboola\Syrup\Job\Metadata;
 use Keboola\StorageApi\Client;
 use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Service\ObjectEncryptor;
+use Keboola\Syrup\Service\StorageApi\StorageApiService;
 
 class JobFactory
 {
-    /**
-     * @var Encryptor
-     */
+    /* @var Encryptor */
     protected $encryptor;
 
-    /**
-     * @var ObjectEncryptor
-     */
+    /* @var ObjectEncryptor */
     protected $configEncryptor;
 
     protected $componentName;
+
+    /** @var StorageApiService */
+    protected $storageApiService;
 
     /**
      * @var Client
      */
     protected $storageApiClient;
 
-    public function __construct($componentName, Encryptor $encryptor, ObjectEncryptor $configEncryptor)
-    {
+    public function __construct(
+        $componentName,
+        Encryptor $encryptor,
+        ObjectEncryptor $configEncryptor,
+        StorageApiService $storageApiService = null
+    ) {
         $this->encryptor = $encryptor;
         $this->configEncryptor = $configEncryptor;
         $this->componentName = $componentName;
+        $this->storageApiService = $storageApiService;
     }
 
+    /**
+     * @deprecated StorageApi Client should be set via StorageApiService
+     * @param Client $storageApiClient
+     */
     public function setStorageApiClient(Client $storageApiClient)
     {
         $this->storageApiClient = $storageApiClient;
@@ -44,11 +53,14 @@ class JobFactory
 
     public function create($command, array $params = [], $lockName = null)
     {
-        if (!$this->storageApiClient) {
-            throw new \Exception('Storage API client must be set');
+        //@todo remove after setStorageApiClient method is removed
+        if ($this->storageApiClient == null) {
+            $this->storageApiClient = $this->storageApiService->getClient();
+            $tokenData = $this->storageApiService->getTokenData();
+        } else {
+            $tokenData = $this->storageApiClient->verifyToken();
         }
 
-        $tokenData = $this->storageApiClient->verifyToken();
         $job = new Job($this->configEncryptor, [
                 'id' => $this->storageApiClient->generateId(),
                 'runId' => $this->storageApiClient->generateRunId($this->storageApiClient->getRunId()),

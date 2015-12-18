@@ -15,6 +15,7 @@ use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Keboola\Syrup\Job\Metadata\JobInterface;
 use Keboola\Syrup\Service\ObjectEncryptor;
+use Keboola\Syrup\Service\StorageApi\StorageApiService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class JobMapperTest extends KernelTestCase
@@ -43,8 +44,10 @@ class JobMapperTest extends KernelTestCase
         $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
         self::$client = new Client(['hosts' => [SYRUP_ELASTICSEARCH_HOST]]);
         self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', self::$client);
-        self::$jobFactory = new JobFactory(SYRUP_APP_NAME, new Encryptor(md5(uniqid())), $configEncryptor);
-        self::$jobFactory->setStorageApiClient(new \Keboola\StorageApi\Client(['token' => SYRUP_SAPI_TEST_TOKEN]));
+        /** @var StorageApiService $storageApiService */
+        $storageApiService = self::$kernel->getContainer()->get('syrup.storage_api');
+        $storageApiService->setClient(new \Keboola\StorageApi\Client(['token' => SYRUP_SAPI_TEST_TOKEN]));
+        self::$jobFactory = new JobFactory(SYRUP_APP_NAME, new Encryptor(md5(uniqid())), $configEncryptor, $storageApiService);
         self::$jobMapper = new JobMapper(self::$client, self::$index, $configEncryptor, null, realpath(__DIR__ . '/../../../../app'));
     }
 

@@ -46,6 +46,10 @@ class CommandTestCase extends WebTestCase
                 ->getContainer()
                 ->getParameter('storage_api.test.url')
         ]);
+        self::$kernel
+            ->getContainer()
+            ->get('syrup.storage_api')
+            ->setClient($this->storageApiClient);
 
         $this->jobMapper = self::$kernel
             ->getContainer()
@@ -54,7 +58,6 @@ class CommandTestCase extends WebTestCase
         $this->jobFactory = self::$kernel
             ->getContainer()
             ->get('syrup.job_factory');
-        $this->jobFactory->setStorageApiClient($this->storageApiClient);
     }
 
     protected function createJob()

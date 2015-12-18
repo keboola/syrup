@@ -25,17 +25,17 @@ class JobTest extends KernelTestCase
      */
     public function testGetParams()
     {
-        $storageApiClient = new Client([
+        $storageApiService = self::$kernel->getContainer()->get('syrup.storage_api');
+        $storageApiService->setClient(new Client([
             'token' => SYRUP_SAPI_TEST_TOKEN,
             'userAgent' => SYRUP_APP_NAME,
-        ]);
+        ]));
 
         $key = md5(uniqid());
         $encryptor = new Encryptor($key);
         /** @var ObjectEncryptor $configEncryptor */
         $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
-        $jobFactory = new JobFactory(SYRUP_APP_NAME, $encryptor, $configEncryptor);
-        $jobFactory->setStorageApiClient($storageApiClient);
+        $jobFactory = new JobFactory(SYRUP_APP_NAME, $encryptor, $configEncryptor, $storageApiService);
 
         $command = uniqid();
         $param = ["key1" => "value1", "#key2" => "value2"];
