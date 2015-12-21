@@ -346,6 +346,30 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals("KBC::Encrypted==abcd", $result["key2"]["nestedKey2"]["#finalKeyEncrypted"]);
     }
 
+
+    public function testEncryptActionEmtpyArrayEmptyObject()
+    {
+        static::$client->request(
+            'POST',
+            '/syrup/encrypt',
+            [],
+            [],
+            [
+                'HTTP_X-StorageApi_Token' => $this->container->getParameter('storage_api.test.token'),
+                'CONTENT_TYPE' => 'application/json'
+            ],
+            '{"key1": "value1", "key2": {}, "key3": []}'
+        );
+
+        $result = json_decode(static::$client->getResponse()->getContent());
+        $this->assertObjectHasAttribute("key1", $result);
+        $this->assertObjectHasAttribute("key2", $result);
+        $this->assertObjectHasAttribute("key3", $result);
+        $this->assertEquals("value1", $result->key1);
+        $this->assertEquals("stdClass", get_class($result->key2));
+        $this->assertTrue(is_array($result->key3));
+    }
+
     public function testEncryptActionIncorrectContentType()
     {
         static::$client->request(

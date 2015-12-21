@@ -55,7 +55,10 @@ class ObjectEncryptor
         if (is_array($data)) {
             return $this->encryptArray($data, $wrapper);
         }
-        throw new ApplicationException("Only arrays and strings are supported for encryption.");
+        if (is_object($data) && get_class($data) == 'stdClass') {
+            return $this->encryptObject($data, $wrapper);
+        }
+        throw new ApplicationException("Only stdClass, array and string are supported types for encryption.");
     }
 
     /**
@@ -74,7 +77,10 @@ class ObjectEncryptor
         if (is_array($data)) {
             return $this->decryptArray($data);
         }
-        throw new ApplicationException("Only arrays and strings are supported for decryption.");
+        if (is_object($data) && get_class($data) == 'stdClass') {
+            return $this->decryptObject($data);
+        }
+        throw new ApplicationException("Only stdClass, array and string are supported types for decryption.");
     }
 
     /**
@@ -131,6 +137,42 @@ class ObjectEncryptor
     }
 
     /**
+     * @param $key
+     * @param $value
+     * @param CryptoWrapperInterface $wrapper
+     * @return array|string|void
+     */
+    protected function encryptItem($key, $value, CryptoWrapperInterface $wrapper)
+    {
+        $result = null;
+        if (substr($key, 0, 1) == '#') {
+            if (is_scalar($value) || is_null($value)) {
+                return $this->encryptValue($value, $wrapper);
+            } elseif (is_array($value)) {
+                return $this->encryptArray($value, $wrapper);
+            } elseif (is_object($value) && get_class($value) == 'stdClass') {
+                return $this->encryptObject($value, $wrapper);
+            } else {
+                throw new ApplicationException(
+                    "Invalid item $key - only stdClass, array and scalar can be encrypted."
+                );
+            }
+        } else {
+            if (is_scalar($value) || is_null($value)) {
+                return $value;
+            } elseif (is_array($value)) {
+                return $this->encryptArray($value, $wrapper);
+            } elseif (is_object($value) && get_class($value) == 'stdClass') {
+                return $this->encryptObject($value, $wrapper);
+            } else {
+                throw new ApplicationException(
+                    "Invalid item $key - only stdClass, array and scalar can be encrypted."
+                );
+            }
+        }
+    }
+
+    /**
      * @param string $value
      * @param CryptoWrapperInterface $wrapper
      * @return string
@@ -158,64 +200,85 @@ class ObjectEncryptor
     {
         $result = [];
         foreach ($data as $key => $value) {
-            if (substr($key, 0, 1) == '#') {
-                if (is_scalar($value) || is_null($value)) {
-                    $result[$key] = $this->encryptValue($value, $wrapper);
-                } elseif (is_array($value)) {
-                    $result[$key] = $this->encryptArray($value, $wrapper);
-                } else {
-                    throw new ApplicationException(
-                        "Invalid item $key - only arrays and scalars are supported for encryption."
-                    );
-                }
-            } else {
-                if (is_scalar($value) || is_null($value)) {
-                    $result[$key] = $value;
-                } elseif (is_array($value)) {
-                    $result[$key] = $this->encryptArray($value, $wrapper);
-                } else {
-                    throw new ApplicationException(
-                        "Invalid item $key - only arrays and scalars are supported for encryption."
-                    );
-                }
-            }
+            $result[$key] = $this->encryptItem($key, $value, $wrapper);
         }
         return $result;
     }
 
     /**
-     * @param $data
+     * @param \stdClass $data
+     * @param CryptoWrapperInterface $wrapper
+     * @return \stdClass
+     */
+    protected function encryptObject(\stdClass $data, CryptoWrapperInterface $wrapper)
+    {
+        $result = new \stdClass();
+        foreach (get_object_vars($data) as $key => $value) {
+            $result->{$key} = $this->encryptItem($key, $value, $wrapper);
+        }
+        return $result;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return array|string|void
+     */
+    protected function decryptItem($key, $value)
+    {
+        try {
+            if (substr($key, 0, 1) == '#') {
+                if (is_scalar($value)) {
+                    return $this->decryptValue($value);
+                } elseif (is_array($value)) {
+                    return $this->decryptArray($value);
+                } elseif (is_object($value) && get_class($value) == 'stdClass') {
+                    return $this->decryptObject($value);
+                } else {
+                    throw new ApplicationException(
+                        "Invalid item $key - only stdClass, array and scalar can be decrypted."
+                    );
+                }
+            } else {
+                if (is_scalar($value) || is_null($value)) {
+                    return $value;
+                } elseif (is_array($value)) {
+                    return $this->decryptArray($value);
+                } elseif (is_object($value) && get_class($value) == 'stdClass') {
+                    return $this->decryptObject($value);
+                } else {
+                    throw new ApplicationException(
+                        "Invalid item $key - only stdClass, array and scalar can be decrypted."
+                    );
+                }
+            }
+        } catch (\InvalidCiphertextException $e) {
+            throw new UserException("Invalid cipher text for key $key " . $e->getMessage(), $e);
+        }
+    }
+
+    /**
+     * @param \stdClass $data
+     * @return \stdClass
+     */
+    protected function decryptObject(\stdClass $data)
+    {
+        $result = new \stdClass();
+        foreach (get_object_vars($data) as $key => $value) {
+            $result->{$key} = $this->decryptItem($key, $value);
+        }
+        return $result;
+    }
+
+    /**
+     * @param array $data
      * @return array
      */
-    protected function decryptArray($data)
+    protected function decryptArray(array $data)
     {
         $result = [];
         foreach ($data as $key => $value) {
-            try {
-                if (substr($key, 0, 1) == '#') {
-                    if (is_scalar($value)) {
-                        $result[$key] = $this->decryptValue($value);
-                    } elseif (is_array($value)) {
-                        $result[$key] = $this->decryptArray($value);
-                    } else {
-                        throw new ApplicationException(
-                            "Invalid item $key - only arrays and scalars are supported for decryption."
-                        );
-                    }
-                } else {
-                    if (is_scalar($value) || is_null($value)) {
-                        $result[$key] = $value;
-                    } elseif (is_array($value)) {
-                        $result[$key] = $this->decryptArray($value);
-                    } else {
-                        throw new ApplicationException(
-                            "Invalid item $key - only arrays and scalars are supported for decryption."
-                        );
-                    }
-                }
-            } catch (\InvalidCiphertextException $e) {
-                throw new UserException("Invalid cipher text for key $key " . $e->getMessage(), $e);
-            }
+            $result[$key] = $this->decryptItem($key, $value);
         }
         return $result;
     }

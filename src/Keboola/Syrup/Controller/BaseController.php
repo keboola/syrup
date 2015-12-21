@@ -63,19 +63,19 @@ class BaseController extends Controller
 
     /**
      * Extracts POST data in JSON from request
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @throws HttpException
-     * @return array
+     * @param Request $request
+     * @param bool $assoc
+     * @return array|mixed
      */
-    protected function getPostJson(Request $request)
+    protected function getPostJson(Request $request, $assoc = true)
     {
         $return = array();
         $body = $request->getContent();
 
         if (!empty($body) && !is_null($body) && $body != 'null') {
-            $return = json_decode($body, true);
+            $return = json_decode($body, $assoc);
 
-            if (null === $return || !is_array($return)) {
+            if (null === $return || ($assoc && !is_array($return) || !$assoc && !is_object($return))) {
                 throw new UserException("Bad JSON format of request body");
             }
         }
