@@ -31,7 +31,7 @@ class SyslogProcessor
         try {
             // does not work for some commands
             $storageApiClient = $storageApiService->getClient();
-            $this->tokenData = $storageApiClient->getLogData();
+            $this->tokenData = $storageApiService->getTokenData();
             $this->runId = $storageApiClient->getRunId();
         } catch (SyrupComponentException $e) {
         } catch (SapiException $e) {
