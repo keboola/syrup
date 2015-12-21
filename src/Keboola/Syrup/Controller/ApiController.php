@@ -113,7 +113,7 @@ class ApiController extends BaseController
             $encryptedValue = $encryptor->encrypt($request->getContent());
             return $this->createResponse($encryptedValue, 200, ["Content-Type" => "text/plain"]);
         } elseif ($contentType == "application/json") {
-            $params = $this->getPostJson($request);
+            $params = $this->getPostJson($request, false);
             $encryptedValue = $encryptor->encrypt($params);
             return $this->createJsonResponse($encryptedValue, 200, ["Content-Type" => "application/json"]);
         } else {

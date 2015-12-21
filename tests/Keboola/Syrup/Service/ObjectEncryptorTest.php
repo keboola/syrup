@@ -11,6 +11,7 @@ use Keboola\Syrup\Exception\UserException;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Keboola\Syrup\Test\AnotherCryptoWrapper;
 use Keboola\Syrup\Test\MockCryptoWrapper;
+use MyProject\Proxies\__CG__\OtherProject\Proxies\__CG__\stdClass;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ObjectEncryptorTest extends WebTestCase
@@ -41,10 +42,14 @@ class ObjectEncryptorTest extends WebTestCase
 
     public function testEncryptorUnsupportedInput()
     {
+        $invalidClass = $this->getMockBuilder('stdClass')
+             ->disableOriginalConstructor()
+             ->getMock();
+
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
-        $unsupportedInput = new \stdClass();
+        $unsupportedInput = $invalidClass;
         try {
             $encryptor->encrypt($unsupportedInput);
             $this->fail("Encryption of invalid data should fail.");
@@ -53,7 +58,7 @@ class ObjectEncryptorTest extends WebTestCase
 
         $unsupportedInput = [
             'key' => 'value',
-            'key2' => new \stdClass(),
+            'key2' => $invalidClass
         ];
         try {
             $encryptor->encrypt($unsupportedInput);
@@ -63,7 +68,7 @@ class ObjectEncryptorTest extends WebTestCase
 
         $unsupportedInput = [
             'key' => 'value',
-            '#key2' => new \stdClass(),
+            '#key2' => $invalidClass,
         ];
         try {
             $encryptor->encrypt($unsupportedInput);
@@ -74,10 +79,14 @@ class ObjectEncryptorTest extends WebTestCase
 
     public function testDecryptorUnsupportedInput()
     {
+        $invalidClass = $this->getMockBuilder('stdClass')
+             ->disableOriginalConstructor()
+             ->getMock();
+
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
-        $unsupportedInput = new \stdClass();
+        $unsupportedInput = $invalidClass;
         try {
             $encryptor->decrypt($unsupportedInput);
             $this->fail("Encryption of invalid data should fail.");
@@ -86,7 +95,7 @@ class ObjectEncryptorTest extends WebTestCase
 
         $unsupportedInput = [
             'key' => 'value',
-            'key2' => new \stdClass(),
+            'key2' => $invalidClass,
         ];
         try {
             $encryptor->decrypt($unsupportedInput);
@@ -96,7 +105,7 @@ class ObjectEncryptorTest extends WebTestCase
 
         $unsupportedInput = [
             'key' => 'value',
-            '#key2' => new \stdClass(),
+            '#key2' => $invalidClass,
         ];
         try {
             $encryptor->decrypt($unsupportedInput);
@@ -224,16 +233,16 @@ class ObjectEncryptorTest extends WebTestCase
         }
     }
 
-    public function testEncryptorSimpleObject()
+    public function testEncryptorSimpleArray()
     {
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
-        $object = [
+        $array = [
             "key1" => "value1",
             "#key2" => "value2"
         ];
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($array);
         $this->assertArrayHasKey("key1", $result);
         $this->assertArrayHasKey("#key2", $result);
         $this->assertEquals("value1", $result["key1"]);
@@ -246,12 +255,34 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value2", $decrypted["#key2"]);
     }
 
-    public function testEncryptorSimpleObjectScalars()
+    public function testEncryptorSimpleObject()
     {
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
-        $object = [
+        $object = new \stdClass();
+        $object->key1 = "value1";
+        $object->{"#key2"} = "value2";
+
+        $result = $encryptor->encrypt($object);
+        $this->assertObjectHasAttribute("key1", $result);
+        $this->assertObjectHasAttribute("#key2", $result);
+        $this->assertEquals("value1", $result->key1);
+        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key2"}, 0, 16));
+
+        $decrypted = $encryptor->decrypt($result);
+        $this->assertObjectHasAttribute("key1", $decrypted);
+        $this->assertObjectHasAttribute("#key2", $decrypted);
+        $this->assertEquals("value1", $decrypted->key1);
+        $this->assertEquals("value2", $decrypted->{"#key2"});
+    }
+
+    public function testEncryptorSimpleArrayScalars()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $array = [
             "key1" => "value1",
             "#key2" => "value2",
             "#key3" => true,
@@ -260,7 +291,7 @@ class ObjectEncryptorTest extends WebTestCase
             "#key6" => null,
             "key7" => null
         ];
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($array);
         $this->assertArrayHasKey("key1", $result);
         $this->assertArrayHasKey("#key2", $result);
         $this->assertEquals("value1", $result["key1"]);
@@ -282,17 +313,53 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals(null, $decrypted["key7"]);
     }
 
-    public function testEncryptorSimpleObjectEncrypted()
+    public function testEncryptorSimpleObjectScalars()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $object = new \stdClass();
+        $object->key1= "value1";
+        $object->{"#key2"} = "value2";
+        $object->{"#key3"} = true;
+        $object->{"#key4"} = 1;
+        $object->{"#key5"} = 1.5;
+        $object->{"#key6"} = null;
+        $object->key7 = null;
+
+        $result = $encryptor->encrypt($object);
+        $this->assertObjectHasAttribute("key1", $result);
+        $this->assertObjectHasAttribute("#key2", $result);
+        $this->assertEquals("value1", $result->key1);
+        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key2"}, 0, 16));
+        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key3"}, 0, 16));
+        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key4"}, 0, 16));
+        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key5"}, 0, 16));
+        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key6"}, 0, 16));
+
+        $decrypted = $encryptor->decrypt($result);
+        $this->assertObjectHasAttribute("key1", $decrypted);
+        $this->assertObjectHasAttribute("#key2", $decrypted);
+        $this->assertEquals("value1", $decrypted->key1);
+        $this->assertEquals("value2", $decrypted->{"#key2"});
+        $this->assertEquals(true, $decrypted->{"#key3"});
+        $this->assertEquals(1, $decrypted->{"#key4"});
+        $this->assertEquals(1.5, $decrypted->{"#key5"});
+        $this->assertEquals(null, $decrypted->{"#key6"});
+        $this->assertEquals(null, $decrypted->{"key7"});
+    }
+
+    public function testEncryptorSimpleArrayEncrypted()
     {
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
         $encryptedValue = $encryptor->encrypt("test");
-        $object = [
+        $array = [
             "key1" => "value1",
             "#key2" => $encryptedValue
         ];
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($array);
         $this->assertArrayHasKey("key1", $result);
         $this->assertArrayHasKey("#key2", $result);
         $this->assertEquals("value1", $result["key1"]);
@@ -305,13 +372,37 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("test", $decrypted["#key2"]);
     }
 
-    public function testEncryptorNestedObject()
+    public function testEncryptorSimpleObjectEncrypted()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $encryptedValue = $encryptor->encrypt("test");
+        $object = new \stdClass();
+        $object->key1 = "value1";
+        $object->{'#key2'} = $encryptedValue;
+
+        $result = $encryptor->encrypt($object);
+        $this->assertObjectHasAttribute("key1", $result);
+        $this->assertObjectHasAttribute("#key2", $result);
+        $this->assertEquals("value1", $result->key1);
+        $this->assertEquals($encryptedValue, $result->{"#key2"});
+
+        $decrypted = $encryptor->decrypt($result);
+        $this->assertObjectHasAttribute("key1", $decrypted);
+        $this->assertObjectHasAttribute("#key2", $decrypted);
+        $this->assertEquals("value1", $decrypted->key1);
+        $this->assertEquals("test", $decrypted->{"#key2"});
+    }
+
+
+    public function testEncryptorNestedArray()
     {
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
 
-        $object = [
+        $array = [
             "key1" => "value1",
             "key2" => [
                 "nestedKey1" => "value2",
@@ -320,7 +411,7 @@ class ObjectEncryptorTest extends WebTestCase
                 ]
             ]
         ];
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($array);
         $this->assertArrayHasKey("key1", $result);
         $this->assertArrayHasKey("key2", $result);
         $this->assertArrayHasKey("nestedKey1", $result["key2"]);
@@ -341,12 +432,47 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value3", $decrypted["key2"]["nestedKey2"]["#finalKey"]);
     }
 
-    public function testEncryptorNestedObjectWithArrayKeyHashmark()
+    public function testEncryptorNestedObject()
     {
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
-        $object = [
+        $object = new \stdClass();
+        $nested1 = new \stdClass();
+        $nested2 = new \stdClass();
+        $nested2->{"#finalKey"} = "value3";
+        $nested1->nestedKey1 = "value2";
+        $nested1->nestedKey2 = $nested2;
+        $object->key1 = "value1";
+        $object->key2 = $nested1;
+
+        $result = $encryptor->encrypt($object);
+        $this->assertObjectHasAttribute("key1", $result);
+        $this->assertObjectHasAttribute("key2", $result);
+        $this->assertObjectHasAttribute("nestedKey1", $result->key2);
+        $this->assertObjectHasAttribute("nestedKey2", $result->key2);
+        $this->assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
+        $this->assertEquals("value1", $result->key1);
+        $this->assertEquals("value2", $result->key2->nestedKey1);
+        $this->assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
+
+        $decrypted = $encryptor->decrypt($result);
+        $this->assertObjectHasAttribute("key1", $decrypted);
+        $this->assertObjectHasAttribute("key2", $decrypted);
+        $this->assertObjectHasAttribute("nestedKey1", $decrypted->key2);
+        $this->assertObjectHasAttribute("nestedKey2", $decrypted->key2);
+        $this->assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
+        $this->assertEquals("value1", $decrypted->key1);
+        $this->assertEquals("value2", $decrypted->key2->nestedKey1);
+        $this->assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
+    }
+
+    public function testEncryptorNestedArrayWithArrayKeyHashmark()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $array = [
             "key1" => "value1",
             "key2" => [
                 "nestedKey1" => "value2",
@@ -359,7 +485,7 @@ class ObjectEncryptorTest extends WebTestCase
                 "#encryptedNestedKey" => "someValue2"
             ]
         ];
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($array);
         $this->assertArrayHasKey("key1", $result);
         $this->assertArrayHasKey("key2", $result);
         $this->assertArrayHasKey("#key3", $result);
@@ -387,13 +513,61 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("someValue2", $decrypted["#key3"]["#encryptedNestedKey"]);
     }
 
-    public function testEncryptorNestedObjectEncrypted()
+
+    public function testEncryptorNestedObjectWithArrayKeyHashmark()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $object = new \stdClass();
+        $nested1 = new \stdClass();
+        $nested2 = new \stdClass();
+        $nested2->{"#finalKey"} = "value3";
+        $nested1->nestedKey1 = "value2";
+        $nested1->nestedKey2 = $nested2;
+        $object->key1 = "value1";
+        $object->key2 = $nested1;
+        $nested3 = new \stdClass();
+        $nested3->anotherNestedKey = "someValue";
+        $nested3->{"#encryptedNestedKey"} = "someValue2";
+        $object->{"#key3"} = $nested3;
+
+
+        $result = $encryptor->encrypt($object);
+        $this->assertObjectHasAttribute("key1", $result);
+        $this->assertObjectHasAttribute("key2", $result);
+        $this->assertObjectHasAttribute("#key3", $result);
+        $this->assertObjectHasAttribute("nestedKey1", $result->key2);
+        $this->assertObjectHasAttribute("nestedKey2", $result->key2);
+        $this->assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
+        $this->assertObjectHasAttribute("anotherNestedKey", $result->{"#key3"});
+        $this->assertEquals("value1", $result->key1);
+        $this->assertEquals("value2", $result->key2->nestedKey1);
+        $this->assertEquals("someValue", $result->{"#key3"}->anotherNestedKey);
+        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key3"}->{"#encryptedNestedKey"}, 0, 16));
+        $this->assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
+
+        $decrypted = $encryptor->decrypt($result);
+        $this->assertObjectHasAttribute("key1", $decrypted);
+        $this->assertObjectHasAttribute("key2", $decrypted);
+        $this->assertObjectHasAttribute("#key3", $decrypted);
+        $this->assertObjectHasAttribute("nestedKey1", $decrypted->key2);
+        $this->assertObjectHasAttribute("nestedKey2", $decrypted->key2);
+        $this->assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
+        $this->assertEquals("value1", $decrypted->key1);
+        $this->assertEquals("value2", $decrypted->key2->nestedKey1);
+        $this->assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
+        $this->assertEquals("someValue", $decrypted->{"#key3"}->anotherNestedKey);
+        $this->assertEquals("someValue2", $decrypted->{"#key3"}->{"#encryptedNestedKey"});
+    }
+
+    public function testEncryptorNestedArrayEncrypted()
     {
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
         $encryptedValue = $encryptor->encrypt("test");
-        $object = [
+        $array = [
             "key1" => "value1",
             "key2" => [
                 "nestedKey1" => "value2",
@@ -403,7 +577,8 @@ class ObjectEncryptorTest extends WebTestCase
                 ]
             ]
         ];
-        $result = $encryptor->encrypt($object);
+
+        $result = $encryptor->encrypt($array);
         $this->assertArrayHasKey("key1", $result);
         $this->assertArrayHasKey("key2", $result);
         $this->assertArrayHasKey("nestedKey1", $result["key2"]);
@@ -428,24 +603,67 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("test", $decrypted["key2"]["nestedKey2"]["#finalKeyEncrypted"]);
     }
 
+
+    public function testEncryptorNestedObjectEncrypted()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $encryptedValue = $encryptor->encrypt("test");
+
+        $object = new \stdClass();
+        $object->key1 = "value1";
+        $nested1 = new \stdClass();
+        $nested1->nestedKey1 = "value2";
+        $nested2 = new \stdClass();
+        $nested2->{"#finalKey"} = "value3";
+        $nested2->{"#finalKeyEncrypted"} = $encryptedValue;
+        $nested1->nestedKey2 = $nested2;
+        $object->key2 = $nested1;
+
+        $result = $encryptor->encrypt($object);
+        $this->assertObjectHasAttribute("key1", $result);
+        $this->assertObjectHasAttribute("key2", $result);
+        $this->assertObjectHasAttribute("nestedKey1", $result->key2);
+        $this->assertObjectHasAttribute("nestedKey2", $result->key2);
+        $this->assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
+        $this->assertObjectHasAttribute("#finalKeyEncrypted", $result->key2->nestedKey2);
+        $this->assertEquals("value1", $result->key1);
+        $this->assertEquals("value2", $result->key2->nestedKey1);
+        $this->assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
+        $this->assertEquals($encryptedValue, $result->key2->nestedKey2->{"#finalKeyEncrypted"});
+
+        $decrypted = $encryptor->decrypt($result);
+        $this->assertObjectHasAttribute("key1", $decrypted);
+        $this->assertObjectHasAttribute("key2", $decrypted);
+        $this->assertObjectHasAttribute("nestedKey1", $decrypted->key2);
+        $this->assertObjectHasAttribute("nestedKey2", $decrypted->key2);
+        $this->assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
+        $this->assertObjectHasAttribute("#finalKeyEncrypted", $decrypted->key2->nestedKey2);
+        $this->assertEquals("value1", $decrypted->key1);
+        $this->assertEquals("value2", $decrypted->key2->nestedKey1);
+        $this->assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
+        $this->assertEquals("test", $decrypted->key2->nestedKey2->{"#finalKeyEncrypted"});
+    }
+
     /**
      * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
      * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
      */
-    public function testEncryptorNestedObjectWithArray()
+    public function testEncryptorNestedArrayWithArray()
     {
         $client = static::createClient();
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
 
 
-        $object = [
+        $array = [
             "key1" => "value1",
             "key2" => [
                 ["nestedKey1" => "value2"],
                 ["nestedKey2" => ["#finalKey" => "value3"]]
             ]
         ];
-        $result = $encryptor->encrypt($object);
+        $result = $encryptor->encrypt($array);
         $this->assertArrayHasKey("key1", $result);
         $this->assertArrayHasKey("key2", $result);
         $this->assertCount(2, $result["key2"]);
@@ -468,7 +686,52 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value3", $decrypted["key2"][1]["nestedKey2"]["#finalKey"]);
     }
 
-    public function testMixedCryptoWrappersDecrypt()
+    /**
+     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
+     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
+     */
+    public function testEncryptorNestedObjectWithArray()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $object = new \stdClass();
+        $object->key1 = "value1";
+        $object->key2 = [];
+        $nested1 = new \stdClass();
+        $nested1->nestedKey1 = "value2";
+        $object->key2[] = $nested1;
+        $nested2 = new \stdClass();
+        $nested3 = new \stdClass();
+        $nested3->{"#finalKey"} = "value3";
+        $nested2->nestedKey2 = $nested3;
+        $object->key2[] = $nested2;
+
+        $result = $encryptor->encrypt($object);
+
+        $this->assertObjectHasAttribute("key1", $result);
+        $this->assertObjectHasAttribute("key2", $result);
+        $this->assertCount(2, $result->key2);
+        $this->assertObjectHasAttribute("nestedKey1", $result->key2[0]);
+        $this->assertObjectHasAttribute("nestedKey2", $result->key2[1]);
+        $this->assertObjectHasAttribute("#finalKey", $result->key2[1]->nestedKey2);
+        $this->assertEquals("value1", $result->key1);
+        $this->assertEquals("value2", $result->key2[0]->nestedKey1);
+        $this->assertEquals("KBC::Encrypted==", substr($result->key2[1]->nestedKey2->{"#finalKey"}, 0, 16));
+
+        $decrypted = $encryptor->decrypt($result);
+        $this->assertObjectHasAttribute("key1", $decrypted);
+        $this->assertObjectHasAttribute("key2", $decrypted);
+        $this->assertCount(2, $result->key2);
+        $this->assertObjectHasAttribute("nestedKey1", $decrypted->key2[0]);
+        $this->assertObjectHasAttribute("nestedKey2", $decrypted->key2[1]);
+        $this->assertObjectHasAttribute("#finalKey", $decrypted->key2[1]->nestedKey2);
+        $this->assertEquals("value1", $decrypted->key1);
+        $this->assertEquals("value2", $decrypted->key2[0]->nestedKey1);
+        $this->assertEquals("value3", $decrypted->key2[1]->nestedKey2->{"#finalKey"});
+    }
+
+    public function testMixedCryptoWrappersDecryptArray()
     {
         $client = static::createClient();
         /**
@@ -479,19 +742,70 @@ class ObjectEncryptorTest extends WebTestCase
         $client->getContainer()->set('another.crypto.wrapper', $wrapper);
         $encryptor->pushWrapper($wrapper);
 
-        $object = [
+        $array = [
             "#key1" => $encryptor->encrypt("value1"),
             "#key2" => $encryptor->encrypt("value2", 'another.crypto.wrapper')
         ];
-        $this->assertEquals("KBC::Encrypted==", substr($object["#key1"], 0, 16));
-        $this->assertEquals("KBC::AnotherCryptoWrapper==", substr($object["#key2"], 0, 27));
+        $this->assertEquals("KBC::Encrypted==", substr($array["#key1"], 0, 16));
+        $this->assertEquals("KBC::AnotherCryptoWrapper==", substr($array["#key2"], 0, 27));
 
-        $decrypted = $encryptor->decrypt($object);
+        $decrypted = $encryptor->decrypt($array);
         $this->assertArrayHasKey("#key1", $decrypted);
         $this->assertArrayHasKey("#key2", $decrypted);
         $this->assertCount(2, $decrypted);
         $this->assertEquals("value1", $decrypted["#key1"]);
         $this->assertEquals("value2", $decrypted["#key2"]);
+    }
+
+    public function testMixedCryptoWrappersDecryptObject()
+    {
+        $client = static::createClient();
+        /**
+         * @var $encryptor ObjectEncryptor
+         */
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+        $wrapper = new AnotherCryptoWrapper(md5(uniqid()));
+        $client->getContainer()->set('another.crypto.wrapper', $wrapper);
+        $encryptor->pushWrapper($wrapper);
+
+        $object = new \stdClass();
+        $object->{"#key1"} = $encryptor->encrypt("value1");
+        $object->{"#key2"} = $encryptor->encrypt("value2", 'another.crypto.wrapper');
+
+        $this->assertEquals("KBC::Encrypted==", substr($object->{"#key1"}, 0, 16));
+        $this->assertEquals("KBC::AnotherCryptoWrapper==", substr($object->{"#key2"}, 0, 27));
+
+        $decrypted = $encryptor->decrypt($object);
+        $this->assertObjectHasAttribute("#key1", $decrypted);
+        $this->assertObjectHasAttribute("#key2", $decrypted);
+        $this->assertEquals("value1", $decrypted->{"#key1"});
+        $this->assertEquals("value2", $decrypted->{"#key2"});
+    }
+
+    public function testEncryptEmptyArray()
+    {
+        $client = static::createClient();
+        /**
+         * @var $encryptor ObjectEncryptor
+         */
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+        $array = [];
+        $encrypted = $encryptor->encrypt($array);
+        $this->assertEquals([], $encrypted);
+        $this->assertEquals([], $encryptor->decrypt($encrypted));
+    }
+
+    public function testEncryptEmptyObject()
+    {
+        $client = static::createClient();
+        /**
+         * @var $encryptor ObjectEncryptor
+         */
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+        $object = new \stdClass();
+        $encrypted = $encryptor->encrypt($object);
+        $this->assertEquals('stdClass', get_class($encrypted));
+        $this->assertEquals('stdClass', get_class($encryptor->decrypt($encrypted)));
     }
 
     public function testEncryptorNoWrappers()
@@ -503,5 +817,76 @@ class ObjectEncryptorTest extends WebTestCase
             $this->fail("Misconfigured object encryptor must raise exception.");
         } catch (ApplicationException $e) {
         }
+    }
+    
+    public function testEncryptorDecodedJSONObject()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $json = str_replace([" ", "\n"], ['', ''], '{
+            "key1": "value1",
+            "key2": {
+                "nestedKey1": "value2",
+                "nestedKey2": {
+                    "#finalKey": "value3"
+                }
+            },
+            "#key3": {
+                "anotherNestedKey": "someValue",
+                "#encryptedNestedKey": "someValue2"
+            },
+            "array": ["a", "b"],
+            "emptyArray": [],
+            "emptyObject": {}
+        }');
+
+        $result = $encryptor->encrypt(json_decode($json));
+        $this->assertTrue(is_object($result));
+        $this->assertObjectHasAttribute("key1", $result);
+        $this->assertObjectHasAttribute("key2", $result);
+        $this->assertObjectHasAttribute("#key3", $result);
+        $this->assertObjectHasAttribute("array", $result);
+        $this->assertObjectHasAttribute("emptyArray", $result);
+        $this->assertObjectHasAttribute("emptyObject", $result);
+        $this->assertObjectHasAttribute("nestedKey1", $result->key2);
+        $this->assertObjectHasAttribute("nestedKey2", $result->key2);
+        $this->assertObjectHasAttribute("#finalKey", $result->key2->nestedKey2);
+        $this->assertTrue(is_array($result->array));
+        $this->assertTrue(is_array($result->emptyArray));
+        $this->assertTrue(is_object($result->emptyObject));
+        $this->assertTrue(is_object($result->key2));
+        $this->assertObjectHasAttribute("anotherNestedKey", $result->{"#key3"});
+        $this->assertTrue(is_object($result->{"#key3"}));
+        $this->assertEquals("value1", $result->key1);
+        $this->assertEquals("value2", $result->key2->nestedKey1);
+        $this->assertEquals("someValue", $result->{"#key3"}->anotherNestedKey);
+        $this->assertEquals("KBC::Encrypted==", substr($result->{"#key3"}->{"#encryptedNestedKey"}, 0, 16));
+        $this->assertEquals("KBC::Encrypted==", substr($result->key2->nestedKey2->{"#finalKey"}, 0, 16));
+
+        $decrypted = $encryptor->decrypt($result);
+        $this->assertTrue(is_object($decrypted));
+        $this->assertObjectHasAttribute("key1", $decrypted);
+        $this->assertObjectHasAttribute("key2", $decrypted);
+        $this->assertObjectHasAttribute("#key3", $decrypted);
+        $this->assertObjectHasAttribute("array", $decrypted);
+        $this->assertObjectHasAttribute("emptyArray", $decrypted);
+        $this->assertObjectHasAttribute("emptyObject", $decrypted);
+        $this->assertObjectHasAttribute("nestedKey1", $decrypted->key2);
+        $this->assertObjectHasAttribute("nestedKey2", $decrypted->key2);
+        $this->assertObjectHasAttribute("#finalKey", $decrypted->key2->nestedKey2);
+        $this->assertTrue(is_array($decrypted->array));
+        $this->assertTrue(is_array($decrypted->emptyArray));
+        $this->assertTrue(is_object($decrypted->emptyObject));
+        $this->assertTrue(is_object($decrypted->key2));
+        $this->assertObjectHasAttribute("anotherNestedKey", $decrypted->{"#key3"});
+        $this->assertTrue(is_object($decrypted->{"#key3"}));
+        $this->assertEquals("value1", $decrypted->key1);
+        $this->assertEquals("value2", $decrypted->key2->nestedKey1);
+        $this->assertEquals("someValue", $decrypted->{"#key3"}->anotherNestedKey);
+        $this->assertEquals("someValue2", $decrypted->{"#key3"}->{"#encryptedNestedKey"});
+        $this->assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
+
+        $this->assertEquals(json_encode($decrypted), $json);
     }
 }
