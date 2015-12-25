@@ -106,4 +106,11 @@ class JobCommandTest extends CommandTestCase
         $this->commandTester->execute(['jobId'   => $jobId]);
         $this->assertEquals(JobCommand::STATUS_LOCK, $this->commandTester->getStatusCode());
     }
+
+    public function testSanitizeExceptionMessage()
+    {
+        $message = "SQLSTATE[XX000]: " . chr(0x00000080) . " abcd";
+        $jobCommand = new JobCommand();
+        $this->assertEquals("SQLSTATE[XX000]: ? abcd", $jobCommand->sanitizeExceptionMessage($message));
+    }
 }

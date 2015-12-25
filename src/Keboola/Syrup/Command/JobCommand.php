@@ -312,9 +312,21 @@ class JobCommand extends ContainerAwareCommand
             $logData['data'] = $exception->getData();
         }
 
-        $this->logger->$level($exception->getMessage(), $logData);
+        $this->logger->$level($this->sanitizeExceptionMessage($exception->getMessage()), $logData);
 
         return $exceptionId;
+    }
+
+    /**
+     *
+     * sanitize invalid characters in exception message
+     *
+     * @param $message
+     * @return string
+     */
+    public function sanitizeExceptionMessage($message)
+    {
+        return mb_convert_encoding($message, 'UTF-8', 'UTF-8');
     }
 
     private function isParallelLimitExceeded()
