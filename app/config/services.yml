@@ -112,4 +112,3 @@ services:
 
     syrup.object_encryptor:
         class: Keboola\Syrup\Service\ObjectEncryptor
-        arguments: [@service_container]

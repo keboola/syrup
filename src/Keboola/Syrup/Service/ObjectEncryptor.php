@@ -11,43 +11,32 @@ use Keboola\Syrup\Encryption\BaseWrapper;
 use Keboola\Syrup\Encryption\CryptoWrapperInterface;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Exception\UserException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 class ObjectEncryptor
 {
-    /**
-     * DI service container.
-     * @var ContainerInterface
-     */
-    protected $container;
-
     /**
      * List of known wrappers.
      * @var CryptoWrapperInterface[]
      */
     private $wrappers = [];
 
-    /**
-     * @param ContainerInterface $container DI container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
 
     /**
      * @param string|array $data Data to encrypt
-     * @param string $wrapperName Service name of encryptor wrapper
+     * @param string $wrapperName Class name of encryptor wrapper
      * @return mixed
      */
-    public function encrypt($data, $wrapperName = 'syrup.encryption.base_wrapper')
+    public function encrypt($data, $wrapperName = BaseWrapper::class)
     {
         /** @var BaseWrapper $wrapper */
-        try {
-            $wrapper = $this->container->get($wrapperName);
-        } catch (ServiceNotFoundException $e) {
-            throw new ApplicationException("Invalid crypto wrapper " . $wrapperName, $e);
+        foreach ($this->wrappers as $cryptoWrapper) {
+            if (get_class($cryptoWrapper) == $wrapperName) {
+                $wrapper = $cryptoWrapper;
+                break;
+            }
+        }
+        if (empty($wrapper)) {
+            throw new ApplicationException("Invalid crypto wrapper " . $wrapperName);
         }
         if (is_scalar($data)) {
             return $this->encryptValue($data, $wrapper);
