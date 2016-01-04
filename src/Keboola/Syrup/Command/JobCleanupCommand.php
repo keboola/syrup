@@ -15,6 +15,7 @@ use Keboola\Syrup\Job\ExecutorFactory;
 use Keboola\Syrup\Job\ExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\Db\Lock;
+use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,8 +57,8 @@ class JobCleanupCommand extends ContainerAwareCommand
         }
 
         // SAPI init
-        /** @var EncryptorInterface $encryptor */
-        $encryptor = $this->getContainer()->get('syrup.encryptor');
+        /** @var ObjectEncryptor $encryptor */
+        $encryptor = $this->getContainer()->get('syrup.object_encryptor');
 
         $this->sapiClient = new SapiClient([
             'token' => $encryptor->decrypt($this->job->getToken()['token']),

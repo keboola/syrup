@@ -7,7 +7,6 @@
 namespace Keboola\Syrup\Tests\Elasticsearch;
 
 use Elasticsearch\Client as ElasticClient;
-use Keboola\Encryption\EncryptorInterface;
 use Keboola\StorageApi\Client as SapiClient;
 use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Elasticsearch\Search;
@@ -24,13 +23,12 @@ class SearchTest extends WebTestCase
     /** @var SapiClient */
     protected static $sapiClient;
 
-    /** @var EncryptorInterface */
-    protected static $encryptor;
-
     /** @var ElasticClient */
     protected static $elasticClient;
+
     /** @var ComponentIndex */
     protected static $index;
+
     /** @var JobMapper */
     protected static $jobMapper;
 
@@ -55,8 +53,6 @@ class SearchTest extends WebTestCase
             'url' => self::$kernel->getContainer()->getParameter('storage_api.test.url'),
             'userAgent' => SYRUP_APP_NAME,
         ]);
-
-        self::$encryptor = self::$kernel->getContainer()->get('syrup.encryptor');
 
         // clear data
         $sapiData = self::$sapiClient->getLogData();
@@ -87,7 +83,7 @@ class SearchTest extends WebTestCase
                 'token'     => [
                     'id'            => $tokenData['id'],
                     'description'   => $tokenData['description'],
-                    'token'         => self::$encryptor->encrypt(self::$sapiClient->getTokenString())
+                    'token'         => $configEncryptor->encrypt(self::$sapiClient->getTokenString())
                 ],
                 'component' => SYRUP_APP_NAME,
                 'command'   => 'run',

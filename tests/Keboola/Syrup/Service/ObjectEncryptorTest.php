@@ -11,7 +11,6 @@ use Keboola\Syrup\Exception\UserException;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Keboola\Syrup\Test\AnotherCryptoWrapper;
 use Keboola\Syrup\Test\MockCryptoWrapper;
-use MyProject\Proxies\__CG__\OtherProject\Proxies\__CG__\stdClass;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ObjectEncryptorTest extends WebTestCase
@@ -758,9 +757,7 @@ class ObjectEncryptorTest extends WebTestCase
     public function testMixedCryptoWrappersDecryptObject()
     {
         $client = static::createClient();
-        /**
-         * @var $encryptor ObjectEncryptor
-         */
+        /** @var ObjectEncryptor $encryptor */
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
         $wrapper = new AnotherCryptoWrapper(md5(uniqid()));
         $client->getContainer()->set('another.crypto.wrapper', $wrapper);
@@ -768,7 +765,7 @@ class ObjectEncryptorTest extends WebTestCase
 
         $object = new \stdClass();
         $object->{"#key1"} = $encryptor->encrypt("value1");
-        $object->{"#key2"} = $encryptor->encrypt("value2", 'another.crypto.wrapper');
+        $object->{"#key2"} = $encryptor->encrypt("value2", AnotherCryptoWrapper::class);
 
         $this->assertEquals("KBC::Encrypted==", substr($object->{"#key1"}, 0, 16));
         $this->assertEquals("KBC::AnotherCryptoWrapper==", substr($object->{"#key2"}, 0, 27));
@@ -815,7 +812,7 @@ class ObjectEncryptorTest extends WebTestCase
         } catch (ApplicationException $e) {
         }
     }
-    
+
     public function testEncryptorDecodedJSONObject()
     {
         $client = static::createClient();
@@ -885,5 +882,17 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
 
         $this->assertEquals(json_encode($decrypted), $json);
+    }
+
+    public function testEncryptorLegacy()
+    {
+        $client = static::createClient();
+        $legacyEncryptor = $client->getContainer()->get('syrup.encryptor');
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $originalText = 'secret';
+        $encrypted = $legacyEncryptor->encrypt($originalText);
+        $this->assertNotEquals($originalText, $encrypted);
+        $this->assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
 }

@@ -9,6 +9,7 @@ namespace Keboola\Syrup\Service;
 
 use Keboola\Syrup\Encryption\BaseWrapper;
 use Keboola\Syrup\Encryption\CryptoWrapperInterface;
+use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Exception\UserException;
 
@@ -20,9 +21,24 @@ class ObjectEncryptor
      */
     private $wrappers = [];
 
+    /**
+     * Encryptor used only for decrypting legacy cipher texts.
+     * @var Encryptor|null
+     */
+    private $legacyEncryptor = null;
+
 
     /**
-     * @param string|array $data Data to encrypt
+     * ObjectEncryptor constructor.
+     * @param Encryptor|null $legacyEncryptor Optional legacy decryptor.
+     */
+    public function __construct(Encryptor $legacyEncryptor = null)
+    {
+        $this->legacyEncryptor = $legacyEncryptor;
+    }
+
+    /**
+     * @param string|array|\stdClass $data Data to encrypt
      * @param string $wrapperName Class name of encryptor wrapper
      * @return mixed
      */
@@ -52,7 +68,7 @@ class ObjectEncryptor
 
     /**
      * @param mixed $data
-     * @return string
+     * @return mixed
      */
     public function decrypt($data)
     {
@@ -113,7 +129,16 @@ class ObjectEncryptor
     {
         $wrapper = $this->findWrapper($value);
         if (!$wrapper) {
-            throw new \InvalidCiphertextException("Value is not an encrypted value.");
+            if ($this->legacyEncryptor) {
+                $ret = $this->legacyEncryptor->decrypt($value);
+                if ($ret === false) {
+                    throw new \InvalidCiphertextException("Value is not an encrypted value.");
+                } else {
+                    return $ret;
+                }
+            } else {
+                throw new \InvalidCiphertextException("Value is not an encrypted value.");
+            }
         }
         try {
             return $wrapper->decrypt(substr($value, mb_strlen($wrapper->getPrefix())));
