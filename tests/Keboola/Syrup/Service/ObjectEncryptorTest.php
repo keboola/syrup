@@ -895,4 +895,18 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertNotEquals($originalText, $encrypted);
         $this->assertEquals($originalText, $encryptor->decrypt($encrypted));
     }
+
+    public function testEncryptorLegacyFail()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $originalText = 'test';
+        try {
+            $encryptor->decrypt($originalText);
+            $this->fail("Invalid cipher must fail.");
+        } catch (UserException $e) {
+            $this->assertContains('is not an encrypted value', $e->getMessage());
+        }
+    }
 }

@@ -158,6 +158,7 @@ class ApiController extends BaseController
      */
     protected function createJob($command, $params)
     {
+        /** @var JobFactory $jobFactory */
         $jobFactory = $this->container->get('syrup.job_factory');
         $jobFactory->setStorageApiClient($this->storageApi);
         return $jobFactory->create($command, $params);

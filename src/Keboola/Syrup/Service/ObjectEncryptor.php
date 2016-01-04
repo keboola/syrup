@@ -130,7 +130,9 @@ class ObjectEncryptor
         $wrapper = $this->findWrapper($value);
         if (!$wrapper) {
             if ($this->legacyEncryptor) {
-                $ret = $this->legacyEncryptor->decrypt($value);
+                /* @ is intentional to suppress warnings from invalid cipher texts which
+                 are handled by checking return === false */
+                $ret = @$this->legacyEncryptor->decrypt($value);
                 if ($ret === false) {
                     throw new \InvalidCiphertextException("Value is not an encrypted value.");
                 } else {
