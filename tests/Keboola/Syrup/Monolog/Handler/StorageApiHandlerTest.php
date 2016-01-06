@@ -251,6 +251,15 @@ class StorageApiHandlerTest extends TestCase
         $this->assertFalse($handler->handle($this->getRecord(Logger::ERROR, 'errorMessage', [])));
     }
 
+    public function testSanitizeExceptionMessage()
+    {
+        /** @var Client $client */
+        /** @var StorageApiHandler $handler */
+        list($client, $handler) = $this->initHandlerAndClient();
+        $message = "SQLSTATE[XX000]: " . chr(0x00000080) . " abcd";
+        $this->assertEquals("SQLSTATE[XX000]: ? abcd", $handler->sanitizeExceptionMessage($message));
+    }
+
     private function initHandlerAndClient()
     {
         $request = new Request();

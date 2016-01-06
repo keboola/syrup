@@ -65,7 +65,7 @@ class StorageApiHandler extends \Monolog\Handler\AbstractHandler
         } else {
             $event->setComponent($this->appName);
         }
-        $event->setMessage($record['message']);
+        $event->setMessage($this->sanitizeExceptionMessage($record['message']));
         $event->setRunId($this->storageApiClient->getRunId());
 
         $params = [];
@@ -107,5 +107,17 @@ class StorageApiHandler extends \Monolog\Handler\AbstractHandler
 
         $this->storageApiClient->createEvent($event);
         return false;
+    }
+
+    /**
+     *
+     * sanitize invalid UTF-8 characters
+     *
+     * @param $message
+     * @return string
+     */
+    public function sanitizeExceptionMessage($message)
+    {
+        return mb_convert_encoding($message, 'UTF-8', 'UTF-8');
     }
 }
