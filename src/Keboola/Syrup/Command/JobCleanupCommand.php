@@ -77,7 +77,7 @@ class JobCleanupCommand extends ContainerAwareCommand
         /** @var \Keboola\Syrup\Monolog\Processor\SyslogProcessor $logProcessor */
         $logProcessor = $this->getContainer()->get('syrup.monolog.syslog_processor');
         $logProcessor->setRunId($this->job->getRunId());
-        $logProcessor->setTokenData($this->sapiClient->getLogData());
+        $logProcessor->setTokenData($storageApiService->getTokenData());
 
         // Lock DB
         /** @var Connection $conn */

@@ -59,7 +59,7 @@ class SearchTest extends WebTestCase
         self::$encryptor = self::$kernel->getContainer()->get('syrup.encryptor');
 
         // clear data
-        $sapiData = self::$sapiClient->getLogData();
+        $sapiData = self::$sapiClient->verifyToken();
         $projectId = $sapiData['owner']['id'];
 
         $jobs = self::$search->getJobs(['projectId' => $projectId, 'component' => SYRUP_APP_NAME]);
