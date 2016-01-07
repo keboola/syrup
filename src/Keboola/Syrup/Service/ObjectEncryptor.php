@@ -9,19 +9,12 @@ namespace Keboola\Syrup\Service;
 
 use Keboola\Syrup\Encryption\BaseWrapper;
 use Keboola\Syrup\Encryption\CryptoWrapperInterface;
+use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Exception\UserException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 class ObjectEncryptor
 {
-    /**
-     * DI service container.
-     * @var ContainerInterface
-     */
-    protected $container;
-
     /**
      * List of known wrappers.
      * @var CryptoWrapperInterface[]
@@ -29,25 +22,37 @@ class ObjectEncryptor
     private $wrappers = [];
 
     /**
-     * @param ContainerInterface $container DI container
+     * Encryptor used only for decrypting legacy cipher texts.
+     * @var Encryptor|null
      */
-    public function __construct(ContainerInterface $container)
+    private $legacyEncryptor = null;
+
+
+    /**
+     * ObjectEncryptor constructor.
+     * @param Encryptor|null $legacyEncryptor Optional legacy decryptor.
+     */
+    public function __construct(Encryptor $legacyEncryptor = null)
     {
-        $this->container = $container;
+        $this->legacyEncryptor = $legacyEncryptor;
     }
 
     /**
-     * @param string|array $data Data to encrypt
-     * @param string $wrapperName Service name of encryptor wrapper
+     * @param string|array|\stdClass $data Data to encrypt
+     * @param string $wrapperName Class name of encryptor wrapper
      * @return mixed
      */
-    public function encrypt($data, $wrapperName = 'syrup.encryption.base_wrapper')
+    public function encrypt($data, $wrapperName = BaseWrapper::class)
     {
         /** @var BaseWrapper $wrapper */
-        try {
-            $wrapper = $this->container->get($wrapperName);
-        } catch (ServiceNotFoundException $e) {
-            throw new ApplicationException("Invalid crypto wrapper " . $wrapperName, $e);
+        foreach ($this->wrappers as $cryptoWrapper) {
+            if (get_class($cryptoWrapper) == $wrapperName) {
+                $wrapper = $cryptoWrapper;
+                break;
+            }
+        }
+        if (empty($wrapper)) {
+            throw new ApplicationException("Invalid crypto wrapper " . $wrapperName);
         }
         if (is_scalar($data)) {
             return $this->encryptValue($data, $wrapper);
@@ -63,7 +68,7 @@ class ObjectEncryptor
 
     /**
      * @param mixed $data
-     * @return string
+     * @return mixed
      */
     public function decrypt($data)
     {
@@ -124,7 +129,18 @@ class ObjectEncryptor
     {
         $wrapper = $this->findWrapper($value);
         if (!$wrapper) {
-            throw new \InvalidCiphertextException("Value is not an encrypted value.");
+            if ($this->legacyEncryptor) {
+                /* @ is intentional to suppress warnings from invalid cipher texts which
+                 are handled by checking return === false */
+                $ret = @$this->legacyEncryptor->decrypt($value);
+                if ($ret === false) {
+                    throw new \InvalidCiphertextException("Value is not an encrypted value.");
+                } else {
+                    return $ret;
+                }
+            } else {
+                throw new \InvalidCiphertextException("Value is not an encrypted value.");
+            }
         }
         try {
             return $wrapper->decrypt(substr($value, mb_strlen($wrapper->getPrefix())));

@@ -8,6 +8,7 @@
 namespace Keboola\Syrup\Tests\Monolog\Processor;
 
 use Keboola\Syrup\Aws\S3\Uploader;
+use Keboola\Syrup\Encryption\BaseWrapper;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Monolog\Processor\JobProcessor;
 use Keboola\Syrup\Monolog\Processor\RequestProcessor;
@@ -21,11 +22,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SyslogProcessorTest extends TestCase
 {
-    public function setUp()
-    {
-        static::bootKernel();
-    }
-
     private function getSysLogProcessor()
     {
         $s3Uploader = new Uploader([
@@ -191,8 +187,8 @@ class SyslogProcessorTest extends TestCase
     public function testJobLong()
     {
         $processor = new JobProcessor();
-        /** @var ObjectEncryptor $configEncryptor */
-        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
+        $configEncryptor = new ObjectEncryptor();
+        $configEncryptor->pushWrapper(new BaseWrapper(uniqid('foobar')));
         $jobId = intval(uniqid());
         $processor->setJob(new Job($configEncryptor, [
             'id' => $jobId,

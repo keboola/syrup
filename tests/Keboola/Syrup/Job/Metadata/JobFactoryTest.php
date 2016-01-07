@@ -7,7 +7,6 @@
 namespace Keboola\Syrup\Tests\Job\Metadata;
 
 use Keboola\StorageApi\Client;
-use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
@@ -20,6 +19,7 @@ class JobFactoryTest extends KernelTestCase
         static::bootKernel();
     }
 
+
     /**
      * @covers \Keboola\Syrup\Job\Metadata\JobFactory::create
      * @covers \Keboola\Syrup\Job\Metadata\JobFactory::setStorageApiClient
@@ -31,14 +31,12 @@ class JobFactoryTest extends KernelTestCase
             'userAgent' => SYRUP_APP_NAME,
         ]);
 
-        $key = md5(uniqid());
-        $encryptor = new Encryptor($key);
-        /** @var ObjectEncryptor $configEncryptor */
-        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
+        /** @var ObjectEncryptor $encryptor */
+        $encryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
         /** @var StorageApiService $storageApiService */
         $storageApiService = self::$kernel->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient($storageApiClient);
-        $jobFactory = new JobFactory(SYRUP_APP_NAME, $encryptor, $configEncryptor, $storageApiService);
+        $jobFactory = new JobFactory(SYRUP_APP_NAME, $encryptor, $storageApiService);
 
         $command = uniqid();
         $param = uniqid();

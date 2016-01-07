@@ -101,7 +101,7 @@ services:
 
     syrup.job_factory:
         class: Keboola\Syrup\Job\Metadata\JobFactory
-        arguments: [%app_name%, @syrup.encryptor, @syrup.object_encryptor, @syrup.storage_api]
+        arguments: [%app_name%, @syrup.object_encryptor, @syrup.storage_api]
 
     syrup.job_executor:
         class: Keboola\Syrup\Job\Executor
@@ -112,4 +112,4 @@ services:
 
     syrup.object_encryptor:
         class: Keboola\Syrup\Service\ObjectEncryptor
-        arguments: [@service_container]
+        arguments: [@syrup.encryptor]

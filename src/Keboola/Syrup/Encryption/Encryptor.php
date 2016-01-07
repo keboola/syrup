@@ -10,6 +10,11 @@ namespace Keboola\Syrup\Encryption;
 use Keboola\Encryption\AesEncryptor;
 use Keboola\Encryption\EncryptorInterface;
 
+/**
+ * Class Encryptor
+ * @package Keboola\Syrup\Encryption
+ * @deprecated Use ObjectEncryptor service
+ */
 class Encryptor implements EncryptorInterface
 {
     /** @var AesEncryptor */
@@ -23,6 +28,7 @@ class Encryptor implements EncryptorInterface
     /**
      * @param $data string data to encrypt
      * @return string encrypted data
+     * @deprecated
      */
     public function encrypt($data)
     {
@@ -32,6 +38,7 @@ class Encryptor implements EncryptorInterface
     /**
      * @param $encryptedData string
      * @return string decrypted data
+     * @deprecated
      */
     public function decrypt($encryptedData)
     {

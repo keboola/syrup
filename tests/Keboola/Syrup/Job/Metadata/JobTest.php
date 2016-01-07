@@ -7,8 +7,6 @@
 namespace Keboola\Syrup\Tests\Job\Metadata;
 
 use Keboola\StorageApi\Client;
-use Keboola\Syrup\Encryption\BaseWrapper;
-use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -31,17 +29,15 @@ class JobTest extends KernelTestCase
             'userAgent' => SYRUP_APP_NAME,
         ]));
 
-        $key = md5(uniqid());
-        $encryptor = new Encryptor($key);
-        /** @var ObjectEncryptor $configEncryptor */
-        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
-        $jobFactory = new JobFactory(SYRUP_APP_NAME, $encryptor, $configEncryptor, $storageApiService);
+        /** @var ObjectEncryptor $objectEncryptor */
+        $objectEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
+        $jobFactory = new JobFactory(SYRUP_APP_NAME, $objectEncryptor, $storageApiService);
 
         $command = uniqid();
         $param = ["key1" => "value1", "#key2" => "value2"];
         $lock = uniqid();
 
-        $job = $jobFactory->create($command, $configEncryptor->encrypt($param), $lock);
+        $job = $jobFactory->create($command, $objectEncryptor->encrypt($param), $lock);
         $job->setEncrypted(true);
 
         $this->assertEquals($command, $job->getCommand());

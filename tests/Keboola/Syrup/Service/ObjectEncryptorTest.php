@@ -11,7 +11,6 @@ use Keboola\Syrup\Exception\UserException;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Keboola\Syrup\Test\AnotherCryptoWrapper;
 use Keboola\Syrup\Test\MockCryptoWrapper;
-use MyProject\Proxies\__CG__\OtherProject\Proxies\__CG__\stdClass;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ObjectEncryptorTest extends WebTestCase
@@ -205,11 +204,10 @@ class ObjectEncryptorTest extends WebTestCase
         /** @var ObjectEncryptor $encryptor */
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
         $wrapper = new MockCryptoWrapper();
-        $client->getContainer()->set('mock.crypto.wrapper', $wrapper);
         $encryptor->pushWrapper($wrapper);
 
         $secret = 'secret';
-        $encryptedValue = $encryptor->encrypt($secret, 'mock.crypto.wrapper');
+        $encryptedValue = $encryptor->encrypt($secret, MockCryptoWrapper::class);
         $this->assertEquals("KBC::MockCryptoWrapper==" . $secret, $encryptedValue);
 
         $encryptedSecond = $encryptor->encrypt($encryptedValue);
@@ -739,12 +737,11 @@ class ObjectEncryptorTest extends WebTestCase
          */
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
         $wrapper = new AnotherCryptoWrapper(md5(uniqid()));
-        $client->getContainer()->set('another.crypto.wrapper', $wrapper);
         $encryptor->pushWrapper($wrapper);
 
         $array = [
             "#key1" => $encryptor->encrypt("value1"),
-            "#key2" => $encryptor->encrypt("value2", 'another.crypto.wrapper')
+            "#key2" => $encryptor->encrypt("value2", AnotherCryptoWrapper::class)
         ];
         $this->assertEquals("KBC::Encrypted==", substr($array["#key1"], 0, 16));
         $this->assertEquals("KBC::AnotherCryptoWrapper==", substr($array["#key2"], 0, 27));
@@ -760,9 +757,7 @@ class ObjectEncryptorTest extends WebTestCase
     public function testMixedCryptoWrappersDecryptObject()
     {
         $client = static::createClient();
-        /**
-         * @var $encryptor ObjectEncryptor
-         */
+        /** @var ObjectEncryptor $encryptor */
         $encryptor = $client->getContainer()->get('syrup.object_encryptor');
         $wrapper = new AnotherCryptoWrapper(md5(uniqid()));
         $client->getContainer()->set('another.crypto.wrapper', $wrapper);
@@ -770,7 +765,7 @@ class ObjectEncryptorTest extends WebTestCase
 
         $object = new \stdClass();
         $object->{"#key1"} = $encryptor->encrypt("value1");
-        $object->{"#key2"} = $encryptor->encrypt("value2", 'another.crypto.wrapper');
+        $object->{"#key2"} = $encryptor->encrypt("value2", AnotherCryptoWrapper::class);
 
         $this->assertEquals("KBC::Encrypted==", substr($object->{"#key1"}, 0, 16));
         $this->assertEquals("KBC::AnotherCryptoWrapper==", substr($object->{"#key2"}, 0, 27));
@@ -810,15 +805,14 @@ class ObjectEncryptorTest extends WebTestCase
 
     public function testEncryptorNoWrappers()
     {
-        $client = static::createClient();
-        $encryptor = new ObjectEncryptor($client->getContainer());
+        $encryptor = new ObjectEncryptor();
         try {
             $encryptor->encrypt("test");
             $this->fail("Misconfigured object encryptor must raise exception.");
         } catch (ApplicationException $e) {
         }
     }
-    
+
     public function testEncryptorDecodedJSONObject()
     {
         $client = static::createClient();
@@ -888,5 +882,31 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value3", $decrypted->key2->nestedKey2->{"#finalKey"});
 
         $this->assertEquals(json_encode($decrypted), $json);
+    }
+
+    public function testEncryptorLegacy()
+    {
+        $client = static::createClient();
+        $legacyEncryptor = $client->getContainer()->get('syrup.encryptor');
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $originalText = 'secret';
+        $encrypted = $legacyEncryptor->encrypt($originalText);
+        $this->assertNotEquals($originalText, $encrypted);
+        $this->assertEquals($originalText, $encryptor->decrypt($encrypted));
+    }
+
+    public function testEncryptorLegacyFail()
+    {
+        $client = static::createClient();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor');
+
+        $originalText = 'test';
+        try {
+            $encryptor->decrypt($originalText);
+            $this->fail("Invalid cipher must fail.");
+        } catch (UserException $e) {
+            $this->assertContains('is not an encrypted value', $e->getMessage());
+        }
     }
 }

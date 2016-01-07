@@ -14,11 +14,8 @@ use Keboola\Syrup\Service\StorageApi\StorageApiService;
 
 class JobFactory
 {
-    /* @var Encryptor */
-    protected $encryptor;
-
     /* @var ObjectEncryptor */
-    protected $configEncryptor;
+    protected $objectEncryptor;
 
     protected $componentName;
 
@@ -32,12 +29,10 @@ class JobFactory
 
     public function __construct(
         $componentName,
-        Encryptor $encryptor,
-        ObjectEncryptor $configEncryptor,
+        ObjectEncryptor $objectEncryptor,
         StorageApiService $storageApiService = null
     ) {
-        $this->encryptor = $encryptor;
-        $this->configEncryptor = $configEncryptor;
+        $this->objectEncryptor = $objectEncryptor;
         $this->componentName = $componentName;
         $this->storageApiService = $storageApiService;
     }
@@ -61,7 +56,7 @@ class JobFactory
             $tokenData = $this->storageApiClient->verifyToken();
         }
 
-        $job = new Job($this->configEncryptor, [
+        $job = new Job($this->objectEncryptor, [
                 'id' => $this->storageApiClient->generateId(),
                 'runId' => $this->storageApiClient->generateRunId($this->storageApiClient->getRunId()),
                 'project' => [
@@ -71,7 +66,7 @@ class JobFactory
                 'token' => [
                     'id' => $tokenData['id'],
                     'description' => $tokenData['description'],
-                    'token' => $this->encryptor->encrypt($this->storageApiClient->getTokenString())
+                    'token' => $this->objectEncryptor->encrypt($this->storageApiClient->getTokenString())
                 ],
                 'component' => $this->componentName,
                 'command' => $command,
