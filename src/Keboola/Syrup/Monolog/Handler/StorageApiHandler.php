@@ -7,7 +7,6 @@
 
 namespace Keboola\Syrup\Monolog\Handler;
 
-use Keboola\StorageApi\Client;
 use Keboola\StorageApi\Event;
 use Keboola\StorageApi\Exception as SapiException;
 use Monolog\Logger;
@@ -43,12 +42,6 @@ class StorageApiHandler extends \Monolog\Handler\AbstractHandler
         } catch (SapiException $e) {
             // Ignore when SAPI client setup is wrong
         }
-    }
-
-    /** @deprecated StorageApiClient should be obtained via StorageApiService */
-    public function setStorageApiClient(Client $client)
-    {
-        $this->storageApiClient = $client;
     }
 
     public function handle(array $record)
