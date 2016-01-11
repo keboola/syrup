@@ -18,6 +18,7 @@
     <testsuites>
         <testsuite name="unit">
             <directory>tests/Keboola/Syrup/Aws</directory>
+            <directory>tests/Keboola/Syrup/Debug</directory>
             <directory>tests/Keboola/Syrup/Elasticsearch</directory>
             <directory>tests/Keboola/Syrup/Listener</directory>
             <directory>tests/Keboola/Syrup/Monolog</directory>

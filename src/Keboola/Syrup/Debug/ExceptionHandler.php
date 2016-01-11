@@ -123,7 +123,13 @@ class ExceptionHandler extends BaseExceptionHandler
             try {
                 $count = count($exception->getAllPrevious());
                 $total = $count + 1;
+                $truncated = 0;
                 foreach ($exception->toArray() as $position => $e) {
+                    if (mb_strlen($content, '8bit') > 12 * 1024 * 1024) {
+                        $truncated++;
+                        continue;
+                    }
+
                     $ind = $count - $position + 1;
                     $class = $this->formatClass($e['class']);
                     $message = nl2br($this->escapeHtml($e['message']));
@@ -163,6 +169,7 @@ EOF;
 
                     $content .= "    </ol>\n</div>\n";
                 }
+                $content .= sprintf('<div class="block">%s exceptions truncated</div>', $truncated);
             } catch (\Exception $e) {
                 // something nasty happened and we cannot throw an exception anymore
                 if ($this->debug) {
