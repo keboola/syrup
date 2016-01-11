@@ -15,6 +15,7 @@ use Keboola\Syrup\Exception\MaintenanceException;
 use Keboola\Syrup\Job\ExecutorFactory;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Keboola\Syrup\Service\StorageApi\Limits;
+use Keboola\Syrup\Service\StorageApi\StorageApiService;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -50,6 +51,9 @@ class JobCommand extends ContainerAwareCommand
 
     /** @var SapiClient */
     protected $sapiClient;
+
+    /** @var StorageApiService */
+    protected $storageApiService;
 
     /** @var Logger */
     protected $logger;
@@ -93,6 +97,7 @@ class JobCommand extends ContainerAwareCommand
         /** @var \Keboola\Syrup\Service\StorageApi\StorageApiService $storageApiService */
         $storageApiService = $this->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient($this->sapiClient);
+        $this->storageApiService = $storageApiService;
 
         /** @var \Keboola\Syrup\Monolog\Processor\JobProcessor $logProcessor */
         $logProcessor = $this->getContainer()->get('syrup.monolog.job_processor');
@@ -141,7 +146,7 @@ class JobCommand extends ContainerAwareCommand
         $checkConn = null;
         /** @var Lock $validationLock */
         $validationLock = null;
-        if (StorageApiLimits::hasParallelLimit($this->sapiClient)) {
+        if (StorageApiLimits::hasParallelLimit($this->storageApiService->getTokenData())) {
             try {
                 $checkConn = $this->getContainer()->get('doctrine.dbal.limit_lock_connection');
                 $checkConn->exec('SET wait_timeout = 31536000;');
@@ -193,7 +198,7 @@ class JobCommand extends ContainerAwareCommand
 
         // Execute job
         try {
-            if (StorageApiLimits::hasParallelLimit($this->sapiClient)) {
+            if (StorageApiLimits::hasParallelLimit($this->storageApiService->getTokenData())) {
                 $validationLock->unlock();
                 $checkConn->close();
             }
@@ -325,7 +330,7 @@ class JobCommand extends ContainerAwareCommand
             return false;
         }
 
-        $maxLimit = Limits::getParallelLimit($this->sapiClient);
+        $maxLimit = Limits::getParallelLimit($this->storageApiService->getTokenData());
 
         /** @var Search $elasticSearch */
         $elasticSearch = $this->getContainer()->get('syrup.elasticsearch.search');

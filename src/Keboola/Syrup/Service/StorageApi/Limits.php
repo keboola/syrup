@@ -23,12 +23,12 @@ class Limits
     }
 
     /**
-     * @param Client $storageApi
+     * @param $tokenData
      * @return bool
      */
-    public static function hasParallelLimit(Client $storageApi)
+    public static function hasParallelLimit($tokenData)
     {
-        if (self::getParallelLimit($storageApi)) {
+        if (self::getParallelLimit($tokenData)) {
             return true;
         } else {
             return false;
@@ -38,12 +38,12 @@ class Limits
     /**
      * Parallel jobs limit of KBC project, null if unlimited
      *
-     * @param Client $storageApi
+     * @param $tokenData
      * @return int|null
      */
-    public static function getParallelLimit(Client $storageApi)
+    public static function getParallelLimit($tokenData)
     {
-        $data = $storageApi->getLogData();
+        $data = $tokenData;
         if (!empty($data['owner']['features'])) {
             foreach ($data['owner']['features'] as $feature) {
                 $matches = array();
