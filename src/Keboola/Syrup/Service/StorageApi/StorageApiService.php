@@ -30,15 +30,9 @@ class StorageApiService
 
     protected $tokenData;
 
-    public function __construct($storageApiUrl = 'https://connection.keboola.com', RequestStack $requestStack = null)
+    public function __construct($storageApiUrl = 'https://connection.keboola.com', RequestStack $requestStack)
     {
         $this->storageApiUrl = $storageApiUrl;
-
-        //@todo: remove this in 2.6 $requestStack will be required not optional
-        if ($requestStack == null) {
-            $requestStack = new RequestStack();
-        }
-
         $this->requestStack = $requestStack;
     }
 
@@ -55,15 +49,6 @@ class StorageApiService
         }
     }
 
-    /**
-     * @deprecated request should be injected via requestStack in constructor
-     * @param $request
-     */
-    public function setRequest($request)
-    {
-        $this->request = $request;
-    }
-
     public function setClient(Client $client)
     {
         $this->client = $this->verifyClient($client);
@@ -71,12 +56,7 @@ class StorageApiService
 
     public function getClient()
     {
-        //@todo remove in 2.6 - setRequest() will be removed
-        if ($this->request != null) {
-            $request = $this->request;
-        } else {
-            $request = $this->requestStack->getCurrentRequest();
-        }
+        $request = $this->requestStack->getCurrentRequest();
 
         if ($this->client == null) {
             if ($request == null) {
