@@ -20,7 +20,7 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
         $exceptionHandler = new \Keboola\Syrup\Debug\ExceptionHandler();
         $content = $exceptionHandler->getContent($flattenException);
 
-        $found = strstr($content, "680 exceptions truncated");
+        $found = strstr($content, "exceptions truncated");
 
         $this->assertNotFalse($found);
     }
