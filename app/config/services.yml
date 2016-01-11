@@ -108,7 +108,7 @@ services:
 
     syrup.job_executor_factory:
         class: Keboola\Syrup\Job\ExecutorFactory
-        arguments: [@service_container]
+        arguments: [@syrup.storage_api, @syrup.job_executor]
 
     syrup.object_encryptor:
         class: Keboola\Syrup\Service\ObjectEncryptor

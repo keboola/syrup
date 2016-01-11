@@ -37,24 +37,10 @@ class JobFactory
         $this->storageApiService = $storageApiService;
     }
 
-    /**
-     * @deprecated StorageApi Client should be set via StorageApiService
-     * @param Client $storageApiClient
-     */
-    public function setStorageApiClient(Client $storageApiClient)
-    {
-        $this->storageApiClient = $storageApiClient;
-    }
-
     public function create($command, array $params = [], $lockName = null)
     {
-        //@todo remove after setStorageApiClient method is removed
-        if ($this->storageApiClient == null) {
-            $this->storageApiClient = $this->storageApiService->getClient();
-            $tokenData = $this->storageApiService->getTokenData();
-        } else {
-            $tokenData = $this->storageApiClient->verifyToken();
-        }
+        $this->storageApiClient = $this->storageApiService->getClient();
+        $tokenData = $this->storageApiService->getTokenData();
 
         $job = new Job($this->objectEncryptor, [
                 'id' => $this->storageApiClient->generateId(),

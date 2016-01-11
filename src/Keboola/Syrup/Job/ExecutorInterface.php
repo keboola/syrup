@@ -12,18 +12,17 @@ use Keboola\Syrup\Job\Metadata\Job;
 
 interface ExecutorInterface
 {
-    public function setStorageApi(Client $sapi);
-
-    public function setJob(Job $job);
-
     /**
-     * @param Job $job DEPRECATED - parameter $job will be removed in next release
-     *                              in favor of setting $job as class member in ExecutorFactory
+     * @param Job $job
      * @return array|Job
      */
     public function execute(Job $job);
 
-    public function cleanup();
+    public function postExecute(Job $job);
 
-    public function postCleanup();
+    public function cleanup(Job $job);
+
+    public function postCleanup(Job $job);
+
+    public function setStorageApi($getClient);
 }

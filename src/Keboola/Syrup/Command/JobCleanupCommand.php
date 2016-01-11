@@ -8,10 +8,8 @@
 namespace Keboola\Syrup\Command;
 
 use Doctrine\DBAL\Connection;
-use Keboola\Encryption\EncryptorInterface;
 use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\Syrup\Exception\ApplicationException;
-use Keboola\Syrup\Job\ExecutorFactory;
 use Keboola\Syrup\Job\ExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\Db\Lock;
@@ -90,15 +88,7 @@ class JobCleanupCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $jobId = $input->getArgument('jobId');
-
         $this->init($jobId);
-
-        // Instantiate jobExecutor based on component name
-        /** @var ExecutorFactory $jobExecutorFactory */
-        $jobExecutorFactory = $this->getContainer()->get('syrup.job_executor_factory');
-
-        /** @var ExecutorInterface $jobExecutor */
-        $jobExecutor = $jobExecutorFactory->create($this->job);
 
         // Ensure that job status is 'terminating'
         if ($this->job->getStatus() != Job::STATUS_TERMINATING) {
@@ -106,8 +96,11 @@ class JobCleanupCommand extends ContainerAwareCommand
             $this->jobMapper->update($this->job);
         }
 
+        /** @var ExecutorInterface $jobExecutor */
+        $jobExecutor = $this->getContainer()->get('syrup.job_executor_factory')->create();
+
         // run cleanup
-        $jobExecutor->cleanup();
+        $jobExecutor->cleanup($this->job);
 
         // Update job
         $endTime = time();
@@ -121,7 +114,7 @@ class JobCleanupCommand extends ContainerAwareCommand
         $this->jobMapper->update($this->job);
 
         // run post-cleanup
-        $jobExecutor->postCleanup();
+        $jobExecutor->postCleanup($this->job);
 
         // DB unlock
         $this->lock->unlock();

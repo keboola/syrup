@@ -185,12 +185,8 @@ class JobCommand extends ContainerAwareCommand
             'pid'   => getmypid()
         ]);
 
-        // Instantiate jobExecutor based on component name
-        /** @var ExecutorFactory $jobExecutorFactory */
-        $jobExecutorFactory = $this->getContainer()->get('syrup.job_executor_factory');
-
         /** @var ExecutorInterface $jobExecutor */
-        $jobExecutor = $jobExecutorFactory->create($this->job);
+        $jobExecutor = $this->getContainer()->get('syrup.job_executor_factory')->create();
 
         // update the job status after jobExecutor was created, so the signal handler is properly registered
         $this->jobMapper->update($this->job);
@@ -280,6 +276,9 @@ class JobCommand extends ContainerAwareCommand
 
         // postExecution action
         try {
+            $jobExecutor->postExecute($this->job);
+
+            //@todo: remove call to this deprecated interface method
             if ($jobExecutor instanceof HookExecutorInterface) {
                 /** @var HookExecutorInterface $jobExecutor */
                 $jobExecutor->postExecution($this->job);

@@ -36,18 +36,18 @@ class Executor extends \Keboola\Syrup\Job\Executor
         }
     }
 
-    public function cleanup()
+    public function cleanup(Job $job)
     {
-        $this->job->setResult(['message' => 'cleaned']);
+        $job->setResult(['message' => 'cleaned']);
 
-        $this->jobMapper->update($this->job);
+        $this->jobMapper->update($job);
     }
 
-    public function postCleanup()
+    public function postCleanup(Job $job)
     {
-        $oldRes = $this->job->getResult();
-        $this->job->setResult(['message' => $oldRes['message'] . '&cleared']);
+        $oldRes = $job->getResult();
+        $job->setResult(['message' => $oldRes['message'] . '&cleared']);
 
-        $this->jobMapper->update($this->job);
+        $this->jobMapper->update($job);
     }
 }

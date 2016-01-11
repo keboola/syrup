@@ -21,15 +21,10 @@ class HookExecutor extends \Keboola\Syrup\Job\Executor implements HookExecutorIn
     }
 
     /**
-     * @param Job $job
      * @return array
      */
     public function execute(Job $job)
     {
-        parent::execute($job);
-
-        $this->job = $job;
-
         return ['testing' => 'HookExecutor'];
     }
 
@@ -41,14 +36,6 @@ class HookExecutor extends \Keboola\Syrup\Job\Executor implements HookExecutorIn
      */
     public function postExecution(Job $job)
     {
-        if ($job->getId() !== $this->job->getId()) {
-            throw new \InvalidArgumentException('Given job must be same as previous executed');
-        }
-
-        if ($job->getComponent() !== $this->job->getComponent()) {
-            throw new \InvalidArgumentException('Given job must be same as previous executed');
-        }
-
         $job->setResult($job->getResult() + array(self::HOOK_RESULT_KEY => self::HOOK_RESULT_VALUE));
 
         $this->jobMapper->update($job);

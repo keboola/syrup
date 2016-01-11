@@ -25,10 +25,10 @@
 
         "keboola/csv": "~1.1",
         "keboola/php-encryption": "~0.2",
-        "keboola/storage-api-client": "~3.0",
+        "keboola/storage-api-client": "^4.0",
         "keboola/php-temp": "~0.1.0",
 
-        "symfony/symfony": "~2.6 >=2.6.5",
+        "symfony/symfony": "^2.7",
         "symfony/monolog-bundle": "~2.6",
         "sensio/distribution-bundle": "~3.0",
         "sensio/framework-extra-bundle": "~3.0",
