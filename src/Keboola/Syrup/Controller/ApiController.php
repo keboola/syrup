@@ -158,10 +158,7 @@ class ApiController extends BaseController
      */
     protected function createJob($command, $params)
     {
-        /** @var JobFactory $jobFactory */
-        $jobFactory = $this->container->get('syrup.job_factory');
-        $jobFactory->setStorageApiClient($this->storageApi);
-        return $jobFactory->create($command, $params);
+        return $this->container->get('syrup.job_factory')->create($command, $params);
     }
 
     /**
@@ -197,22 +194,5 @@ class ApiController extends BaseController
         $sapiEvent->setType($type);
 
         $this->storageApi->createEvent($sapiEvent);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function camelize($value)
-    {
-        if (!is_string($value)) {
-            return $value;
-        }
-
-        $chunks = explode('-', $value);
-        $ucfirsted = array_map(function ($s) {
-            return ucfirst($s);
-        }, $chunks);
-
-        return lcfirst(implode('', $ucfirsted));
     }
 }
