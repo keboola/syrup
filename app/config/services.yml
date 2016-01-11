@@ -67,7 +67,7 @@ services:
 
     syrup.storage_api:
         class: Keboola\Syrup\Service\StorageApi\StorageApiService
-        arguments: [%storage_api.url%, @request_stack]
+        arguments: [@request_stack, %storage_api.url%]
 
     syrup.encryptor:
         class: Keboola\Syrup\Encryption\Encryptor

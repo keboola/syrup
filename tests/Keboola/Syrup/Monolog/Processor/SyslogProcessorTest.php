@@ -33,8 +33,9 @@ class SyslogProcessorTest extends TestCase
 
         $request = new Request();
         $request->headers->add(['x-storageapi-token' => SYRUP_SAPI_TEST_TOKEN]);
-        $storageApiService = new StorageApiService();
-        $storageApiService->setRequest($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $storageApiService = new StorageApiService($requestStack);
 
         return new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
     }
@@ -111,8 +112,9 @@ class SyslogProcessorTest extends TestCase
 
         $request = new Request();
         $request->headers->add(['x-storageapi-token' => 'invalid']);
-        $storageApiService = new StorageApiService();
-        $storageApiService->setRequest($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $storageApiService = new StorageApiService($requestStack);
 
         $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000));
         // instantiation must not fail

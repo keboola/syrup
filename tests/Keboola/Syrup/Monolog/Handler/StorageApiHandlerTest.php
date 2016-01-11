@@ -23,7 +23,7 @@ class StorageApiHandlerTest extends TestCase
      */
     public function testHandler()
     {
-        $storageApiService = new StorageApiService();
+        $storageApiService = new StorageApiService(new RequestStack());
         $handler = new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);
         $record = $this->getRecord(Logger::INFO, 'infoMessage');
         $handler->handle($record);
@@ -33,7 +33,7 @@ class StorageApiHandlerTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $storageApiService = new StorageApiService('https://connection.keboola.com', $requestStack);
+        $storageApiService = new StorageApiService($requestStack);
         $client = $storageApiService->getClient();
         $client->setRunId(uniqid());
         $events = $client->listEvents(['q' => 'message: infoMessage + runId:' . $client->getRunId()]);
@@ -246,7 +246,7 @@ class StorageApiHandlerTest extends TestCase
         $request->headers->add(['x-storageapi-token' => 'invalid']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $storageApiService = new StorageApiService('https://connection.keboola.com', $requestStack);
+        $storageApiService = new StorageApiService($requestStack);
         $handler = new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);
         $this->assertFalse($handler->handle($this->getRecord(Logger::ERROR, 'errorMessage', [])));
     }
@@ -266,7 +266,7 @@ class StorageApiHandlerTest extends TestCase
         $request->headers->add(['x-storageapi-token' => SYRUP_SAPI_TEST_TOKEN]);
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $storageApiService = new StorageApiService('https://connection.keboola.com', $requestStack);
+        $storageApiService = new StorageApiService($requestStack);
         $client = $storageApiService->getClient();
         $client->setRunId(uniqid());
         $handler = new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);

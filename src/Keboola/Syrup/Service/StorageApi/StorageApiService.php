@@ -30,7 +30,7 @@ class StorageApiService
 
     protected $tokenData;
 
-    public function __construct($storageApiUrl = 'https://connection.keboola.com', RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, $storageApiUrl = 'https://connection.keboola.com')
     {
         $this->storageApiUrl = $storageApiUrl;
         $this->requestStack = $requestStack;
