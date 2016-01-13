@@ -1,19 +1,23 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: miroslavcillik
  * Date: 11/01/16
  * Time: 13:52
  */
+namespace Keboola\Syrup\Tests\Debug;
+
 class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetContent()
     {
-        $exception = new \Exception("error message [0]", 500);
-        for ($i=1; $i<=3000; $i++) {
+        $array = array_fill(0, 1000, "dummy stuff");
+        $largeErrorContent = json_encode($array);
+
+        $exception = new \Exception("error message [0]: " . $largeErrorContent, 500);
+        for ($i=1; $i<=250; $i++) {
             $prevException = $exception;
-            $exception = new \Exception("error message [$i]", 500, $prevException);
+            $exception = new \Exception("error message [$i]: " . $largeErrorContent, 500, $prevException);
         }
 
         $flattenException = \Keboola\Syrup\Debug\Exception\FlattenException::create($exception);
@@ -24,5 +28,4 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotFalse($found);
     }
-
 }
