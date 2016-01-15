@@ -22,17 +22,11 @@ class ComponentIndexTest extends \PHPUnit_Framework_TestCase
         self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', new Client(['hosts' => [SYRUP_ELASTICSEARCH_HOST]]));
     }
 
-    /**
-     * @covers \Keboola\Syrup\Elasticsearch\ComponentIndex::getIndexPrefix
-     */
     public function testGetIndexPrefix()
     {
         $this->assertEquals('devel', self::$index->getIndexPrefix());
     }
 
-    /**
-     * @covers \Keboola\Syrup\Elasticsearch\ComponentIndex::buildMapping
-     */
     public function testMapping()
     {
         $mapping = ComponentIndex::buildMapping(__DIR__.'/../../../../app');

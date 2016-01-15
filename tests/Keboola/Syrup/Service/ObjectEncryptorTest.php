@@ -644,10 +644,6 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("test", $decrypted->key2->nestedKey2->{"#finalKeyEncrypted"});
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
     public function testEncryptorNestedArrayWithArray()
     {
         $client = static::createClient();
@@ -684,10 +680,6 @@ class ObjectEncryptorTest extends WebTestCase
         $this->assertEquals("value3", $decrypted["key2"][1]["nestedKey2"]["#finalKey"]);
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::encrypt
-     * @covers \Keboola\Syrup\Service\ObjectEncryptor::decrypt
-     */
     public function testEncryptorNestedObjectWithArray()
     {
         $client = static::createClient();

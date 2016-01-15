@@ -14,9 +14,6 @@ use Keboola\Syrup\Service\StorageApi\StorageApiService;
 
 class StorageApiServiceTest extends WebTestCase
 {
-    /**
-     * @covers \Keboola\Syrup\Service\StorageApi\StorageApiService::getClient
-     */
     public function testStorageApiService()
     {
         $client = static::createClient();
@@ -35,9 +32,6 @@ class StorageApiServiceTest extends WebTestCase
         $this->assertInstanceOf('Keboola\StorageApi\Client', $sapiClient);
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\StorageApi\StorageApiService::getClient
-     */
     public function testWrongToken()
     {
         $client = static::createClient();
@@ -55,10 +49,6 @@ class StorageApiServiceTest extends WebTestCase
         $sapiClient = $storageApiService->getClient();
     }
 
-    /**
-     * @covers \Keboola\Syrup\Service\StorageApi\StorageApiService::setClient
-     * @covers \Keboola\Syrup\Service\StorageApi\StorageApiService::getTokenData
-     */
     public function testGetTokenData()
     {
         $client = static::createClient();

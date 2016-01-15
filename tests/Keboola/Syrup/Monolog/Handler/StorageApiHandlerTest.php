@@ -17,10 +17,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class StorageApiHandlerTest extends TestCase
 {
-    /**
-     * @covers \Keboola\Syrup\Monolog\Handler\StorageApiHandler::__construct
-     * @covers \Keboola\Syrup\Monolog\Handler\StorageApiHandler::handle
-     */
     public function testHandler()
     {
         $storageApiService = new StorageApiService(new RequestStack());
@@ -80,10 +76,6 @@ class StorageApiHandlerTest extends TestCase
         $this->assertArrayNotHasKey('job', $event['results']);
     }
 
-
-    /**
-     * @covers \Keboola\Syrup\Monolog\Handler\StorageApiHandler::handle
-     */
     public function testHandlerMessageInfo()
     {
         /** @var Client $client */
@@ -103,10 +95,6 @@ class StorageApiHandlerTest extends TestCase
         $this->assertEquals('', $event['description']);
     }
 
-
-    /**
-     * @covers \Keboola\Syrup\Monolog\Handler\StorageApiHandler::handle
-     */
     public function testHandlerMessageNotice()
     {
         /** @var Client $client */
@@ -126,10 +114,6 @@ class StorageApiHandlerTest extends TestCase
         $this->assertEquals('', $event['description']);
     }
 
-
-    /**
-     * @covers \Keboola\Syrup\Monolog\Handler\StorageApiHandler::handle
-     */
     public function testHandlerMessageWarning()
     {
         /** @var Client $client */
@@ -149,10 +133,6 @@ class StorageApiHandlerTest extends TestCase
         $this->assertEquals('', $event['description']);
     }
 
-
-    /**
-     * @covers \Keboola\Syrup\Monolog\Handler\StorageApiHandler::handle
-     */
     public function testHandlerMessageCritical()
     {
         /** @var Client $client */
@@ -172,10 +152,6 @@ class StorageApiHandlerTest extends TestCase
         $this->assertNotEquals('', $event['description']);
     }
 
-
-    /**
-     * @covers \Keboola\Syrup\Monolog\Handler\StorageApiHandler::handle
-     */
     public function testHandlerMessageEmergency()
     {
         /** @var Client $client */
@@ -195,10 +171,6 @@ class StorageApiHandlerTest extends TestCase
         $this->assertNotEquals('', $event['description']);
     }
 
-
-    /**
-     * @covers \Keboola\Syrup\Monolog\Handler\StorageApiHandler::handle
-     */
     public function testHandlerMessageAlert()
     {
         /** @var Client $client */
@@ -218,10 +190,6 @@ class StorageApiHandlerTest extends TestCase
         $this->assertNotEquals('', $event['description']);
     }
 
-
-    /**
-     * @covers \Keboola\Syrup\Monolog\Handler\StorageApiHandler::handle
-     */
     public function testHandlerMessageError()
     {
         /** @var Client $client */

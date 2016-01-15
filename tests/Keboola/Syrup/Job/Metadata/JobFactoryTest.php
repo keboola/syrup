@@ -19,11 +19,6 @@ class JobFactoryTest extends KernelTestCase
         static::bootKernel();
     }
 
-
-    /**
-     * @covers \Keboola\Syrup\Job\Metadata\JobFactory::create
-     * @covers \Keboola\Syrup\Job\Metadata\JobFactory::setStorageApiClient
-     */
     public function testJobFactory()
     {
         $storageApiClient = new Client([

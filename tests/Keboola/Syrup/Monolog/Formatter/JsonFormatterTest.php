@@ -13,10 +13,6 @@ use Keboola\Syrup\Test\Monolog\TestCase;
 
 class JsonFormatterTest extends TestCase
 {
-
-    /**
-     * @covers \Keboola\Syrup\Monolog\Formatter\JsonFormatter::format
-     */
     public function testFormat()
     {
         $formatter = new JsonFormatter();
@@ -30,10 +26,6 @@ class JsonFormatterTest extends TestCase
         $this->assertEquals(json_encode($expectedRecord), $formatter->format($record));
     }
 
-    /**
-     * @covers \Keboola\Syrup\Monolog\Formatter\JsonFormatter::formatBatch
-     * @covers \Keboola\Syrup\Monolog\Formatter\JsonFormatter::formatBatchJson
-     */
     public function testFormatBatch()
     {
         $formatter = new JsonFormatter();

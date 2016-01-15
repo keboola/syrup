@@ -18,9 +18,6 @@ class JobTest extends KernelTestCase
         static::bootKernel();
     }
 
-    /**
-     * @covers \Keboola\Syrup\Job\Metadata\Job::getParams
-     */
     public function testGetParams()
     {
         $storageApiService = self::$kernel->getContainer()->get('syrup.storage_api');

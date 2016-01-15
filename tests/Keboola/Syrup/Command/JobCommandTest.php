@@ -17,9 +17,6 @@ use Keboola\Syrup\Command\JobCommand;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Tests\Job as TestExecutor;
 
-/**
- * @covers \Keboola\Syrup\Command\JobCommand
- */
 class JobCommandTest extends CommandTestCase
 {
     /**

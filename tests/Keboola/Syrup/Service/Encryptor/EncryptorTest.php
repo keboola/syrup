@@ -11,11 +11,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class EncryptorTest extends WebTestCase
 {
-
-    /**
-     * @covers \Keboola\Syrup\Encryption\Encryptor::encrypt
-     * @covers \Keboola\Syrup\Encryption\Encryptor::decrypt
-     */
     public function testEncryptor()
     {
         $client = static::createClient();

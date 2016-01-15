@@ -11,24 +11,17 @@ use Keboola\Syrup\Elasticsearch\IndexNameResolver;
 
 class IndexNameResolverTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers \Keboola\Syrup\Elasticsearch\IndexNameResolver::getYearFromIndexName
-     */
     public function testGetYearFromIndexName()
     {
         $this->assertEquals(2014, IndexNameResolver::getYearFromIndexName('prod_syrup_ex-twitter_2014_7'));
     }
 
-    /**
-     * @covers \Keboola\Syrup\Elasticsearch\IndexNameResolver::getVersionFromIndexName
-     */
     public function testGetVersionFromIndexName()
     {
         $this->assertEquals(7, IndexNameResolver::getVersionFromIndexName('prod_syrup_ex-twitter_2014_7'));
     }
 
     /**
-     * @covers \Keboola\Syrup\Elasticsearch\IndexNameResolver::getLastIndexname
      * @dataProvider resolutionData
      */
     public function testLastIndexNameResolution($expected, $indices)

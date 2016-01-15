@@ -15,11 +15,6 @@ use Keboola\Syrup\Test\Monolog\TestCase;
 
 class RequestProcessorTest extends TestCase
 {
-
-    /**
-     * @covers \Keboola\Syrup\Monolog\Processor\RequestProcessor::__invoke
-     * @covers \Keboola\Syrup\Monolog\Processor\RequestProcessor::processRecord
-     */
     public function testProcessor()
     {
         $s3Uploader = new Uploader([

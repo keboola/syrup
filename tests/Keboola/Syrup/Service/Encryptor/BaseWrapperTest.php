@@ -23,11 +23,6 @@ class BaseWrapperTest extends KernelTestCase
         $this->assertEquals('KBC::Encrypted==', $wrapper->getPrefix());
     }
 
-
-    /**
-     * @covers \Keboola\Syrup\Encryption\BaseWrapper::encrypt
-     * @covers \Keboola\Syrup\Encryption\BaseWrapper::decrypt
-     */
     public function testEncryptor()
     {
         $wrapper = self::$kernel->getContainer()->get('syrup.encryption.base_wrapper');

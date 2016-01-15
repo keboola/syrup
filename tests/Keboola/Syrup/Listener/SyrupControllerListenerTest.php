@@ -17,10 +17,6 @@ use Keboola\Syrup\Listener\SyrupControllerListener;
 
 class SyrupControllerListenerTest extends WebTestCase
 {
-
-    /**
-     * @covers \Keboola\Syrup\Listener\SyrupControllerListener::onKernelController
-     */
     public function testListener()
     {
         $client = static::createClient();

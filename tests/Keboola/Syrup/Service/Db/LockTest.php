@@ -9,11 +9,6 @@ use Keboola\Syrup\Service\Db\Lock;
 
 class LockTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers \Keboola\Syrup\Service\Db\Lock::lock
-     * @covers \Keboola\Syrup\Service\Db\Lock::isFree
-     * @covers \Keboola\Syrup\Service\Db\Lock::unlock
-     */
     public function testLocks()
     {
         $connectionParams = [

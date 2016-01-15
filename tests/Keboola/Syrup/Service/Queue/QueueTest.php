@@ -10,14 +10,6 @@ use Keboola\Syrup\Service\Queue\QueueFactory;
 
 class QueueTest extends \PHPUnit_Framework_TestCase
 {
-
-    /**
-     * @covers \Keboola\Syrup\Service\Queue\QueueFactory::__construct
-     * @covers \Keboola\Syrup\Service\Queue\QueueFactory::get
-     * @covers \Keboola\Syrup\Service\Queue\QueueService::enqueue
-     * @covers \Keboola\Syrup\Service\Queue\QueueService::receive
-     * @covers \Keboola\Syrup\Service\Queue\QueueService::deleteMessage
-     */
     public function testQueue()
     {
         $db = \Doctrine\DBAL\DriverManager::getConnection([

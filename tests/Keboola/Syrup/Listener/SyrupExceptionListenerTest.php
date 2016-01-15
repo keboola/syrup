@@ -54,9 +54,6 @@ class SyrupExceptionListenerTest extends KernelTestCase
         $this->listener = new SyrupExceptionListener(SYRUP_APP_NAME, $storageApiService, $logger);
     }
 
-    /**
-     * @covers \Keboola\Syrup\Listener\SyrupExceptionListener::onConsoleException
-     */
     public function testConsoleException()
     {
         $command = new JobCommand();
@@ -103,9 +100,6 @@ class SyrupExceptionListenerTest extends KernelTestCase
         $this->assertEquals('Keboola\Syrup\Exception\UserException', $record['exception']['class']);
     }
 
-    /**
-     * @covers \Keboola\Syrup\Listener\SyrupExceptionListener::onKernelException
-     */
     public function testKernelException()
     {
         $request = Request::create('/syrup/run', 'POST');
