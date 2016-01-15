@@ -15,7 +15,7 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
         $largeErrorContent = json_encode($array);
 
         $exception = new \Exception("error message [0]: " . $largeErrorContent, 500);
-        for ($i=1; $i<=100; $i++) {
+        for ($i=1; $i<=50; $i++) {
             $prevException = $exception;
             $exception = new \Exception("error message [$i]: " . $largeErrorContent, 500, $prevException);
         }
