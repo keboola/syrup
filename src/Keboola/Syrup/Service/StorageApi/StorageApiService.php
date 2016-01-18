@@ -49,6 +49,16 @@ class StorageApiService
         }
     }
 
+    public function getBackoffTries($hostname)
+    {
+        // keep the backoff settings minimal for API servers
+        if (false === strstr($hostname, 'worker')) {
+            return 3;
+        }
+
+        return 11;
+    }
+
     public function setClient(Client $client)
     {
         $this->client = $this->verifyClient($client);
@@ -71,6 +81,7 @@ class StorageApiService
                 'token' => $request->headers->get('X-StorageApi-Token'),
                 'url' => $this->storageApiUrl,
                 'userAgent' => explode('/', $request->getPathInfo())[1],
+                'backoffMaxTries' => $this->getBackoffTries(gethostname())
             ]));
 
             if ($request->headers->has('X-KBC-RunId')) {

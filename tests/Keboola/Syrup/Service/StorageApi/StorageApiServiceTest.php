@@ -69,4 +69,19 @@ class StorageApiServiceTest extends WebTestCase
         $this->assertArrayHasKey('token', $tokenData);
         $this->assertArrayHasKey('owner', $tokenData);
     }
+
+    public function testGetBackoffTries()
+    {
+        $client = static::createClient();
+        $container = $client->getContainer();
+
+        /** @var StorageApiService $storageApiService */
+        $storageApiService = $container->get('syrup.storage_api');
+
+        $backoffTries = $storageApiService->getBackoffTries('syrup-worker.keboola.com');
+        $this->assertEquals(11, $backoffTries);
+
+        $backoffTries = $storageApiService->getBackoffTries('syrup.keboola.com');
+        $this->assertEquals(3, $backoffTries);
+    }
 }
