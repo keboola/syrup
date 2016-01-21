@@ -58,7 +58,7 @@ class SyslogProcessorTest extends TestCase
 
         $this->assertArrayHasKey('id', $newRecord['token']);
         $this->assertArrayHasKey('description', $newRecord['token']);
-        $this->assertArrayHasKey('token', $newRecord['token']);
+        $this->assertArrayNotHasKey('token', $newRecord['token']);
         $this->assertArrayHasKey('owner', $newRecord['token']);
 
         $this->assertArrayHasKey('id', $newRecord['token']['owner']);
@@ -89,7 +89,7 @@ class SyslogProcessorTest extends TestCase
 
         $this->assertArrayHasKey('id', $newRecord['token']);
         $this->assertArrayHasKey('description', $newRecord['token']);
-        $this->assertArrayHasKey('token', $newRecord['token']);
+        $this->assertArrayNotHasKey('token', $newRecord['token']);
         $this->assertArrayHasKey('owner', $newRecord['token']);
 
         $this->assertArrayHasKey('id', $newRecord['token']['owner']);
