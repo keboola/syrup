@@ -70,7 +70,6 @@ class SyslogProcessor
             $record['token'] = [
                 'id' => $this->tokenData['id'],
                 'description' => $this->tokenData['description'],
-                'token' => $this->tokenData['token'],
                 'owner' => [
                     'id' => $this->tokenData['owner']['id'],
                     'name' => $this->tokenData['owner']['name']

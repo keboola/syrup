@@ -86,6 +86,25 @@ UPGRADE FROM 2.x to 3.0
     $executor->run($job);
     ```
     
+    Also, the create method used to construct executor service name from the name of the component. 
+    This behaviour has been removed, when you want to override executor just use "syrup.job_executor" name in your service container.               
+    
+    Before:
+    ```yml
+        #services.yml        
+        ex-google-drive.job_executor:
+            class: Keboola\GoogleDriveExtractor\JobExecutor
+            arguments: [@logger]
+    ```
+    
+    After:
+    ```yml
+        #services.yml        
+        syrup.job_executor:
+            class: Keboola\GoogleDriveExtractor\JobExecutor
+            arguments: [@logger]
+    ```
+    
  * `Keboola\Syrup\Job\ExecutorInterface` has now methods:
  
     - `cleanup($job)`
