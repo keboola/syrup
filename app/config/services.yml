@@ -10,11 +10,11 @@ services:
 
     session.handler.pdo:
         class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\LegacyPdoSessionHandler
-        arguments: [@pdo, %pdo.db_options%]
+        arguments: ["@pdo", "%pdo.db_options%"]
 
     syrup.listener.exception:
         class: Keboola\Syrup\Listener\SyrupExceptionListener
-        arguments: [%app_name%, @syrup.storage_api, @logger]
+        arguments: ["%app_name%", "@syrup.storage_api", "@logger"]
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
             - { name: kernel.event_listener, event: console.exception, method: onConsoleException }
@@ -26,24 +26,24 @@ services:
 
     syrup.s3_uploader:
         class: Keboola\Syrup\Aws\S3\Uploader
-        arguments: [%uploader%]
+        arguments: ["%uploader%"]
 
     syrup.monolog.sapi_handler:
         class: Keboola\Syrup\Monolog\Handler\StorageApiHandler
-        arguments: [%app_name%, @syrup.storage_api]
+        arguments: ["%app_name%", "@syrup.storage_api"]
 
     syrup.monolog.signal_handler:
         class: Keboola\Syrup\Monolog\Handler\SignalHandler
 
     syrup.monolog.syslog_processor:
         class: Keboola\Syrup\Monolog\Processor\SyslogProcessor
-        arguments: [%app_name%, @syrup.storage_api, @syrup.s3_uploader]
+        arguments: ["%app_name%", "@syrup.storage_api", "@syrup.s3_uploader"]
         tags:
             - { name: monolog.processor, method: processRecord, handler: syrup_syslog }
 
     syrup.monolog.request_processor:
         class: Keboola\Syrup\Monolog\Processor\RequestProcessor
-        arguments: [@request_stack, @syrup.s3_uploader]
+        arguments: ["@request_stack", "@syrup.s3_uploader"]
         tags:
             - { name: monolog.processor, method: processRecord }
 
@@ -57,59 +57,64 @@ services:
 
     syrup.routing_loader:
         class: Keboola\Syrup\Routing\Loader
-        arguments: [%components%]
+        arguments: ["%components%"]
         tags:
             - { name: routing.loader }
 
     syrup.temp:
         class: Keboola\Temp\Temp
-        arguments: [%app_name%]
+        arguments: ["%app_name%"]
 
     syrup.storage_api:
         class: Keboola\Syrup\Service\StorageApi\StorageApiService
-        arguments: [@request_stack, %storage_api.url%]
+        arguments: ["@request_stack", "%storage_api.url%"]
 
     syrup.encryptor:
         class: Keboola\Syrup\Encryption\Encryptor
-        arguments: [%encryption_key%]
+        arguments: ["%encryption_key%"]
 
     syrup.encryption.base_wrapper:
         class: Keboola\Syrup\Encryption\BaseWrapper
-        arguments: [%encryption_key%]
+        arguments: ["%encryption_key%"]
         tags:
             - { name: syrup.encryption.wrapper }
 
     syrup.elasticsearch.client:
         class: Elasticsearch\Client
-        arguments: [%elasticsearch%]
+        arguments: ["%elasticsearch%"]
 
     syrup.elasticsearch.current_component_index:
         class: Keboola\Syrup\Elasticsearch\ComponentIndex
-        arguments: [%app_name%, %elasticsearch.index_prefix%, @syrup.elasticsearch.client]
+        arguments: ["%app_name%", "%elasticsearch.index_prefix%", "@syrup.elasticsearch.client"]
 
     syrup.elasticsearch.current_component_job_mapper:
         class: Keboola\Syrup\Elasticsearch\JobMapper
-        arguments: [@syrup.elasticsearch.client, @syrup.elasticsearch.current_component_index, @syrup.object_encryptor, @logger, %kernel.root_dir%]
+        arguments:
+          - "@syrup.elasticsearch.client"
+          - "@syrup.elasticsearch.current_component_index"
+          - "@syrup.object_encryptor"
+          - "@logger"
+          - "%kernel.root_dir%"
 
     syrup.elasticsearch.search:
         class: Keboola\Syrup\Elasticsearch\Search
-        arguments: [@syrup.elasticsearch.client, %elasticsearch.index_prefix%, @syrup.object_encryptor, @logger]
+        arguments: ["@syrup.elasticsearch.client", "%elasticsearch.index_prefix%", "@syrup.object_encryptor", "@logger"]
 
     syrup.queue_factory:
         class: Keboola\Syrup\Service\Queue\QueueFactory
-        arguments: [@doctrine.dbal.syrup_connection, %queue%, %app_name%]
+        arguments: ["@doctrine.dbal.syrup_connection", "%queue%", "%app_name%"]
 
     syrup.job_factory:
         class: Keboola\Syrup\Job\Metadata\JobFactory
-        arguments: [%app_name%, @syrup.object_encryptor, @syrup.storage_api]
+        arguments: ["%app_name%", "@syrup.object_encryptor", "@syrup.storage_api"]
 
     syrup.job_executor:
         class: Keboola\Syrup\Job\Executor
 
     syrup.job_executor_factory:
         class: Keboola\Syrup\Job\ExecutorFactory
-        arguments: [@syrup.storage_api, @syrup.job_executor]
+        arguments: ["@syrup.storage_api", "@syrup.job_executor"]
 
     syrup.object_encryptor:
         class: Keboola\Syrup\Service\ObjectEncryptor
-        arguments: [@syrup.encryptor]
+        arguments: ["@syrup.encryptor"]
