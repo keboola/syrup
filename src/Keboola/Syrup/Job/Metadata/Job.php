@@ -188,6 +188,9 @@ class Job implements JobInterface
 
     public function setResult($result)
     {
+        if (is_array($result) && isset($result["message"])) {
+            $result["message"] = mb_convert_encoding($result["message"], 'UTF-8', 'UTF-8');
+        }
         $this->data['result'] = $result;
         return $this;
     }
