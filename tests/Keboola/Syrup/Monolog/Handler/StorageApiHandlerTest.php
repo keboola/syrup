@@ -221,11 +221,34 @@ class StorageApiHandlerTest extends TestCase
 
     public function testSanitizeExceptionMessage()
     {
-        /** @var Client $client */
-        /** @var StorageApiHandler $handler */
-        list($client, $handler) = $this->initHandlerAndClient();
-        $message = "SQLSTATE[XX000]: " . chr(0x00000080) . " abcd";
-        $this->assertEquals("SQLSTATE[XX000]: ? abcd", $handler->sanitizeExceptionMessage($message));
+        $storageClientStub = $this->getMockBuilder("\\Keboola\\StorageApi\\Client")
+            ->disableOriginalConstructor()
+            ->getMock();
+        $storageClientStub->expects($this->once())
+            ->method("getRunId")
+            ->will($this->returnValue("123456"));
+        $storageClientStub->expects($this->once())
+            ->method("createEvent")
+            ->with($this->callback(function ($event) {
+                if ($event->getMessage() == 'SQLSTATE[XX000]: ? abcd') {
+                    return true;
+                }
+                return false;
+            }));
+
+        $storageServiceStub = $this->getMockBuilder("\\Keboola\\Syrup\\Service\\StorageApi\\StorageApiService")
+            ->disableOriginalConstructor()
+            ->getMock();
+        $storageServiceStub->expects($this->atLeastOnce())
+            ->method("getClient")
+            ->will($this->returnValue($storageClientStub));
+
+        $handler = new StorageApiHandler("testsuite", $storageServiceStub);
+        $record = [
+            "message" => "SQLSTATE[XX000]: " . chr(0x00000080) . " abcd",
+            "level" => "info"
+        ];
+        $handler->handle($record);
     }
 
     private function initHandlerAndClient()
