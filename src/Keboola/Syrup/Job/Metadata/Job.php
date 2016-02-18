@@ -188,6 +188,9 @@ class Job implements JobInterface
 
     public function setResult($result)
     {
+        if (is_array($result) && isset($result["message"])) {
+            $result["message"] = \Keboola\Utils\sanitizeUtf8($result["message"]);
+        }
         $this->data['result'] = $result;
         return $this;
     }
