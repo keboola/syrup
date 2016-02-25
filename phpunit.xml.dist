@@ -14,19 +14,10 @@
     <php>
         <server name="KERNEL_DIR" value="app/" />
         <ini name="date.timezone" value="Europe/Prague"/>
-        <ini name="display_errors" value="true"/>
     </php>
     <testsuites>
         <testsuite name="unit">
-            <directory>tests/Keboola/Syrup/Aws</directory>
-            <directory>tests/Keboola/Syrup/Debug</directory>
-            <directory>tests/Keboola/Syrup/Elasticsearch</directory>
-            <directory>tests/Keboola/Syrup/Listener</directory>
-            <directory>tests/Keboola/Syrup/Monolog</directory>
-            <directory>tests/Keboola/Syrup/Command</directory>
-            <directory>tests/Keboola/Syrup/Controller</directory>
-            <directory>tests/Keboola/Syrup/Job</directory>
-            <directory>tests/Keboola/Syrup/Service</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
     <filter>
