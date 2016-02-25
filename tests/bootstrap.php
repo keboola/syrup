@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Keboola\Syrup\Debug\Debug;
+
 defined('SYRUP_APP_NAME') || define('SYRUP_APP_NAME', getenv('SYRUP_APP_NAME')? getenv('SYRUP_APP_NAME') : 'syrup-test');
 defined('SYRUP_DATABASE_PORT') || define('SYRUP_DATABASE_PORT', getenv('SYRUP_DATABASE_PORT')? getenv('SYRUP_DATABASE_PORT') : null);
 defined('SYRUP_DATABASE_HOST') || define('SYRUP_DATABASE_HOST', getenv('SYRUP_DATABASE_HOST')? getenv('SYRUP_DATABASE_HOST') : '127.0.0.1');
@@ -88,4 +90,8 @@ $db->insert('queues', [
 passthru('php vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php '
     . 'app vendor');
 passthru(sprintf('php "%s/../app/console" cache:clear --env=test', __DIR__));
+passthru(sprintf('php "%s/../app/console" cache:clear --env=dev', __DIR__));
+passthru(sprintf('php "%s/../app/console" cache:clear --env=prod', __DIR__));
 passthru(sprintf('php "%s/../app/console" syrup:create-index -d  --env=test', __DIR__));
+
+Debug::enable(null, true, 'prod');

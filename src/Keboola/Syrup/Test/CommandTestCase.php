@@ -33,7 +33,6 @@ class CommandTestCase extends WebTestCase
     protected function setUp()
     {
         $this->bootKernel([
-            'environment' => 'prod',
             'debug' => true
         ]);
 
@@ -91,7 +90,8 @@ class CommandTestCase extends WebTestCase
                     'host' => gethostname(),
                     'pid' => getmypid()
                 ],
-                'createdTime' => date('c')
+                'createdTime' => date('c'),
+                'lockName' => 'test-' . microtime(true)
             ], null, null, null);
     }
 }

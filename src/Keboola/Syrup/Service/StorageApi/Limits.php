@@ -18,6 +18,7 @@ class Limits
     public static function unlimitedComponents()
     {
         return array(
+            'syrup',
             'orchestrator',
         );
     }

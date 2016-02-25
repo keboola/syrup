@@ -31,9 +31,6 @@ class ErrorCommand extends ContainerAwareCommand
 
         switch ($error) {
             case 'notice':
-//                $foo = ['a', 'b', 'c'];
-//                $e = $foo['5'];
-//                echo $e;
                 trigger_error('This is NOTICE!', E_USER_NOTICE);
                 break;
             case 'warning':
