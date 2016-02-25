@@ -41,7 +41,7 @@ class ErrorCommand extends ContainerAwareCommand
                 break;
             case 'memory':
                 $str = "something";
-                while(true) {
+                while (true) {
                     $str .= "something else";
                 }
                 break;
@@ -49,5 +49,4 @@ class ErrorCommand extends ContainerAwareCommand
                 echo "You must specify one of 'notice | warning | fatal | memory'";
         }
     }
-
 }

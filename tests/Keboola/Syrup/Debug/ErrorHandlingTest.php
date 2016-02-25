@@ -40,7 +40,7 @@ class ErrorHandlingTest extends CommandTestCase
             ->getMock();
         $syslogProcessorMock->expects($this->any())
             ->method("processRecord")
-            ->with($this->callback(function($subject) use (&$errorOccured) {
+            ->with($this->callback(function ($subject) use (&$errorOccured) {
                 if ($subject['message'] == 'Notice: Undefined offset: 3') {
                     $e = $subject['context']['exception'];
                     $errorOccured = true;
@@ -76,7 +76,7 @@ class ErrorHandlingTest extends CommandTestCase
             ->getMock();
         $exceptionListener->expects($this->any())
             ->method("onConsoleException")
-            ->with($this->callback(function($event) use (&$errorOccured) {
+            ->with($this->callback(function ($event) use (&$errorOccured) {
                 $errorOccured = true;
                 $this->assertEquals("User Notice: This is NOTICE!", $event->getException()->getMessage());
                 return true;
