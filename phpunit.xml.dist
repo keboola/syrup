@@ -18,9 +18,22 @@
     </php>
     <testsuites>
         <testsuite name="unit">
-            <directory>tests/</directory>
+            <directory>tests/Keboola/Syrup/Aws</directory>
+            <directory>tests/Keboola/Syrup/Debug</directory>
+            <directory>tests/Keboola/Syrup/Elasticsearch</directory>
+            <directory>tests/Keboola/Syrup/Listener</directory>
+            <directory>tests/Keboola/Syrup/Monolog</directory>
+            <directory>tests/Keboola/Syrup/Command</directory>
+            <directory>tests/Keboola/Syrup/Controller</directory>
+            <directory>tests/Keboola/Syrup/Job</directory>
+            <directory>tests/Keboola/Syrup/Service</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
     <logging>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
     </logging>
