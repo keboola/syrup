@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * Created by PhpStorm.
+ * User: miroslavcillik
+ * Date: 24/02/16
+ * Time: 14:02
+ */
 namespace Keboola\Syrup\Test\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -8,12 +13,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Created by PhpStorm.
- * User: miroslavcillik
- * Date: 24/02/16
- * Time: 14:02
- */
 class ErrorCommand extends ContainerAwareCommand
 {
     protected function configure()
