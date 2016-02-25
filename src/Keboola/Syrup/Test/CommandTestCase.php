@@ -32,7 +32,10 @@ class CommandTestCase extends WebTestCase
 
     protected function setUp()
     {
-        $this->bootKernel();
+        $this->bootKernel([
+            'environment' => 'prod',
+            'debug' => true
+        ]);
 
         $this->application = new Application(self::$kernel);
 

@@ -8,6 +8,7 @@
 
 namespace Keboola\Syrup\Debug;
 
+use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\ExceptionHandler as BaseExceptionHandler;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +40,11 @@ class ExceptionHandler extends BaseExceptionHandler
     {
         $handler = new static($debug, 'UTF-8', $env);
 
-        set_exception_handler([$handler, 'handle']);
+        $prev = set_exception_handler([$handler, 'handle']);
+        if (is_array($prev) && $prev[0] instanceof ErrorHandler) {
+            restore_exception_handler();
+            $prev[0]->setExceptionHandler(array($handler, 'handle'));
+        }
 
         return $handler;
     }

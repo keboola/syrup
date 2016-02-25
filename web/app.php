@@ -17,7 +17,7 @@ $loader = new ApcClassLoader('sf2', $loader);
 $loader->register(true);
 */
 
-Debug::enable('prod');
+Debug::enable(null, true, 'prod');
 
 require_once __DIR__.'/../app/AppKernel.php';
 //require_once __DIR__.'/../app/AppCache.php';

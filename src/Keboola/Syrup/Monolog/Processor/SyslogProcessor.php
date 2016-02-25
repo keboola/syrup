@@ -93,6 +93,7 @@ class SyslogProcessor
                     'code' => $e->getCode(),
                     'attachment' => $this->s3Uploader->uploadString('exception', $html, 'text/html')
                 ];
+//                var_dump($record['exception']['message']);
             }
         }
 

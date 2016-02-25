@@ -10,5 +10,20 @@ _configurator:
     resource: "@SensioDistributionBundle/Resources/config/routing/webconfigurator.xml"
     prefix:   /_configurator
 
+keboola_syrup_test_notice:
+    path: /tests/notice
+    defaults: { _controller: Keboola\Syrup\Test\Controller\TestController::noticeAction }
+    methods: [GET]
+
+keboola_syrup_test_fatal:
+    path: /tests/fatal
+    defaults: { _controller: Keboola\Syrup\Test\Controller\TestController::fatalAction }
+    methods: [GET]
+
+keboola_syrup_test_memory:
+    path: /tests/memory
+    defaults: { _controller: Keboola\Syrup\Test\Controller\TestController::memoryAction }
+    methods: [GET]
+
 _main:
     resource: routing.yml

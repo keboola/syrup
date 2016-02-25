@@ -8,6 +8,7 @@
 
 namespace Keboola\Syrup\Debug;
 
+use Symfony\Component\Debug\BufferingLogger;
 use Symfony\Component\Debug\DebugClassLoader;
 use Symfony\Component\Debug\Debug as BaseDebug;
 use Symfony\Component\Debug\ErrorHandler;
@@ -16,7 +17,7 @@ class Debug extends BaseDebug
 {
     private static $enabled = false;
 
-    public static function enable($environment = 'dev', $displayErrors = true)
+    public static function enable($errorReportingLevel = null, $displayErrors = true, $environment = 'dev')
     {
         if (static::$enabled) {
             return;
@@ -29,7 +30,7 @@ class Debug extends BaseDebug
         // Beware, ExceptionHandler::register and ErrorHandler::register must be called in this order
         // to fatal errors handling work
         ExceptionHandler::register(true, $environment);
-        ErrorHandler::register();
+        ErrorHandler::register(new ErrorHandler(new BufferingLogger()));
         DebugClassLoader::enable();
     }
 }
