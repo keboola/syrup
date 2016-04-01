@@ -90,6 +90,7 @@ class JobCommandTest extends CommandTestCase
 
         $job = $this->jobMapper->get($jobId);
         $result = $job->getResult();
+
         $this->assertArrayHasKey('testing', $result);
         $this->assertArrayHasKey(HookExecutor::HOOK_RESULT_KEY, $result);
         $this->assertEquals(HookExecutor::HOOK_RESULT_VALUE, $result[HookExecutor::HOOK_RESULT_KEY]);
@@ -101,6 +102,6 @@ class JobCommandTest extends CommandTestCase
         self::$kernel->getContainer()->set('syrup.job_executor', new MaintenanceExecutor());
         $jobId = $this->jobMapper->create($this->createJob());
         $this->commandTester->execute(['jobId'   => $jobId]);
-        $this->assertEquals(JobCommand::STATUS_LOCK, $this->commandTester->getStatusCode());
+        $this->assertEquals(JobCommand::STATUS_RETRY, $this->commandTester->getStatusCode());
     }
 }

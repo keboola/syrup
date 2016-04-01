@@ -49,6 +49,14 @@
                                     "index": "not_analyzed"
                                 }
                             }
+                        },
+                        "features": {
+                            "type": "object",
+                            "enabled": false
+                        },
+                        "limits": {
+                            "type": "object",
+                            "enabled": false
                         }
                     }
                 },
