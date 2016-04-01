@@ -47,7 +47,9 @@ class JobFactory
                 'runId' => $this->storageApiClient->generateRunId($this->storageApiClient->getRunId()),
                 'project' => [
                     'id' => $tokenData['owner']['id'],
-                    'name' => $tokenData['owner']['name']
+                    'name' => $tokenData['owner']['name'],
+                    'features' => $tokenData['owner']['features'],
+                    'limits' => $tokenData['owner']['limits']
                 ],
                 'token' => [
                     'id' => $tokenData['id'],
