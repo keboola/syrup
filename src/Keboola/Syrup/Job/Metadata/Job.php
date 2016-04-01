@@ -39,9 +39,7 @@ class Job implements JobInterface
         'lockName' => null,
         'project' => [
             'id' => null,
-            'name' => null,
-            'features' => null,
-            'limits' => null
+            'name' => null
         ],
         'token' => [
             'id' => null,
