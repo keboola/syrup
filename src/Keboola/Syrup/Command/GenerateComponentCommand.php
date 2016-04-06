@@ -32,7 +32,7 @@ class GenerateComponentCommand extends GeneratorCommand
                     (ie. ex-twitter, ex-google-drive, wr-db, ...)'),
                 new InputOption('dir', '', InputOption::VALUE_OPTIONAL, 'The directory where to create the bundle')
             ))
-            ->setDescription('Generates a component')
+            ->setDescription('!!!DEPRECATED! This command is deprecated and will be removed in 4.0.!!! Generates a component')
             ->setHelp(
                 <<<EOT
 The <info>generate:bundle</info> command helps you generate new components.
