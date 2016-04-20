@@ -33,16 +33,6 @@ class PublicControllerTest extends WebTestCase
         $this->container = $container;
     }
 
-    public function testIndexAction()
-    {
-        static::$client->request('GET', '/');
-        var_dump(static::$client->getResponse()->getContent());
-        $res = json_decode(static::$client->getResponse()->getContent(), true);
-        $this->assertArrayHasKey('host', $res);
-        $this->assertArrayHasKey('components', $res);
-        $this->assertGreaterThan(0, count($res['components']));
-    }
-
     public function testEncryptActionSimpleText()
     {
         static::$client->request('POST', '/syrup/encrypt', [], [], ['CONTENT_TYPE' => 'text/plain'], 'abcd');
