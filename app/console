@@ -16,8 +16,8 @@ use Keboola\Syrup\Debug\Debug;
 
 $input = new ArgvInput();
 $env = $input->getParameterOption(array('--env', '-e'), getenv('SYMFONY_ENV') ?: 'prod');
-$debug = getenv('SYMFONY_DEBUG') !== '0' && !$input->hasParameterOption(array('--no-debug', ''));
-Debug::enable(null, true, $env);
+$debug = getenv('SYMFONY_DEBUG') !== '0' && !$input->hasParameterOption(array('--no-debug', '') && $env !== 'prod');
+Debug::enable($env);
 $kernel = new AppKernel($env, $debug);
 $application = new Application($kernel);
 $application->run($input);

@@ -17,7 +17,7 @@ class Debug extends BaseDebug
 {
     private static $enabled = false;
 
-    public static function enable($errorReportingLevel = null, $displayErrors = true, $environment = 'dev')
+    public static function enable($environment = 'dev')
     {
         if (static::$enabled) {
             return;
