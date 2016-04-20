@@ -29,8 +29,10 @@ class PublicController extends BaseController
      */
     public function indexAction()
     {
+        var_dump(ROOT_PATH);
         $rootPath = str_replace('web/../', '', ROOT_PATH);
 
+        var_dump($rootPath);
         $filepath = $rootPath . '/../../composer/installed.json';
 
         if (!file_exists($filepath)) {
