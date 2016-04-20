@@ -36,6 +36,7 @@ class PublicControllerTest extends WebTestCase
     public function testIndexAction()
     {
         static::$client->request('GET', '/');
+        var_dump(static::$client->getResponse()->getContent());
         $res = json_decode(static::$client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('host', $res);
         $this->assertArrayHasKey('components', $res);

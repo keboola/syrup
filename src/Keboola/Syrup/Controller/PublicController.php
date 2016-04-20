@@ -16,6 +16,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
+/**
+ * Class PublicController - controller for actions not requiring Storage Tokens
+ * @package Keboola\Syrup\Controller
+ */
 class PublicController extends BaseController
 {
     /**
