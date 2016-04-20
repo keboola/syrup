@@ -12,7 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Keboola\Syrup\Exception\UserException;
 use Keboola\Temp\Temp;
 
@@ -32,13 +31,13 @@ class BaseController extends Controller
     {
         $this->componentName = $this->container->getParameter('app_name');
 
-        $pathInfo = explode('/', $request->getPathInfo());
-        $actionName = $pathInfo[2];
-
         $this->initLogger();
         $this->initTemp();
 
-        $this->logger->debug('Component ' . $this->componentName . ' started action ' . $actionName);
+        $pathInfo = explode('/', $request->getPathInfo());
+        $this->logger->debug(
+            'Component ' . $this->componentName . ' started action ' . (count($pathInfo) > 2 ? $pathInfo[2] : "")
+        );
     }
 
     protected function initTemp()

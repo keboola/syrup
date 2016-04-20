@@ -9,12 +9,14 @@
 namespace Keboola\Syrup\Controller;
 
 use Keboola\Syrup\Exception\SyrupComponentException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Keboola\Syrup\Exception\UserException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
-class IndexController extends Controller
+class PublicController extends BaseController
 {
     /**
      * Displays Syrup components with their recent version
@@ -55,5 +57,31 @@ class IndexController extends Controller
     public function notFoundAction()
     {
         throw new SyrupComponentException(404, "Route not found");
+    }
+
+    /**
+     * Run Action
+     *
+     * Creates new job, saves it to Elasticsearch and add to SQS
+     *
+     * @param Request $request
+     * @return Response
+     * @throws UserException
+     */
+    public function encryptAction(Request $request)
+    {
+        $encryptor = $this->container->get("syrup.object_encryptor");
+        $contentType = $request->headers->get('Content-type');
+        $contentType = strtolower(trim(explode(';', $contentType)[0]));
+        if ($contentType == "text/plain") {
+            $encryptedValue = $encryptor->encrypt($request->getContent());
+            return $this->createResponse($encryptedValue, 200, ["Content-Type" => "text/plain"]);
+        } elseif ($contentType == "application/json") {
+            $params = $this->getPostJson($request, false);
+            $encryptedValue = $encryptor->encrypt($params);
+            return $this->createJsonResponse($encryptedValue, 200, ["Content-Type" => "application/json"]);
+        } else {
+            throw new UserException("Incorrect Content-Type.");
+        }
     }
 }
