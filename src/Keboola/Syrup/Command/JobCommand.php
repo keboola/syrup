@@ -10,7 +10,6 @@ namespace Keboola\Syrup\Command;
 
 use Keboola\Syrup\Elasticsearch\Search;
 use Keboola\Syrup\Exception\MaintenanceException;
-use Keboola\Syrup\Job\HookExecutorInterface;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Keboola\Syrup\Service\StorageApi\Limits;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
@@ -230,12 +229,6 @@ class JobCommand extends ContainerAwareCommand
         // postExecution action
         try {
             $jobExecutor->postExecute($this->job);
-
-            //@todo: remove call to this deprecated interface method in 4.0
-            if ($jobExecutor instanceof HookExecutorInterface) {
-                /** @var HookExecutorInterface $jobExecutor */
-                $jobExecutor->postExecution($this->job);
-            }
         } catch (\Exception $e) {
             $this->logException('critical', $e);
         }
