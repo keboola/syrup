@@ -163,6 +163,7 @@ class JobCommand extends ContainerAwareCommand
             ];
             $jobStatus = Job::STATUS_PROCESSING;
             $status = self::STATUS_RETRY;
+
         } catch (MaintenanceException $e) {
             $jobResult = [];
             $jobStatus = Job::STATUS_PROCESSING;
@@ -176,6 +177,7 @@ class JobCommand extends ContainerAwareCommand
             $jobStatus = Job::STATUS_ERROR;
             $this->job->setError(Job::ERROR_USER);
             $status = self::STATUS_SUCCESS;
+
         } catch (JobException $e) {
             $logLevel = 'error';
             if ($e->getStatus() === Job::STATUS_WARNING) {

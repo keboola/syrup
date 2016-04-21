@@ -140,6 +140,7 @@ EOT
             if (file_exists($dir . 'parameters.yml')) {
                 file_put_contents($dir . 'parameters.yml', $yaml);
             }
+
         } catch (\Exception $e) {
             return array($e->getMessage());
         }
