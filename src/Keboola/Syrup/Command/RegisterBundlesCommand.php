@@ -66,7 +66,8 @@ class RegisterBundlesCommand extends ContainerAwareCommand
 
                 $output->writeln($bundleName . " succesfully registered to Kernel." . PHP_EOL);
             }
-
         }
+
+        return 0;
     }
 }
