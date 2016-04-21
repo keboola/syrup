@@ -64,8 +64,7 @@ class JobFactory
                     'pid' => getmypid()
                 ],
                 'nestingLevel' => 0,
-                'createdTime' => date('c'),
-                'protocol' => 'v2'
+                'createdTime' => date('c')
             ], null, null, null);
 
         if ($lockName) {
