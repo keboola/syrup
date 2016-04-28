@@ -7,6 +7,7 @@
 
 namespace Keboola\Syrup\Job\Metadata;
 
+use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Service\ObjectEncryptor;
 
@@ -457,10 +458,5 @@ class Job implements JobInterface
         $this->encryptor = $encryptor;
 
         return $this;
-    }
-
-    public function getProtocol()
-    {
-        return $this->getProperty('protocol');
     }
 }

@@ -49,14 +49,6 @@
                                     "index": "not_analyzed"
                                 }
                             }
-                        },
-                        "features": {
-                            "type": "object",
-                            "enabled": false
-                        },
-                        "limits": {
-                            "type": "object",
-                            "enabled": false
                         }
                     }
                 },
@@ -166,12 +158,8 @@
                     }
                 },
                 "encrypted": {
-                    "index": "not_analyzed",
-                    "type": "string"
-                },
-                "protocol": {
-                    "index": "not_analyzed",
-                    "type": "string"
+                  "index": "not_analyzed",
+                  "type": "string"
                 }
             }
         }

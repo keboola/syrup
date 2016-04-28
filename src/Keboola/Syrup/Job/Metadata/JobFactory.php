@@ -47,9 +47,7 @@ class JobFactory
                 'runId' => $this->storageApiClient->generateRunId($this->storageApiClient->getRunId()),
                 'project' => [
                     'id' => $tokenData['owner']['id'],
-                    'name' => $tokenData['owner']['name'],
-                    'features' => $tokenData['owner']['features'],
-                    'limits' => $tokenData['owner']['limits']
+                    'name' => $tokenData['owner']['name']
                 ],
                 'token' => [
                     'id' => $tokenData['id'],
@@ -64,8 +62,7 @@ class JobFactory
                     'pid' => getmypid()
                 ],
                 'nestingLevel' => 0,
-                'createdTime' => date('c'),
-                'protocol' => 'v2'
+                'createdTime' => date('c')
             ], null, null, null);
 
         if ($lockName) {

@@ -8,9 +8,11 @@
 
 namespace Keboola\Syrup\Command;
 
+use Doctrine\DBAL\Connection;
+use Keboola\Encryption\EncryptorInterface;
 use Keboola\Syrup\Elasticsearch\Search;
 use Keboola\Syrup\Exception\MaintenanceException;
-use Keboola\Syrup\Job\HookExecutorInterface;
+use Keboola\Syrup\Job\ExecutorFactory;
 use Keboola\Syrup\Service\ObjectEncryptor;
 use Keboola\Syrup\Service\StorageApi\Limits;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
@@ -26,15 +28,20 @@ use Keboola\Syrup\Exception\UserException;
 use Keboola\StorageApi\Client as SapiClient;
 use Keboola\Syrup\Job\Exception\InitializationException;
 use Keboola\Syrup\Job\ExecutorInterface;
+use Keboola\Syrup\Job\HookExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\Db\Lock;
 use Keboola\Syrup\Elasticsearch\JobMapper;
+use Keboola\Syrup\Service\StorageApi\Limits as StorageApiLimits;
 
 class JobCommand extends ContainerAwareCommand
 {
     const STATUS_SUCCESS = 0;
     const STATUS_ERROR = 1;
+    const STATUS_LOCK = 64;
     const STATUS_RETRY = 65;
+
+    const PARALLEL_LIMIT_LOCK_TIMEOUT = 3;
 
     /** @var Job */
     protected $job;
@@ -100,6 +107,12 @@ class JobCommand extends ContainerAwareCommand
         $logProcessor = $this->getContainer()->get('syrup.monolog.syslog_processor');
         $logProcessor->setRunId($this->job->getRunId());
         $logProcessor->setTokenData($storageApiService->getTokenData());
+
+        // Lock DB
+        /** @var Connection $conn */
+        $conn = $this->getContainer()->get('doctrine.dbal.lock_connection');
+        $conn->exec('SET wait_timeout = 31536000;');
+        $this->lock = new Lock($conn, $this->job->getLockName());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -115,6 +128,9 @@ class JobCommand extends ContainerAwareCommand
             $this->logException('error', $e);
 
             // Don't update job status or result -> error could be related to ES
+            // Don't unlock DB, error happened either before lock creation or when creating the lock,
+            // so the DB isn't locked
+
             return self::STATUS_RETRY;
         }
 
@@ -122,12 +138,43 @@ class JobCommand extends ContainerAwareCommand
             throw new UserException("Missing jobId argument.");
         }
 
+        if (!$this->lock->lock()) {
+            return self::STATUS_LOCK;
+        }
+
+        /** @var Connection $checkConn */
+        $checkConn = null;
+        /** @var Lock $validationLock */
+        $validationLock = null;
+        if (StorageApiLimits::hasParallelLimit($this->storageApiService->getTokenData())) {
+            try {
+                $checkConn = $this->getContainer()->get('doctrine.dbal.limit_lock_connection');
+                $checkConn->exec('SET wait_timeout = 31536000;');
+
+                $validationLock = new Lock(
+                    $checkConn,
+                    sprintf('syrup-%s-job-limit-check', $this->job->getProject()['id'])
+                );
+
+                if (!$validationLock->lock(self::PARALLEL_LIMIT_LOCK_TIMEOUT)) {
+                    throw new \RuntimeException('Could not lock for parallel validation');
+                }
+
+                if ($this->isParallelLimitExceeded()) {
+                    throw new \RuntimeException('Exceeded parallel processing limit');
+                }
+            } catch (\RuntimeException $e) {
+                return self::STATUS_LOCK;
+            }
+        }
+
+
         // check job status
         $this->job = $this->jobMapper->get($jobId);
 
         if (!in_array($this->job->getStatus(), [Job::STATUS_WAITING, Job::STATUS_PROCESSING])) {
             // job is not waiting or processing
-            return self::STATUS_ERROR;
+            return self::STATUS_LOCK;
         }
 
         $startTime = time();
@@ -151,6 +198,11 @@ class JobCommand extends ContainerAwareCommand
 
         // Execute job
         try {
+            if (StorageApiLimits::hasParallelLimit($this->storageApiService->getTokenData())) {
+                $validationLock->unlock();
+                $checkConn->close();
+            }
+
             $jobResult = $jobExecutor->execute($this->job);
             $jobStatus = Job::STATUS_SUCCESS;
             $status = self::STATUS_SUCCESS;
@@ -165,8 +217,8 @@ class JobCommand extends ContainerAwareCommand
             $status = self::STATUS_RETRY;
         } catch (MaintenanceException $e) {
             $jobResult = [];
-            $jobStatus = Job::STATUS_PROCESSING;
-            $status = self::STATUS_RETRY;
+            $jobStatus = Job::STATUS_WAITING;
+            $status = self::STATUS_LOCK;
         } catch (UserException $e) {
             $exceptionId = $this->logException('error', $e);
             $jobResult = [
@@ -229,7 +281,7 @@ class JobCommand extends ContainerAwareCommand
         try {
             $jobExecutor->postExecute($this->job);
 
-            //@todo: remove call to this deprecated interface method in 4.0
+            //@todo: remove call to this deprecated interface method
             if ($jobExecutor instanceof HookExecutorInterface) {
                 /** @var HookExecutorInterface $jobExecutor */
                 $jobExecutor->postExecution($this->job);
@@ -237,6 +289,9 @@ class JobCommand extends ContainerAwareCommand
         } catch (\Exception $e) {
             $this->logException('critical', $e);
         }
+
+        // DB unlock
+        $this->lock->unlock();
 
         return $status;
     }
