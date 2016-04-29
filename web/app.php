@@ -17,12 +17,12 @@ $loader = new ApcClassLoader('sf2', $loader);
 $loader->register(true);
 */
 
-Debug::enable(null, true, 'prod');
+Debug::enable('prod');
 
 require_once __DIR__.'/../app/AppKernel.php';
 //require_once __DIR__.'/../app/AppCache.php';
 
-$kernel = new AppKernel('prod', false);
+$kernel = new AppKernel('prod', true);
 $kernel->loadClassCache();
 $request = Request::createFromGlobals();
 
