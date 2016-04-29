@@ -1,6 +1,6 @@
 keboola_syrup_index:
     path:      /
-    defaults:  { _controller: SyrupBundle:Index:index }
+    defaults:  { _controller: SyrupBundle:Public:index }
 
 keboola_syrup_core:
     resource: .
@@ -20,12 +20,12 @@ keboola_syrup_api_run:
 
 keboola_syrup_api_encrypt:
     path:     /{componentName}/encrypt
-    defaults: { _controller: SyrupBundle:Api:encrypt, _format: json }
+    defaults: { _controller: SyrupBundle:Public:encrypt, _format: json }
     methods:  [POST]
 
 
 keboola_syrup_not_found:
     path:      /{path}
-    defaults:  { _controller: SyrupBundle:Index:notFound }
+    defaults:  { _controller: SyrupBundle:Public:notFound }
     requirements:
         path: .*
