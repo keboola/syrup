@@ -87,7 +87,9 @@ class ExceptionHandler extends BaseExceptionHandler
         ];
 
         // log to syslog
+        openlog($appName, LOG_ODELAY, LOG_LOCAL0);
         syslog(LOG_ERR, json_encode($logData));
+        closelog();
 
         $response = [
             "status" => "error",
@@ -146,12 +148,13 @@ class ExceptionHandler extends BaseExceptionHandler
                         </h2>
                         <div class="block">
 EOF;
+
                     $content .= sprintf(
                         $contentTemplate,
                         $ind,
                         $total,
                         $class,
-                        $e['code'],
+                        empty($e['code'])?0:$e['code'],
                         $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']),
                         $message
                     );

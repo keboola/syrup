@@ -11,26 +11,42 @@ namespace Keboola\Syrup\Tests\Command;
 use Symfony\Component\Console\Application;
 use Keboola\Syrup\Test\Command\ErrorCommand;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Process\Process;
 
 class ErrorCommandTest extends \PHPUnit_Framework_TestCase
 {
     public function testNoticeToExceptionCommand()
     {
-        $application = new Application();
-        $command = $application->add(new ErrorCommand());
+        $process = $this->runErrorCommand('notice');
+        $this->assertContains('Symfony\Component\Debug\Exception\ContextErrorException', $process->getErrorOutput());
+    }
 
-        $commandTester = new CommandTester($command);
-        $exceptionOccured = false;
-        try {
-            $commandTester->execute([
-                'command' => $command->getName(),
-                'error' => 'notice'
-            ]);
-        } catch (\Exception $e) {
-            $exceptionOccured = true;
-            $this->assertInstanceOf('\Symfony\Component\Debug\Exception\ContextErrorException', $e);
-        }
+    public function testWarningToExceptionCommand()
+    {
+        $process = $this->runErrorCommand('warning');
+        $this->assertContains('Symfony\Component\Debug\Exception\ContextErrorException', $process->getErrorOutput());
+    }
 
-        $this->assertTrue($exceptionOccured);
+    public function testFatalErrorToExceptionCommand()
+    {
+        $process = $this->runErrorCommand('fatal');
+        $this->assertContains('Symfony\Component\Debug\Exception\ClassNotFoundException', $process->getErrorOutput());
+        $this->assertContains('exceptionId', (string) $process->getOutput());
+    }
+
+    public function testFatalErrorMemoryToExceptionCommand()
+    {
+        $process = $this->runErrorCommand('memory');
+        $this->assertContains('Allowed memory size of', $process->getErrorOutput());
+        $this->assertContains('exceptionId', (string) $process->getOutput());
+    }
+
+    private function runErrorCommand($errorType)
+    {
+        $cmd = sprintf('php ' . __DIR__ . '/../../../../app/console syrup:test:error %s --env prod', $errorType);
+        $process = new Process($cmd);
+        $process->run();
+
+        return $process;
     }
 }
