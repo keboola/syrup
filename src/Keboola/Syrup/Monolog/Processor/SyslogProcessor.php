@@ -100,7 +100,7 @@ class SyslogProcessor
         if (strlen($json) < 1024) {
             return $record;
         } else {
-            $record['attachment'] = $this->s3Uploader->uploadString('log', $json, 'text/json');
+            $record['attachment'] = $this->s3Uploader->uploadString('log', $json, 'application/json');
             if (mb_strlen($record['message']) > 256) {
                 $record['message'] = mb_substr($record['message'], 0, 256);
             }
