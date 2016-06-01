@@ -33,7 +33,9 @@ class QueueRegisterCommand extends ContainerAwareCommand
         $data = $input->getArguments();
 
         /** @var Connection $conn */
-        $conn = $this->getContainer()->get('database_connection');
+        $conn = $this->getContainer()->get('doctrine.dbal.syrup_connection');
+
+        unset($data['command']);
 
         $conn->insert('queues', $data);
     }
