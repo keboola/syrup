@@ -7,6 +7,10 @@ framework:
 
 monolog:
     handlers:
+        console:
+            type: console
+            verbosity_levels:
+                VERBOSITY_NORMAL: EMERGENCY
         syrup_syslog:
             type: syslog
             ident: %app_name%
