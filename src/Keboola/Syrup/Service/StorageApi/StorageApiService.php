@@ -43,7 +43,9 @@ class StorageApiService
             return $client;
         } catch (ClientException $e) {
             if ($e->getCode() == 401) {
-                throw new UserException("Invalid StorageApi Token");
+                throw new UserException("Invalid StorageApi Token", $e);
+            } elseif ($e->getCode() < 500) {
+                throw new UserException($e->getMessage(), $e);
             }
             throw $e;
         }
