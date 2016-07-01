@@ -87,9 +87,9 @@ $db->insert('queues', [
     'url' => SYRUP_SQS_URL
 ]);
 
-passthru('php vendor/sensio/distribution-bundle/Sensio/Bundle/DistributionBundle/Resources/bin/build_bootstrap.php '
+passthru('php vendor/sensio/distribution-bundle/Resources/bin/build_bootstrap.php '
     . 'app vendor');
-passthru(sprintf('php "%s/../app/console" cache:clear --env=test', __DIR__));
-passthru(sprintf('php "%s/../app/console" syrup:create-index -d  --env=test', __DIR__));
+passthru(sprintf('php "%s/../bin/console" cache:clear --env=test', __DIR__));
+passthru(sprintf('php "%s/../bin/console" syrup:create-index -d  --env=test', __DIR__));
 
 Debug::enable(null, true, 'test');

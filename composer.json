@@ -14,7 +14,8 @@
         }
     ],
     "autoload": {
-        "psr-4": { "": "src/" }
+        "psr-4": { "": "src/" },
+        "classmap": [ "app/AppKernel.php" ]
     },
     "autoload-dev": {
         "psr-4": { "": "tests/" }
@@ -59,6 +60,8 @@
     "minimum-stability": "stable",
     "extra": {
         "symfony-app-dir": "app",
+        "symfony-bin-dir": "bin",
+        "symfony-var-dir": "var",
         "symfony-web-dir": "web"
     }
 }
