@@ -9,6 +9,7 @@
 namespace Keboola\Syrup\Tests\Command;
 
 use Symfony\Component\Console\Application;
+use Keboola\Syrup\Test\Command\ErrorCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Process\Process;
 
@@ -42,7 +43,7 @@ class ErrorCommandTest extends \PHPUnit_Framework_TestCase
 
     private function runErrorCommand($errorType)
     {
-        $cmd = sprintf('php ' . __DIR__ . '/../../../../bin/console syrup:test:error %s --env prod', $errorType);
+        $cmd = sprintf('php ' . __DIR__ . '/../../../../app/console syrup:test:error %s --env prod', $errorType);
         $process = new Process($cmd);
         $process->run();
 

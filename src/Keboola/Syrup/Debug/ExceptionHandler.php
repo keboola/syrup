@@ -56,7 +56,7 @@ class ExceptionHandler extends BaseExceptionHandler
      *
      * @return JsonResponse A JsonResponse instance
      */
-    public function sendPhpResponse($exception)
+    public function createResponse($exception)
     {
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);
@@ -101,25 +101,18 @@ class ExceptionHandler extends BaseExceptionHandler
             $response['message'] = $exception->getMessage();
         }
 
-        // nicely format for console
+        // nicely format for console - @todo create ConsoleExceptionHandler
         if (php_sapi_name() == 'cli') {
             $resString = PHP_EOL;
             foreach ($response as $k => $v) {
                 $resString .= $k . ': ' . $v . PHP_EOL;
             }
-            echo $resString . PHP_EOL;
-            return;
+            $resString .= PHP_EOL;
+
+            return new Response($resString, $code, $exception->getHeaders());
         }
 
-        if (!headers_sent()) {
-            header(sprintf('HTTP/1.0 %s', $code));
-            foreach ($exception->getHeaders() as $name => $value) {
-                header($name.': '.$value, false);
-            }
-            header('Content-Type: application/json; charset=utf-8');
-        }
-
-        echo json_encode($response);
+        return new JsonResponse($response, $code, $exception->getHeaders());
     }
 
     public function getContent(FlattenException $exception)
