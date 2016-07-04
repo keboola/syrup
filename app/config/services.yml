@@ -8,6 +8,10 @@ services:
         calls:
             - [setAttribute, [3,2]] # \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION
 
+    session.handler.pdo:
+        class:     Symfony\Component\HttpFoundation\Session\Storage\Handler\LegacyPdoSessionHandler
+        arguments: ["@pdo", "%pdo.db_options%"]
+
     syrup.listener.exception:
         class: Keboola\Syrup\Listener\SyrupExceptionListener
         arguments: ["%app_name%", "@syrup.storage_api", "@logger"]
