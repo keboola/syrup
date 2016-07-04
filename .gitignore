@@ -4,8 +4,7 @@ test.sh
 /app/cache/*
 /app/logs/*
 /vendor/
-/bin/*
-!/bin/console
+/bin/
 /app/config/parameters.yml
 /app/config/parameters_shared.yml
 /.idea/
