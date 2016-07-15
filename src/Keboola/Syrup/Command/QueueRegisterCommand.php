@@ -30,7 +30,13 @@ class QueueRegisterCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $data = $input->getArguments();
+        $data = [
+            'id' => $input->getArgument('id'),
+            'access_key' => $input->getArgument('access_key'),
+            'secret_key' => $input->getArgument('secret_key'),
+            'region' => $input->getArgument('region'),
+            'url' => $input->getArgument('url')
+        ];
 
         /** @var Connection $conn */
         $conn = $this->getContainer()->get('doctrine.dbal.syrup_connection');
