@@ -141,7 +141,6 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('_index', $res);
         $this->assertArrayHasKey('_type', $res);
         $this->assertArrayHasKey('url', $res);
-
     }
 
     // test wrong parameter user error

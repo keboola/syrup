@@ -52,6 +52,5 @@ class IndexCreateCommand extends ContainerAwareCommand
             $indexName = $index->createIndex($settings, $mapping);
             echo "Created new index '" . $indexName ."'" . PHP_EOL;
         }
-
     }
 }
