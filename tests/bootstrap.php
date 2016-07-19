@@ -12,6 +12,7 @@ defined('SYRUP_DATABASE_NAME') || define('SYRUP_DATABASE_NAME', getenv('SYRUP_DA
 defined('SYRUP_AWS_KEY') || define('SYRUP_AWS_KEY', getenv('SYRUP_AWS_KEY')? getenv('SYRUP_AWS_KEY') : null);
 defined('SYRUP_AWS_SECRET') || define('SYRUP_AWS_SECRET', getenv('SYRUP_AWS_SECRET')? getenv('SYRUP_AWS_SECRET') : null);
 defined('SYRUP_AWS_REGION') || define('SYRUP_AWS_REGION', getenv('SYRUP_AWS_REGION')? getenv('SYRUP_AWS_REGION') : 'us-east-1');
+defined('SYRUP_SAPI_TEST_URL') || define('SYRUP_SAPI_TEST_URL', getenv('SYRUP_SAPI_TEST_URL')? getenv('SYRUP_SAPI_TEST_URL') : null);
 defined('SYRUP_SAPI_TEST_TOKEN') || define('SYRUP_SAPI_TEST_TOKEN', getenv('SYRUP_SAPI_TEST_TOKEN')? getenv('SYRUP_SAPI_TEST_TOKEN') : null);
 defined('SYRUP_ELASTICSEARCH_HOST') || define('SYRUP_ELASTICSEARCH_HOST', getenv('SYRUP_ELASTICSEARCH_HOST')? getenv('SYRUP_ELASTICSEARCH_HOST') : 'http://127.0.0.1:9200');
 defined('SYRUP_SQS_URL') || define('SYRUP_SQS_URL', getenv('SYRUP_SQS_URL')? getenv('SYRUP_SQS_URL') : 'https://sqs.us-east-1.amazonaws.com/[id]/[name]');
@@ -47,8 +48,8 @@ $paramsYaml = \Symfony\Component\Yaml\Yaml::dump([
             's3-upload-path' => SYRUP_S3_BUCKET,
             'aws-region' => SYRUP_AWS_REGION
         ],
-        'storage_api.url' => 'https://connection.keboola.com/',
-        'storage_api.test.url' => 'https://connection.keboola.com/',
+        'storage_api.url' => SYRUP_SAPI_TEST_URL,
+        'storage_api.test.url' => SYRUP_SAPI_TEST_URL,
         'storage_api.test.token' => SYRUP_SAPI_TEST_TOKEN,
         'elasticsearch' => [
             'hosts' => [SYRUP_ELASTICSEARCH_HOST]
