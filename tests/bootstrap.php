@@ -83,7 +83,7 @@ $db->insert('queues', [
     'id' => 'default',
     'access_key' => SYRUP_AWS_KEY,
     'secret_key' => SYRUP_AWS_SECRET,
-    'region' => 'us-east-1',
+    'region' => SYRUP_AWS_REGION,
     'url' => SYRUP_SQS_URL
 ]);
 
