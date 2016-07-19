@@ -46,7 +46,10 @@ class JobMapperTest extends KernelTestCase
         self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', self::$client);
         /** @var StorageApiService $storageApiService */
         $storageApiService = self::$kernel->getContainer()->get('syrup.storage_api');
-        $storageApiService->setClient(new \Keboola\StorageApi\Client(['token' => SYRUP_SAPI_TEST_TOKEN]));
+        $storageApiService->setClient(new \Keboola\StorageApi\Client([
+            'token' => SYRUP_SAPI_TEST_TOKEN,
+            'url' => SYRUP_SAPI_TEST_URL,
+        ]));
         self::$jobFactory = new JobFactory(SYRUP_APP_NAME, $configEncryptor, $storageApiService);
         self::$jobMapper = new JobMapper(self::$client, self::$index, $configEncryptor, null, realpath(__DIR__ . '/../../../../app'));
     }

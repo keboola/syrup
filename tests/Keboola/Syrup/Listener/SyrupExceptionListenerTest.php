@@ -40,7 +40,10 @@ class SyrupExceptionListenerTest extends KernelTestCase
     public function setUp()
     {
         $storageApiService = new StorageApiService(new RequestStack());
-        $storageApiService->setClient(new Client(['token' => SYRUP_SAPI_TEST_TOKEN]));
+        $storageApiService->setClient(new Client([
+            'token' => SYRUP_SAPI_TEST_TOKEN,
+            'url' => SYRUP_SAPI_TEST_URL,
+        ]));
         $uploader = new Uploader([
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,

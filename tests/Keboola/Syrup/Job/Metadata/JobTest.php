@@ -24,6 +24,7 @@ class JobTest extends KernelTestCase
         $storageApiService->setClient(new Client([
             'token' => SYRUP_SAPI_TEST_TOKEN,
             'userAgent' => SYRUP_APP_NAME,
+            'url' => SYRUP_SAPI_TEST_URL,
         ]));
 
         /** @var ObjectEncryptor $objectEncryptor */
@@ -49,6 +50,7 @@ class JobTest extends KernelTestCase
         $storageApiService->setClient(new Client([
             'token' => SYRUP_SAPI_TEST_TOKEN,
             'userAgent' => SYRUP_APP_NAME,
+            'url' => SYRUP_SAPI_TEST_URL,
         ]));
 
         /** @var ObjectEncryptor $objectEncryptor */
