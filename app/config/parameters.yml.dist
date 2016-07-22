@@ -1,7 +1,38 @@
 parameters:
-    app_name:          syrup
-
-    # Components
-    components:
-        ex-dummy:
-            class:  Keboola\Syrup\Component\DummyExtractor
+    app_name: syrup
+    secret:
+    encryption_key:
+    database_driver: pdo_mysql
+    database_port:
+    database_host:
+    database_user:
+    database_password:
+    database_name:
+    syrup.driver: pdo_mysql
+    syrup.port:
+    syrup.host:
+    syrup.user:
+    syrup.password:
+    syrup.name:
+    locks_db.driver: pdo_mysql
+    locks_db.port:
+    locks_db.host:
+    locks_db.user:
+    locks_db.password:
+    locks_db.name:
+    doctrine_migrations_dir:
+    uploader:
+        aws-access-key:
+        aws-secret-key:
+        s3-upload-path:
+        aws-region:
+    storage_api.url: 'https://connection.keboola.com/'
+    storage_api.test.url: 'https://connection.keboola.com/'
+    storage_api.test.token:
+    elasticsearch:
+        hosts: []
+    elasticsearch.index_prefix: devel
+    queue:
+        url: null,
+        db_table: queues
+    components: {  }

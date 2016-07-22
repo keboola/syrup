@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+env 'SYRUP_APP_NAME=syrup' \
+    'SYRUP_DATABASE_USER=' \
+    'SYRUP_DATABASE_PASSWORD=' \
+    'SYRUP_DATABASE_NAME=' \
+    'SYRUP_AWS_KEY=' \
+    'SYRUP_AWS_SECRET=' \
+    'SYRUP_AWS_REGION=' \
+    'SYRUP_ELASTICSEARCH_HOST=' \
+    'SYRUP_SAPI_TEST_URL=' \
+    'SYRUP_SAPI_TEST_TOKEN=' \
+    'SYRUP_SQS_URL=' \
+    bin/phpunit
