@@ -29,7 +29,7 @@ class StorageApiHandlerTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $storageApiService = new StorageApiService($requestStack);
+        $storageApiService = new StorageApiService($requestStack, SYRUP_SAPI_TEST_URL);
         $client = $storageApiService->getClient();
         $client->setRunId(uniqid());
         $events = $client->listEvents(['q' => 'message: infoMessage + runId:' . $client->getRunId()]);
@@ -214,7 +214,7 @@ class StorageApiHandlerTest extends TestCase
         $request->headers->add(['x-storageapi-token' => 'invalid']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $storageApiService = new StorageApiService($requestStack);
+        $storageApiService = new StorageApiService($requestStack, SYRUP_SAPI_TEST_URL);
         $handler = new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);
         $this->assertFalse($handler->handle($this->getRecord(Logger::ERROR, 'errorMessage', [])));
     }
@@ -257,7 +257,7 @@ class StorageApiHandlerTest extends TestCase
         $request->headers->add(['x-storageapi-token' => SYRUP_SAPI_TEST_TOKEN]);
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $storageApiService = new StorageApiService($requestStack);
+        $storageApiService = new StorageApiService($requestStack, SYRUP_SAPI_TEST_URL);
         $client = $storageApiService->getClient();
         $client->setRunId(uniqid());
         $handler = new StorageApiHandler(SYRUP_APP_NAME, $storageApiService);

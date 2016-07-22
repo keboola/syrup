@@ -34,7 +34,7 @@ class QueueFactoryTest extends \PHPUnit_Framework_TestCase
         // delete the queue from AWS
         $sqsClient = new SqsClient([
             'version' => '2012-11-05',
-            'region' => 'us-east-1'
+            'region' => SYRUP_AWS_REGION
         ]);
         $sqsClient->deleteQueue([
             'QueueUrl' => $sqsQueue->get('QueueUrl')

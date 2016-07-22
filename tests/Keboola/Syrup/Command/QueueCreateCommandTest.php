@@ -55,7 +55,7 @@ class QueueCreateCommandTest extends CommandTestCase
 
         $sqsClient = new SqsClient([
             'version' => '2012-11-05',
-            'region' => 'us-east-1'
+            'region' => SYRUP_AWS_REGION
         ]);
         $sqsClient->deleteQueue([
             'QueueUrl' => $dbQueue->getUrl()
