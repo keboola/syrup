@@ -6,6 +6,7 @@ use Keboola\StorageApi\Exception as SapiException;
 use Keboola\Syrup\Debug\Exception\FlattenException;
 use Keboola\Syrup\Debug\ExceptionHandler;
 use Keboola\Syrup\Aws\S3\Uploader;
+use Keboola\Syrup\Exception\SimpleException;
 use Keboola\Syrup\Exception\SyrupComponentException;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
 
@@ -35,6 +36,7 @@ class SyslogProcessor
             $this->runId = $storageApiClient->getRunId();
         } catch (SyrupComponentException $e) {
         } catch (SapiException $e) {
+        } catch (SimpleException $e) {
         }
     }
 
@@ -83,7 +85,7 @@ class SyslogProcessor
         if (isset($record['context']['exception'])) {
             /** @var \Exception $e */
             $e = $record['context']['exception'];
-            if ($e instanceof \Exception) {
+            if ($e instanceof \Exception && !($e instanceof SimpleException)) {
                 $flattenException = FlattenException::create($e);
                 $eHandler = new ExceptionHandler(true);
                 $html = $eHandler->getHtml($flattenException);

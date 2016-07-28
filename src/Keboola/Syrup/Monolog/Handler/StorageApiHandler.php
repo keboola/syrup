@@ -9,6 +9,7 @@ namespace Keboola\Syrup\Monolog\Handler;
 
 use Keboola\StorageApi\Event;
 use Keboola\StorageApi\Exception as SapiException;
+use Keboola\Syrup\Exception\SimpleException;
 use Monolog\Logger;
 use Keboola\Syrup\Exception\NoRequestException;
 use Keboola\Syrup\Exception\UserException;
@@ -38,6 +39,8 @@ class StorageApiHandler extends \Monolog\Handler\AbstractHandler
         } catch (NoRequestException $e) {
             // Ignore when no SAPI client setup
         } catch (UserException $e) {
+            // Ignore when no SAPI client setup
+        } catch (SimpleException $e) {
             // Ignore when no SAPI client setup
         } catch (SapiException $e) {
             // Ignore when SAPI client setup is wrong

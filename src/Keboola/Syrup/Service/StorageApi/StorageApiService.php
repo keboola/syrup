@@ -10,6 +10,7 @@ namespace Keboola\Syrup\Service\StorageApi;
 use Keboola\StorageApi\ClientException;
 use Keboola\StorageApi\Client;
 use Keboola\Syrup\Exception\ApplicationException;
+use Keboola\Syrup\Exception\SimpleException;
 use Symfony\Component\HttpFoundation\Request;
 use Keboola\Syrup\Exception\NoRequestException;
 use Keboola\Syrup\Exception\UserException;
@@ -43,9 +44,9 @@ class StorageApiService
             return $client;
         } catch (ClientException $e) {
             if ($e->getCode() == 401) {
-                throw new UserException("Invalid StorageApi Token", $e);
+                throw new SimpleException($e->getCode(), "Invalid StorageApi Token", $e);
             } elseif ($e->getCode() < 500) {
-                throw new UserException($e->getMessage(), $e);
+                throw new SimpleException($e->getCode(), $e->getMessage(), $e);
             }
             throw $e;
         }

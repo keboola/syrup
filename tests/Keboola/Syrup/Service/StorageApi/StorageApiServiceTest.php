@@ -44,7 +44,8 @@ class StorageApiServiceTest extends WebTestCase
         /** @var StorageApiService $storageApiService */
         $storageApiService = $container->get('syrup.storage_api');
 
-        $this->setExpectedException('Keboola\Syrup\Exception\UserException', 'Invalid StorageApi Token');
+        $this->expectException('Keboola\Syrup\Exception\SimpleException');
+        $this->expectExceptionMessage('Invalid StorageApi Token');
 
         $sapiClient = $storageApiService->getClient();
     }
@@ -55,8 +56,7 @@ class StorageApiServiceTest extends WebTestCase
         $container = $client->getContainer();
 
         $sapiClient = new Client([
-            'token' => $container->getParameter('storage_api.test.token'),
-            'url' => $container->getParameter('storage_api.test.url'),
+            'token' => $container->getParameter('storage_api.test.token')
         ]);
 
         /** @var StorageApiService $storageApiService */
