@@ -16,6 +16,6 @@ class SimpleException extends HttpException
 {
     public function __construct($code, $message, $previous = null)
     {
-        parent::__construct($code, $message, $previous);
+        parent::__construct($code, $message, $previous, [], $code);
     }
 }

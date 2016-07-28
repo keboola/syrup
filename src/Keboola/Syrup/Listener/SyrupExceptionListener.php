@@ -7,6 +7,7 @@
  */
 namespace Keboola\Syrup\Listener;
 
+use Keboola\Syrup\Exception\SimpleException;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,6 +36,7 @@ class SyrupExceptionListener
             $this->runId = $storageApiClient->getRunId();
         } catch (NoRequestException $e) {
         } catch (UserException $e) {
+        } catch (SimpleException $e) {
         }
         $this->logger = $logger;
     }

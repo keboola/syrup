@@ -172,4 +172,35 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('message', $result);
         $this->assertArrayHasKey('runId', $result);
     }
+
+    public function testRunActionInvalidToken()
+    {
+        try {
+            static::$client->request(
+                'POST',
+                '/syrup/run',
+                [],
+                [],
+                ['HTTP_X-StorageApi_Token' => '123456'],
+                '{}'
+            );
+        } catch (\Exception $e) {
+            print get_class($e);
+            print $e->getMessage();
+            print $e->getCode();
+            die;
+        }
+
+        $result = json_decode(static::$client->getResponse()->getContent(), true);
+
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('error', $result['status']);
+        $this->assertArrayHasKey('error', $result);
+        $this->assertEquals('User error', $result['error']);
+        $this->assertArrayHasKey('code', $result);
+        $this->assertEquals(401, $result['code']);
+        $this->assertArrayHasKey('exceptionId', $result);
+        $this->assertArrayHasKey('message', $result);
+        $this->assertArrayHasKey('runId', $result);
+    }
 }
