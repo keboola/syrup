@@ -56,7 +56,8 @@ class StorageApiServiceTest extends WebTestCase
         $container = $client->getContainer();
 
         $sapiClient = new Client([
-            'token' => $container->getParameter('storage_api.test.token')
+            'token' => $container->getParameter('storage_api.test.token'),
+            'url' => $container->getParameter('storage_api.test.url'),
         ]);
 
         /** @var StorageApiService $storageApiService */
