@@ -6,6 +6,9 @@ use Composer\Script\Event,
 	Composer\IO\IOInterface;
 use Aws\S3\S3Client;
 
+// fix autoloading problem when called from composer.json postInstall
+include_once(__DIR__ . '/../../../../../../autoload.php');
+
 class ScriptHandler
 {
 	const PARAMETERS_DIR = "vendor/keboola/syrup/app/config/";
@@ -134,7 +137,10 @@ s - skip <info>(keep current file)</info>
 			$bucket = 'keboola-configs-devel';
 		}
 
-		$client = S3Client::factory();
+        $client = new S3Client(array(
+            'version' => '2006-03-01',
+            'region' => 'us-east-1',
+        ));
 		$client->getObject(array(
 			'Bucket' => $bucket,
 			'Key'	=> $key,
