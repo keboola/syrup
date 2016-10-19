@@ -10,6 +10,7 @@ services:
   - elasticsearch
 before_script:
   - mysql -e 'create database syrup;'
+  - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   - composer self-update
   - composer install -n --no-scripts
 script:
