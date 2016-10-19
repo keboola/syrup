@@ -135,9 +135,18 @@ s - skip <info>(keep current file)</info>
             $bucket = 'keboola-configs-devel';
         }
 
+        if (getenv('KEBOOLA_SYRUP_CONFIGS_BUCKET')) {
+            $bucket = getenv('KEBOOLA_SYRUP_CONFIGS_BUCKET');
+        }
+
+        $awsRegion = 'us-east-1';
+        if (getenv('AWS_REGION')) {
+            $awsRegion = getenv('AWS_REGION');
+        }
+
         $client = new S3Client(array(
             'version' => '2006-03-01',
-            'region' => 'us-east-1',
+            'region' => $awsRegion
         ));
         $client->getObject(array(
             'Bucket' => $bucket,
