@@ -21,7 +21,7 @@ services:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
     syrup.s3_uploader:
-        class: Keboola\Syrup\Aws\S3\Uploader
+        class: Keboola\DebugLogUploader\UploaderS3
         arguments: ["%uploader%"]
 
     syrup.monolog.sapi_handler:

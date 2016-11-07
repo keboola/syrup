@@ -7,7 +7,7 @@
 
 namespace Keboola\Syrup\Tests\Monolog\Processor;
 
-use Keboola\Syrup\Aws\S3\Uploader;
+use Keboola\DebugLogUploader\UploaderS3;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Keboola\Syrup\Monolog\Processor\RequestProcessor;
@@ -17,11 +17,12 @@ class RequestProcessorTest extends TestCase
 {
     public function testProcessor()
     {
-        $s3Uploader = new Uploader([
+        $s3Uploader = new UploaderS3([
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
+            's3-upload-path' => SYRUP_S3_BUCKET,
             'aws-region' => SYRUP_AWS_REGION,
-            's3-upload-path' => SYRUP_S3_BUCKET
+            'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ]);
 
         $params = [

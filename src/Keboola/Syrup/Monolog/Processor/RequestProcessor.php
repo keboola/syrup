@@ -7,7 +7,7 @@
 
 namespace Keboola\Syrup\Monolog\Processor;
 
-use Keboola\Syrup\Aws\S3\Uploader;
+use Keboola\DebugLogUploader\UploaderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class RequestProcessor
@@ -17,11 +17,11 @@ class RequestProcessor
      */
     private $requestStack;
     /**
-     * @var Uploader
+     * @var UploaderInterface
      */
     private $s3Uploader;
 
-    public function __construct(RequestStack $requestStack, Uploader $s3Uploader)
+    public function __construct(RequestStack $requestStack, UploaderInterface $s3Uploader)
     {
         $this->requestStack = $requestStack;
         $this->s3Uploader = $s3Uploader;
