@@ -2,10 +2,10 @@
 
 namespace Keboola\Syrup\Monolog\Processor;
 
+use Keboola\DebugLogUploader\UploaderInterface;
 use Keboola\StorageApi\Exception as SapiException;
 use Keboola\Syrup\Debug\Exception\FlattenException;
 use Keboola\Syrup\Debug\ExceptionHandler;
-use Keboola\Syrup\Aws\S3\Uploader;
 use Keboola\Syrup\Exception\SimpleException;
 use Keboola\Syrup\Exception\SyrupComponentException;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
@@ -21,11 +21,11 @@ class SyslogProcessor
     private $runId;
 
     /**
-     * @var Uploader
+     * @var UploaderInterface
      */
     private $s3Uploader;
 
-    public function __construct($componentName, StorageApiService $storageApiService, Uploader $s3Uploader)
+    public function __construct($componentName, StorageApiService $storageApiService, UploaderInterface $s3Uploader)
     {
         $this->componentName = $componentName;
         $this->s3Uploader = $s3Uploader;

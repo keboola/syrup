@@ -7,6 +7,7 @@
 
 namespace Keboola\Syrup\Tests\Listener;
 
+use Keboola\DebugLogUploader\UploaderS3;
 use Keboola\StorageApi\Client;
 use Keboola\StorageApi\ClientException;
 use Monolog\Handler\TestHandler;
@@ -18,7 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Keboola\Syrup\Aws\S3\Uploader;
 use Keboola\Syrup\Command\JobCommand;
 use Keboola\Syrup\Exception\UserException;
 use Keboola\Syrup\Listener\SyrupExceptionListener;
@@ -44,11 +44,12 @@ class SyrupExceptionListenerTest extends KernelTestCase
             'token' => SYRUP_SAPI_TEST_TOKEN,
             'url' => SYRUP_SAPI_TEST_URL,
         ]));
-        $uploader = new Uploader([
+        $uploader = new UploaderS3([
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
             's3-upload-path' => SYRUP_S3_BUCKET,
-            'aws-region' => SYRUP_AWS_REGION
+            'aws-region' => SYRUP_AWS_REGION,
+            'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ]);
         $this->testLogHandler = new TestHandler();
         $this->testLogHandler->setFormatter(new JsonFormatter());

@@ -46,7 +46,8 @@ $paramsYaml = \Symfony\Component\Yaml\Yaml::dump([
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
             's3-upload-path' => SYRUP_S3_BUCKET,
-            'aws-region' => SYRUP_AWS_REGION
+            'aws-region' => SYRUP_AWS_REGION,
+            'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ],
         'storage_api.url' => SYRUP_SAPI_TEST_URL,
         'storage_api.test.url' => SYRUP_SAPI_TEST_URL,

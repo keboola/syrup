@@ -26,6 +26,7 @@ parameters:
         aws-secret-key:
         s3-upload-path:
         aws-region:
+        url-prefix: 'https://connection.keboola.com/admin/utils/logs?file='
     storage_api.url: 'https://connection.keboola.com/'
     storage_api.test.url: 'https://connection.keboola.com/'
     storage_api.test.token:
