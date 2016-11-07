@@ -29,7 +29,7 @@
         "keboola/php-temp": "~0.1.0",
 
         "symfony/symfony": "^2.7",
-        "symfony/monolog-bundle": "~2.6",
+        "symfony/monolog-bundle": "~2.11.1",
         "sensio/distribution-bundle": "~4.0.4",
         "sensio/framework-extra-bundle": "~3.0",
         "sensio/generator-bundle": "~2.3",
