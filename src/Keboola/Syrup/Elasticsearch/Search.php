@@ -57,7 +57,7 @@ class Search
                 ]);
 
                 foreach ($result['docs'] as $doc) {
-                    if ($doc['found']) {
+                    if (isset($doc['found']) && $doc['found'] === true) {
                         return new Job($this->configEncryptor, $doc['_source'], $doc['_index'], $doc['_type'], $doc['_version']);
                     }
                 }
