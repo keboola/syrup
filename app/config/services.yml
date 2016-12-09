@@ -81,7 +81,7 @@ services:
 
     syrup.elasticsearch.current_component_index:
         class: Keboola\Syrup\Elasticsearch\ComponentIndex
-        arguments: ["%app_name%", "%elasticsearch.index_prefix%", "@syrup.elasticsearch.client"]
+        arguments: ["%app_name%", "%elasticsearch.index_prefix%", "@syrup.elasticsearch.client", "@logger"]
 
     syrup.elasticsearch.current_component_job_mapper:
         class: Keboola\Syrup\Elasticsearch\JobMapper

@@ -210,13 +210,33 @@ class Search
 
     public function getIndices()
     {
-        $indices = $this->client->indices()->get([
-            'index' => $this->indexPrefix . '_syrup*'
-        ]);
-        if (!empty($indices)) {
-            return array_keys($indices);
+        $i = 0;
+        while (true) {
+            try {
+                $indices = $this->client->indices()->get([
+                    'index' => $this->indexPrefix . '_syrup*'
+                ]);
+                if (!empty($indices)) {
+                    return array_keys($indices);
+                }
+                return [];
+            } catch (ServerErrorResponseException $e) {
+
+                if ($i > 5) {
+                    throw $e;
+                }
+
+                // ES server error, try again
+                $this->log('error', 'Elastic server error response', [
+                    'attemptNo' => $i,
+                    'exception' => $e
+                ]);
+
+            }
+
+            sleep(1 + intval(pow(2, $i)/2));
+            $i++;
         }
-        return [];
     }
 
     protected function log($level, $message, $context = [])

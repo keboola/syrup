@@ -9,7 +9,9 @@ namespace Keboola\Syrup\Elasticsearch;
 
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
 use Keboola\Syrup\Exception\ApplicationException;
+use Monolog\Logger;
 
 class ComponentIndex
 {
@@ -19,13 +21,17 @@ class ComponentIndex
     protected $client;
     protected $indexPrefix;
     protected $componentName;
+
+    /** @var Logger */
+    protected $logger;
     protected static $rootDir;
 
-    public function __construct($componentName, $indexPrefix, Client $client)
+    public function __construct($componentName, $indexPrefix, Client $client, Logger $logger = null)
     {
         $this->client = $client;
         $this->indexPrefix = $indexPrefix;
         $this->componentName = $componentName;
+        $this->logger = $logger;
     }
 
     public static function setRootDir($rootDir)
@@ -89,9 +95,29 @@ class ComponentIndex
 
     public function getIndices()
     {
-        return array_keys($this->client->indices()->getAlias([
-            'name'  => $this->getIndexName()
-        ]));
+        $i = 0;
+        while (true) {
+            try {
+                return array_keys($this->client->indices()->getAlias([
+                    'name'  => $this->getIndexName()
+                ]));
+            } catch (ServerErrorResponseException $e) {
+
+                if ($i > 5) {
+                    throw $e;
+                }
+
+                // ES server error, try again
+                $this->log('error', 'Elastic server error response', [
+                    'attemptNo' => $i,
+                    'exception' => $e
+                ]);
+
+            }
+
+            sleep(1 + intval(pow(2, $i)/2));
+            $i++;
+        }
     }
 
     public function createIndex($settings = null, $mappings = null)
@@ -192,4 +218,13 @@ class ComponentIndex
 
         return isset($mappings['mappings']['jobs']['properties'][$property]);
     }
+
+    private function log($level, $message, $context = [])
+    {
+        // do nothing if logger is null
+        if ($this->logger !== null) {
+            $this->logger->$level($message, $context);
+        }
+    }
+
 }
