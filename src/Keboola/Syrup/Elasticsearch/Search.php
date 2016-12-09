@@ -107,16 +107,20 @@ class Search
 
         $filter = [];
 
-        if ($projectId != null) {
+        if ($projectId !== null) {
             $filter[] = ['term' => ['project.id' => $projectId]];
         }
 
-        if ($runId != null) {
+        if ($runId !== null) {
             $filter[] = ['term' => ['runId' => $runId]];
         }
 
-        if ($status != null) {
+        if ($status !== null) {
             $filter[] = ['term' => ['status' => $status]];
+        }
+
+        if ($component !== null) {
+            $filter[] = ['term' => ['component' => $component]];
         }
 
         $queryParam = ['match_all' => []];
@@ -151,7 +155,7 @@ class Search
         }
 
         $params = [
-            'index' => $this->indexPrefix . '_syrup_' . ($component ?: '*'),
+            'index' => $this->indexPrefix . '_syrup_*',
             'body' => [
                 'from' => $offset,
                 'size' => $limit,
