@@ -102,7 +102,6 @@ class ComponentIndex
                     'name'  => $this->getIndexName()
                 ]));
             } catch (ServerErrorResponseException $e) {
-
                 if ($i > 5) {
                     throw $e;
                 }
@@ -112,7 +111,6 @@ class ComponentIndex
                     'attemptNo' => $i,
                     'exception' => $e
                 ]);
-
             }
 
             sleep(1 + intval(pow(2, $i)/2));
@@ -226,5 +224,4 @@ class ComponentIndex
             $this->logger->$level($message, $context);
         }
     }
-
 }

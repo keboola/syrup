@@ -221,7 +221,6 @@ class Search
                 }
                 return [];
             } catch (ServerErrorResponseException $e) {
-
                 if ($i > 5) {
                     throw $e;
                 }
@@ -231,7 +230,6 @@ class Search
                     'attemptNo' => $i,
                     'exception' => $e
                 ]);
-
             }
 
             sleep(1 + intval(pow(2, $i)/2));
