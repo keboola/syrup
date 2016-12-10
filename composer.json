@@ -24,7 +24,7 @@
         "php": "~5.6|^7.0",
 
         "keboola/csv": "~1.1",
-        "keboola/php-encryption": "0.2.1",
+        "keboola/php-encryption": "~0.2",
         "keboola/storage-api-client": "^4.0",
         "keboola/php-temp": "~0.1.0",
 
