@@ -98,4 +98,8 @@ interface JobInterface
     public function setTerminatedBy(array $token);
 
     public function getTerminatedBy();
+
+    public function getUsage();
+
+    public function setUsage(array $usage);
 }

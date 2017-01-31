@@ -60,7 +60,8 @@ class Job implements JobInterface
         'startTime' => null,
         'endTime' => null,
         'durationSeconds' => null,
-        'waitSeconds' => null
+        'waitSeconds' => null,
+        'usage' => []
     ];
 
     public function __construct(ObjectEncryptor $encryptor, array $data = [], $index = null, $type = null, $version = null)
@@ -338,6 +339,17 @@ class Job implements JobInterface
     public function getErrorNote()
     {
         return $this->getProperty('errorNote');
+    }
+
+    public function getUsage()
+    {
+        return $this->getProperty('usage');
+    }
+
+    public function setUsage(array $usage)
+    {
+        $this->data['usage'] = $usage;
+        return $this;
     }
 
     /**
