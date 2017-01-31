@@ -160,6 +160,19 @@
                 "encrypted": {
                   "index": "not_analyzed",
                   "type": "string"
+                },
+                "usage": {
+                    "dynamic": "strict",
+                    "type": "nested",
+                    "index": "not_analyzed",
+                    "properties": {
+                        "metric": {
+                            "type": "string"
+                        },
+                        "value": {
+                            "type": "long"
+                        }
+                    }
                 }
             }
         }
