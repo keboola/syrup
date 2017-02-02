@@ -117,5 +117,17 @@ class JobMapperTest extends KernelTestCase
         self::$jobMapper->update($job);
         $job = self::$jobMapper->get($id);
         $this->assertEquals($job->getStatus(), Job::STATUS_WARNING);
+
+        $this->assertSame($job->getUsage(), []);
+        $usage = [
+            [
+                'metric' => 'API calls',
+                'value' => 10,
+            ]
+        ];
+        $job->setUsage($usage);
+        self::$jobMapper->update($job);
+        $job = self::$jobMapper->get($id);
+        $this->assertSame($job->getUsage(), $usage);
     }
 }

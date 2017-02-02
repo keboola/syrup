@@ -160,6 +160,11 @@
                 "encrypted": {
                   "index": "not_analyzed",
                   "type": "string"
+                },
+                "usage": {
+                    "dynamic": true,
+                    "type": "nested",
+                    "index": "not_analyzed"
                 }
             }
         }
