@@ -52,12 +52,6 @@
         "squizlabs/php_codesniffer": "2.*",
         "codeclimate/php-test-reporter": "dev-master"
     },
-    "scripts": {
-        "post-install-cmd": [
-            "bash git/setup.sh"
-        ],
-        "post-update-cmd": []
-    },
     "config": {
         "bin-dir": "bin"
     },
