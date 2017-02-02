@@ -162,17 +162,9 @@
                   "type": "string"
                 },
                 "usage": {
-                    "dynamic": "strict",
+                    "dynamic": true,
                     "type": "nested",
-                    "index": "not_analyzed",
-                    "properties": {
-                        "metric": {
-                            "type": "string"
-                        },
-                        "value": {
-                            "type": "long"
-                        }
-                    }
+                    "index": "not_analyzed"
                 }
             }
         }
