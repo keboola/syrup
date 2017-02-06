@@ -58,9 +58,6 @@
     "minimum-stability": "stable",
     "extra": {
         "symfony-app-dir": "app",
-        "symfony-web-dir": "web",
-        "branch-alias": {
-            "dev-master": "5.1-dev"
-        }
+        "symfony-web-dir": "web"
     }
 }
