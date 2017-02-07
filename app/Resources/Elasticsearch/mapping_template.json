@@ -162,9 +162,8 @@
                   "type": "string"
                 },
                 "usage": {
-                    "dynamic": true,
-                    "type": "nested",
-                    "index": "not_analyzed"
+                    "type": "object",
+                    "enabled": false
                 }
             }
         }
