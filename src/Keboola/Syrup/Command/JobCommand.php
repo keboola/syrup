@@ -275,6 +275,12 @@ class JobCommand extends ContainerAwareCommand
         $this->job->setEndTime(date('c', $endTime));
         $this->job->setDurationSeconds($endTime - $startTime);
         $this->job->setWaitSeconds($waitSeconds);
+
+        // fetch usage from ES
+        if (($jobFromElastic = $this->jobMapper->get($this->job->getId())) !== null) {
+            $this->job->setUsage($jobFromElastic->getUsage());
+        }
+
         $this->jobMapper->update($this->job);
 
         // postExecution action
