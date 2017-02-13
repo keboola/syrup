@@ -23,4 +23,4 @@ after_script:
   - ./codeclimate.sh
 notifications:
   slack:
-    secure: I73TdwZCz04fIrLIM8kctaZd6uyVhqBZXs1L6wFC2lhyUFX+L5kxKRldOyBrQp1v5SL+wkuok+CBPmqxa1e75fWYA7Zsi/VpH+XFnG2zCjuq1+v9wXjiWMVp75aL24kcsm6WiXqqpEIrpnaO99+nXDuT9+Os/+0COW0wN1sfwjg=
+    secure: IhgEyPivbdLPWsZb5mWeUwGdhxFZdmba8Zkgutk7Y02Px/fA+vqFlcZo2HSNFH2mvChQjHD/8abUZdZxvsyNCtGE25lz4t7Kc3BkSW8N48GI49RzcndE3DB1cXiNzdmmTFW9wrzkoScTrQUp6UWpWsnV3JBkIyvX2vmp2uPFa4A=
