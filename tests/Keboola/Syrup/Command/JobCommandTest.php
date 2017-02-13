@@ -12,6 +12,7 @@ use Keboola\Syrup\Test\Job\Executor\HookExecutor;
 use Keboola\Syrup\Test\Job\Executor\MaintenanceExecutor;
 use Keboola\Syrup\Test\Job\Executor\SuccessExecutor;
 use Keboola\Syrup\Test\Job\Executor\WarningExecutor;
+use Keboola\Syrup\Test\Job\Executor\UsageUpdateExecutor;
 use Symfony\Component\Console\Tester\CommandTester;
 use Keboola\Syrup\Command\JobCommand;
 use Keboola\Syrup\Job\Metadata\Job;
@@ -102,5 +103,24 @@ class JobCommandTest extends CommandTestCase
         $jobId = $this->jobMapper->create($this->createJob());
         $this->commandTester->execute(['jobId'   => $jobId]);
         $this->assertEquals(JobCommand::STATUS_LOCK, $this->commandTester->getStatusCode());
+    }
+
+    public function testRunJobWithExternalUsageUpdate()
+    {
+        self::$kernel->getContainer()->set('syrup.job_executor', new UsageUpdateExecutor($this->jobMapper));
+        $jobId = $this->jobMapper->create($this->createJob());
+        $this->commandTester->execute(['jobId'   => $jobId]);
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+
+        $job = $this->jobMapper->get($jobId);
+        $this->assertArrayHasKey('testing', $job->getResult());
+        $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
+
+        $this->assertEquals([
+            [
+                'metric' => 'documents',
+                'value' => 234,
+            ]
+        ], $job->getUsage());
     }
 }
