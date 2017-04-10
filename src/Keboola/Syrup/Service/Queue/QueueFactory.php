@@ -40,6 +40,7 @@ class QueueFactory
             throw new ApplicationException('No queue configuration found in DB.');
         }
 
+        $this->db->close();
         return new QueueService($queueConfig, $this->componentName);
     }
 
