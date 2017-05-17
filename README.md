@@ -41,3 +41,29 @@ cp test.sh.template test.sh
 chmod a+x test.sh
 ./test.sh
 ```
+
+Docker-ish Development
+----------------------------------
+*Note: non-persistent*
+
+- Clone from GitHub
+```bash
+git clone https://github.com/keboola/syrup.git
+```
+
+- Install dependencies
+```bash
+php composer.phar install
+```
+
+- Create `test.sh` from `test.sh.template`
+- Create AWS resources from [aws-services.json](./aws-services.json) and fill `SYRUP_AWS_KEY`, `SYRUP_AWS_SECRET`, `SYRUP_AWS_REGION`, `SYRUP_S3_BUCKET`, `SYRUP_SQS_URL` in `tests.sh`
+- Run elasticsearch and mysql
+```bash
+docker-compose up elastic mysql
+```
+- Run tests
+```bash
+chmod a+x test.sh
+./test.sh
+```

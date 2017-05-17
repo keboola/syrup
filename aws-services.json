@@ -1,0 +1,82 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "DebugLogUploaderS3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {}
+    },
+    "Queue": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {}
+    },
+    "User": {
+      "Type": "AWS::IAM::User",
+      "Properties": {
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "S3AndSQSAccess",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "sqs:*"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": ["Queue", "Arn"]
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:*"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:s3:::",
+                          {
+                            "Ref": "DebugLogUploaderS3Bucket"
+                          },
+                          "/*"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "DebugLogUploaderS3Bucket": {
+      "Value": {
+        "Ref": "DebugLogUploaderS3Bucket"
+      }
+    },
+    "Queue": {
+      "Value": {
+        "Ref": "Queue"
+      }
+    },
+    "User": {
+      "Value": {
+        "Ref": "User"
+      }
+    }
+  }
+}

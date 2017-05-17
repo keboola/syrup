@@ -27,7 +27,7 @@ class SyslogProcessorTest extends TestCase
         $s3Uploader = new UploaderS3([
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
-            's3-upload-path' => SYRUP_S3_BUCKET,
+            's3-upload-path' => SYRUP_S3_BUCKET . SYRUP_S3_BUCKET_LOGS_PATH,
             'aws-region' => SYRUP_AWS_REGION,
             'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ]);
@@ -107,7 +107,7 @@ class SyslogProcessorTest extends TestCase
         $s3Uploader = new UploaderS3([
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
-            's3-upload-path' => SYRUP_S3_BUCKET,
+            's3-upload-path' => SYRUP_S3_BUCKET . SYRUP_S3_BUCKET_LOGS_PATH,
             'aws-region' => SYRUP_AWS_REGION,
             'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ]);
@@ -145,7 +145,7 @@ class SyslogProcessorTest extends TestCase
         $s3Uploader = new UploaderS3([
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
-            's3-upload-path' => SYRUP_S3_BUCKET,
+            's3-upload-path' => SYRUP_S3_BUCKET . SYRUP_S3_BUCKET_LOGS_PATH,
             'aws-region' => SYRUP_AWS_REGION,
             'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ]);

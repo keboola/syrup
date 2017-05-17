@@ -26,7 +26,7 @@ class QueueFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory = new QueueFactory($db, ['db_table' => 'queues'], SYRUP_APP_NAME);
 
-        $sqsQueue = $factory->create('test');
+        $sqsQueue = $factory->create('test', SYRUP_AWS_REGION);
 
         $queueUrlArr = explode('/', $sqsQueue->get('QueueUrl'));
         $this->assertEquals('test', array_pop($queueUrlArr));

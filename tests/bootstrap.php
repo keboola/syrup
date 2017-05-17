@@ -16,7 +16,8 @@ defined('SYRUP_SAPI_TEST_URL') || define('SYRUP_SAPI_TEST_URL', getenv('SYRUP_SA
 defined('SYRUP_SAPI_TEST_TOKEN') || define('SYRUP_SAPI_TEST_TOKEN', getenv('SYRUP_SAPI_TEST_TOKEN')? getenv('SYRUP_SAPI_TEST_TOKEN') : null);
 defined('SYRUP_ELASTICSEARCH_HOST') || define('SYRUP_ELASTICSEARCH_HOST', getenv('SYRUP_ELASTICSEARCH_HOST')? getenv('SYRUP_ELASTICSEARCH_HOST') : 'http://127.0.0.1:9200');
 defined('SYRUP_SQS_URL') || define('SYRUP_SQS_URL', getenv('SYRUP_SQS_URL')? getenv('SYRUP_SQS_URL') : 'https://sqs.us-east-1.amazonaws.com/[id]/[name]');
-defined('SYRUP_S3_BUCKET') || define('SYRUP_S3_BUCKET', getenv('SYRUP_S3_BUCKET')? getenv('SYRUP_S3_BUCKET') : 'keboola-logs/debug-files');
+defined('SYRUP_S3_BUCKET') || define('SYRUP_S3_BUCKET', getenv('SYRUP_S3_BUCKET')? getenv('SYRUP_S3_BUCKET') : 'keboola-logs');
+defined('SYRUP_S3_BUCKET_LOGS_PATH') || define('SYRUP_S3_BUCKET_LOGS_PATH', getenv('SYRUP_S3_BUCKET_LOGS_PATH')? getenv('SYRUP_S3_BUCKET_LOGS_PATH') : '/debug-files');
 
 $paramsYaml = \Symfony\Component\Yaml\Yaml::dump([
     'parameters' => [
@@ -45,7 +46,7 @@ $paramsYaml = \Symfony\Component\Yaml\Yaml::dump([
         'uploader' => [
             'aws-access-key' => SYRUP_AWS_KEY,
             'aws-secret-key' => SYRUP_AWS_SECRET,
-            's3-upload-path' => SYRUP_S3_BUCKET,
+            's3-upload-path' => SYRUP_S3_BUCKET . SYRUP_S3_BUCKET_LOGS_PATH,
             'aws-region' => SYRUP_AWS_REGION,
             'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ],

@@ -41,6 +41,7 @@ class QueueCreateCommandTest extends CommandTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'name' => $queueName,
+            'region' => SYRUP_AWS_REGION,
             '--register' => null,
             '--no-watch' => null
         ]);

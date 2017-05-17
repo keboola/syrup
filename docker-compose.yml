@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  elastic:
+    container_name: syrup_elastic
+    image: elasticsearch:2.4
+    tty: true
+    stdin_open: true
+    network_mode: bridge
+    ports:
+      - "9200:9200"
+
+  mysql:
+    container_name: syrup_mysql
+    image: mysql:5.7
+    tty: true
+    stdin_open: true
+    network_mode: bridge
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=syrup
+      - MYSQL_USER=syrup
+      - MYSQL_PASSWORD=syrup
+      - LANG=en_US.UTF-8
+    entrypoint:
+      - "docker-entrypoint.sh"
+      - "--sql-mode=ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
+      - "--character-set-server=utf8"
+      - "--collation-server=utf8_general_ci"
