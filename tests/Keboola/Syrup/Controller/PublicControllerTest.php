@@ -233,6 +233,7 @@ class PublicControllerTest extends WebTestCase
         $this->assertArrayHasKey('exceptionId', $result);
         $this->assertArrayHasKey('message', $result);
         $this->assertArrayHasKey('runId', $result);
+        $this->assertArrayNotHasKey('context', $result);
         $this->assertEquals('Incorrect Content-Type.', $result["message"]);
     }
 }

@@ -12,6 +12,7 @@ class WarningExecutor extends \Keboola\Syrup\Job\Executor
 
         $e = new JobException(400, 'One of orchestration tasks failed');
         $e
+            ->setData(array('key' => 'value'))
             ->setStatus(Job::STATUS_WARNING)
             ->setResult(array('testing' => 'value'));
 

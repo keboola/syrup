@@ -11,6 +11,7 @@ use Keboola\Syrup\Test\Job\Executor\ErrorExecutor;
 use Keboola\Syrup\Test\Job\Executor\HookExecutor;
 use Keboola\Syrup\Test\Job\Executor\MaintenanceExecutor;
 use Keboola\Syrup\Test\Job\Executor\SuccessExecutor;
+use Keboola\Syrup\Test\Job\Executor\UserErrorExecutor;
 use Keboola\Syrup\Test\Job\Executor\WarningExecutor;
 use Keboola\Syrup\Test\Job\Executor\UsageUpdateExecutor;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -44,6 +45,7 @@ class JobCommandTest extends CommandTestCase
 
         $job = $this->jobMapper->get($jobId);
         $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
+        $this->assertEmpty($job->getResult());
     }
 
     public function testRunJobWithWarning()
@@ -55,6 +57,8 @@ class JobCommandTest extends CommandTestCase
 
         $job = $this->jobMapper->get($jobId);
         $this->assertArrayHasKey('testing', $job->getResult());
+        $this->assertArrayHasKey('context', $job->getResult());
+        $this->assertArrayHasKey('key', $job->getResult()['context']);
         $this->assertEquals($job->getStatus(), Job::STATUS_WARNING);
     }
 
@@ -67,6 +71,7 @@ class JobCommandTest extends CommandTestCase
 
         $job = $this->jobMapper->get($jobId);
         $this->assertArrayHasKey('testing', $job->getResult());
+        $this->assertArrayNotHasKey('context', $job->getResult());
         $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
     }
 
@@ -79,6 +84,21 @@ class JobCommandTest extends CommandTestCase
 
         $job = $this->jobMapper->get($jobId);
         $this->assertArrayHasKey('testing', $job->getResult());
+        $this->assertArrayHasKey('context', $job->getResult());
+        $this->assertArrayHasKey('key', $job->getResult()['context']);
+        $this->assertEquals($job->getStatus(), Job::STATUS_ERROR);
+    }
+
+    public function testRunJobWithUserException()
+    {
+        self::$kernel->getContainer()->set('syrup.job_executor', new UserErrorExecutor());
+        $jobId = $this->jobMapper->create($this->createJob());
+        $this->commandTester->execute(['jobId'   => $jobId]);
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+
+        $job = $this->jobMapper->get($jobId);
+        $this->assertArrayHasKey('context', $job->getResult());
+        $this->assertArrayHasKey('key', $job->getResult()['context']);
         $this->assertEquals($job->getStatus(), Job::STATUS_ERROR);
     }
 
@@ -95,6 +115,7 @@ class JobCommandTest extends CommandTestCase
         $this->assertArrayHasKey(HookExecutor::HOOK_RESULT_KEY, $result);
         $this->assertEquals(HookExecutor::HOOK_RESULT_VALUE, $result[HookExecutor::HOOK_RESULT_KEY]);
         $this->assertEquals($job->getStatus(), Job::STATUS_SUCCESS);
+        $this->assertArrayNotHasKey('context', $job->getResult());
     }
 
     public function testRunJobWithMaintenance()
@@ -122,5 +143,6 @@ class JobCommandTest extends CommandTestCase
                 'value' => 234,
             ]
         ], $job->getUsage());
+        $this->isEmpty('context', $job->getResult());
     }
 }

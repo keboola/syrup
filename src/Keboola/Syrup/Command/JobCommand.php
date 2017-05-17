@@ -223,7 +223,8 @@ class JobCommand extends ContainerAwareCommand
             $exceptionId = $this->logException('error', $e);
             $jobResult = [
                 'message'       => $e->getMessage(),
-                'exceptionId'   => $exceptionId
+                'exceptionId'   => $exceptionId,
+                'context'       => $e->getData()
             ];
             $jobStatus = Job::STATUS_ERROR;
             $this->job->setError(Job::ERROR_USER);
@@ -237,8 +238,12 @@ class JobCommand extends ContainerAwareCommand
             $exceptionId = $this->logException($logLevel, $e);
             $jobResult = [
                 'message'       => $e->getMessage(),
-                'exceptionId'   => $exceptionId
+                'exceptionId'   => $exceptionId,
             ];
+
+            if ($e->getStatus() !== Job::STATUS_SUCCESS) {
+                $jobResult['context'] = $e->getData();
+            }
 
             if ($e->getResult()) {
                 $jobResult += $e->getResult();
