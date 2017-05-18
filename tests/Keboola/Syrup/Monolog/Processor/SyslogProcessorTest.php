@@ -25,18 +25,18 @@ class SyslogProcessorTest extends TestCase
     private function getSysLogProcessor()
     {
         $s3Uploader = new UploaderS3([
-            'aws-access-key' => SYRUP_AWS_KEY,
-            'aws-secret-key' => SYRUP_AWS_SECRET,
-            's3-upload-path' => SYRUP_S3_BUCKET . SYRUP_S3_BUCKET_LOGS_PATH,
-            'aws-region' => SYRUP_AWS_REGION,
+            'aws-access-key' => AWS_ACCESS_KEY_ID,
+            'aws-secret-key' => AWS_SECRET_ACCESS_KEY,
+            's3-upload-path' => AWS_S3_BUCKET . AWS_S3_BUCKET_LOGS_PATH,
+            'aws-region' => AWS_REGION,
             'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ]);
 
         $request = new Request();
-        $request->headers->add(['x-storageapi-token' => SYRUP_SAPI_TEST_TOKEN]);
+        $request->headers->add(['x-storageapi-token' => SAPI_TOKEN]);
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $storageApiService = new StorageApiService($requestStack, SYRUP_SAPI_TEST_URL);
+        $storageApiService = new StorageApiService($requestStack, SAPI_URL);
 
         return new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
     }
@@ -105,10 +105,10 @@ class SyslogProcessorTest extends TestCase
     public function testProcessorInitInvalidTokenLong()
     {
         $s3Uploader = new UploaderS3([
-            'aws-access-key' => SYRUP_AWS_KEY,
-            'aws-secret-key' => SYRUP_AWS_SECRET,
-            's3-upload-path' => SYRUP_S3_BUCKET . SYRUP_S3_BUCKET_LOGS_PATH,
-            'aws-region' => SYRUP_AWS_REGION,
+            'aws-access-key' => AWS_ACCESS_KEY_ID,
+            'aws-secret-key' => AWS_SECRET_ACCESS_KEY,
+            's3-upload-path' => AWS_S3_BUCKET . AWS_S3_BUCKET_LOGS_PATH,
+            'aws-region' => AWS_REGION,
             'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ]);
 
@@ -116,7 +116,7 @@ class SyslogProcessorTest extends TestCase
         $request->headers->add(['x-storageapi-token' => 'invalid']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $storageApiService = new StorageApiService($requestStack, SYRUP_SAPI_TEST_URL);
+        $storageApiService = new StorageApiService($requestStack, SAPI_URL);
 
         $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000));
         // instantiation must not fail
@@ -143,10 +143,10 @@ class SyslogProcessorTest extends TestCase
     public function testHTTPRequestLong()
     {
         $s3Uploader = new UploaderS3([
-            'aws-access-key' => SYRUP_AWS_KEY,
-            'aws-secret-key' => SYRUP_AWS_SECRET,
-            's3-upload-path' => SYRUP_S3_BUCKET . SYRUP_S3_BUCKET_LOGS_PATH,
-            'aws-region' => SYRUP_AWS_REGION,
+            'aws-access-key' => AWS_ACCESS_KEY_ID,
+            'aws-secret-key' => AWS_SECRET_ACCESS_KEY,
+            's3-upload-path' => AWS_S3_BUCKET . AWS_S3_BUCKET_LOGS_PATH,
+            'aws-region' => AWS_REGION,
             'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ]);
 

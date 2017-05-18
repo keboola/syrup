@@ -1,26 +1,21 @@
 #branches:
 #  only:
 #    - master
-sudo: false
-language: php
-php:
-  - '5.6'
+
+
+sudo: required
+language: bash
 services:
-  - mysql
-  - elasticsearch
+  - docker
 before_script:
-  - mysql -e 'create database syrup;'
-  - php -i | grep memory_limit
-  - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - composer self-update
-  - composer install -n --no-scripts
-  - echo "memory_limit=1G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-script:
-  - ./bin/phpcs --standard=psr2 -n src tests
-#  - ./bin/phpmd src/ text codesize,unusedcode,naming,phpmd.xml
-  - ./bin/phpunit --debug
+  - docker -v
+  - docker-compose -v
+  - docker-compose build
+script: docker-compose run --rm tests
+after_success:
+  - docker images
 after_script:
-  - ./codeclimate.sh
+  - docker-compose run --rm --entrypoint=/code/codeclimate.sh tests
 notifications:
   slack:
     secure: IhgEyPivbdLPWsZb5mWeUwGdhxFZdmba8Zkgutk7Y02Px/fA+vqFlcZo2HSNFH2mvChQjHD/8abUZdZxvsyNCtGE25lz4t7Kc3BkSW8N48GI49RzcndE3DB1cXiNzdmmTFW9wrzkoScTrQUp6UWpWsnV3JBkIyvX2vmp2uPFa4A=

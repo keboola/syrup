@@ -22,9 +22,9 @@ class JobTest extends KernelTestCase
     {
         $storageApiService = self::$kernel->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient(new Client([
-            'token' => SYRUP_SAPI_TEST_TOKEN,
+            'token' => SAPI_TOKEN,
             'userAgent' => SYRUP_APP_NAME,
-            'url' => SYRUP_SAPI_TEST_URL,
+            'url' => SAPI_URL,
         ]));
 
         /** @var ObjectEncryptor $objectEncryptor */
@@ -48,9 +48,9 @@ class JobTest extends KernelTestCase
     {
         $storageApiService = self::$kernel->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient(new Client([
-            'token' => SYRUP_SAPI_TEST_TOKEN,
+            'token' => SAPI_TOKEN,
             'userAgent' => SYRUP_APP_NAME,
-            'url' => SYRUP_SAPI_TEST_URL,
+            'url' => SAPI_URL,
         ]));
 
         /** @var ObjectEncryptor $objectEncryptor */

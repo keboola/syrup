@@ -24,15 +24,15 @@ class QueueCreateCommandTest extends CommandTestCase
 
     public function testCreateQueue()
     {
-        $queueName = 'test_queue';
+        $queueName = AWS_SQS_TEST_QUEUE_NAME;
 
         $db = DriverManager::getConnection([
             'driver' => 'pdo_mysql',
-            'host' => SYRUP_DATABASE_HOST,
-            'dbname' => SYRUP_DATABASE_NAME,
-            'user' => SYRUP_DATABASE_USER,
-            'password' => SYRUP_DATABASE_PASSWORD,
-            'port' => SYRUP_DATABASE_PORT
+            'host' => DATABASE_HOST,
+            'dbname' => DATABASE_NAME,
+            'user' => DATABASE_USER,
+            'password' => DATABASE_PASSWORD,
+            'port' => DATABASE_PORT
         ]);
 
         $db->query("DELETE FROM queues WHERE id='$queueName'")->execute();
@@ -41,7 +41,7 @@ class QueueCreateCommandTest extends CommandTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'name' => $queueName,
-            'region' => SYRUP_AWS_REGION,
+            'region' => AWS_REGION,
             '--register' => null,
             '--no-watch' => null
         ]);
@@ -56,7 +56,7 @@ class QueueCreateCommandTest extends CommandTestCase
 
         $sqsClient = new SqsClient([
             'version' => '2012-11-05',
-            'region' => SYRUP_AWS_REGION
+            'region' => AWS_REGION
         ]);
         $sqsClient->deleteQueue([
             'QueueUrl' => $dbQueue->getUrl()

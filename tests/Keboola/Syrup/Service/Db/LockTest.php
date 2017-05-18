@@ -12,11 +12,11 @@ class LockTest extends \PHPUnit_Framework_TestCase
     public function testLocks()
     {
         $connectionParams = [
-            'host' => SYRUP_DATABASE_HOST,
-            'dbname' => SYRUP_DATABASE_NAME,
-            'user' => SYRUP_DATABASE_USER,
-            'password' => SYRUP_DATABASE_PASSWORD,
-            'port' => SYRUP_DATABASE_PORT,
+            'host' => DATABASE_HOST,
+            'dbname' => DATABASE_NAME,
+            'user' => DATABASE_USER,
+            'password' => DATABASE_PASSWORD,
+            'port' => DATABASE_PORT,
             'driver' => 'pdo_mysql',
             'charset' => 'utf8'
         ];

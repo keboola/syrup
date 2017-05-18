@@ -12,58 +12,48 @@ It is based on Symfony2 framework.
 Development
 ----------------------------------
 
-- Clone from GitHub:
-```bash
-git clone https://github.com/keboola/syrup.git
-```
-
-- Create `app/config/parameters.yml` from `paramters.yml.dist` file. Fill in required fields:
-```bash
-cd syrup
-cp app/config/parameters.yml.dist app/config/parameters.yml
-```
-
-- Install composer dependencies:
-    - download and install composer as described [here](https://getcomposer.org/download/)
-    - install dependencies
-```bash
-php composer.phar install
-```
-
-- Run tests
-    - create `test.sh` from `test.sh.template`
-```bash
-cp test.sh.template test.sh
-```
-    - set values to environment variables needed
-    - run tests
-```bash
-chmod a+x test.sh
-./test.sh
-```
-
-Docker-ish Development
-----------------------------------
-*Note: non-persistent*
+*Note: Elastic & MySQL non-persistent*
 
 - Clone from GitHub
 ```bash
 git clone https://github.com/keboola/syrup.git
 ```
 
-- Install dependencies
+- Set up Docker Compose
 ```bash
-php composer.phar install
+docker-compose build
 ```
 
-- Create `test.sh` from `test.sh.template`
-- Create AWS resources from [aws-services.json](./aws-services.json) and fill `SYRUP_AWS_KEY`, `SYRUP_AWS_SECRET`, `SYRUP_AWS_REGION`, `SYRUP_S3_BUCKET`, `SYRUP_SQS_URL` in `tests.sh`
+- Create `.env` file with this content
+```
+SYRUP_APP_NAME=syrup-devel
+DATABASE_HOST=mysql
+DATABASE_USER=syrup
+DATABASE_PASSWORD=syrup
+DATABASE_NAME=syrup
+DATABASE_PORT=3306
+ELASTICSEARCH_HOST=elastic:9200
+AWS_S3_BUCKET_LOGS_PATH=/debug-files
+SAPI_URL=https://connection.keboola.com/
+
+SAPI_TOKEN=
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
+AWS_S3_BUCKET=
+AWS_SQS_DEFAULT_QUEUE=
+AWS_SQS_TEST_QUEUE_NAME=
+
+```
+
+- Create AWS resources from [aws-services.json](./aws-services.json) and fill `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET`, `AWS_SQS_DEFAULT_QUEUE` and `AWS_SQS_TEST_QUEUE_NAME` in `.env`
+- Insert a Storage API token into `SAPI_TOKEN`
 - Run elasticsearch and mysql
 ```bash
 docker-compose up elastic mysql
 ```
 - Run tests
 ```bash
-chmod a+x test.sh
-./test.sh
+docker-compose run --rm tests
 ```

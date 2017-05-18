@@ -14,11 +14,11 @@ class QueueTest extends \PHPUnit_Framework_TestCase
     {
         $db = \Doctrine\DBAL\DriverManager::getConnection([
             'driver' => 'pdo_mysql',
-            'host' => SYRUP_DATABASE_HOST,
-            'dbname' => SYRUP_DATABASE_NAME,
-            'user' => SYRUP_DATABASE_USER,
-            'password' => SYRUP_DATABASE_PASSWORD,
-            'port' => SYRUP_DATABASE_PORT
+            'host' => DATABASE_HOST,
+            'dbname' => DATABASE_NAME,
+            'user' => DATABASE_USER,
+            'password' => DATABASE_PASSWORD,
+            'port' => DATABASE_PORT
         ]);
         $queueFactory = new QueueFactory($db, ['db_table' => 'queues'], SYRUP_APP_NAME);
         $queueService = $queueFactory->get();

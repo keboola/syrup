@@ -41,14 +41,14 @@ class SyrupExceptionListenerTest extends KernelTestCase
     {
         $storageApiService = new StorageApiService(new RequestStack());
         $storageApiService->setClient(new Client([
-            'token' => SYRUP_SAPI_TEST_TOKEN,
-            'url' => SYRUP_SAPI_TEST_URL,
+            'token' => SAPI_TOKEN,
+            'url' => SAPI_URL,
         ]));
         $uploader = new UploaderS3([
-            'aws-access-key' => SYRUP_AWS_KEY,
-            'aws-secret-key' => SYRUP_AWS_SECRET,
-            's3-upload-path' => SYRUP_S3_BUCKET . SYRUP_S3_BUCKET_LOGS_PATH,
-            'aws-region' => SYRUP_AWS_REGION,
+            'aws-access-key' => AWS_ACCESS_KEY_ID,
+            'aws-secret-key' => AWS_SECRET_ACCESS_KEY,
+            's3-upload-path' => AWS_S3_BUCKET . AWS_S3_BUCKET_LOGS_PATH,
+            'aws-region' => AWS_REGION,
             'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
         ]);
         $this->testLogHandler = new TestHandler();
@@ -107,7 +107,7 @@ class SyrupExceptionListenerTest extends KernelTestCase
     public function testKernelException()
     {
         $request = Request::create('/syrup/run', 'POST');
-        $request->headers->set('X-StorageApi-Token', SYRUP_SAPI_TEST_TOKEN);
+        $request->headers->set('X-StorageApi-Token', SAPI_TOKEN);
 
         $message = uniqid();
         $event = new GetResponseForExceptionEvent(self::$kernel, $request, HttpKernelInterface::MASTER_REQUEST, new UserException($message));

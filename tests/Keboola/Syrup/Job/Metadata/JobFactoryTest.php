@@ -22,9 +22,9 @@ class JobFactoryTest extends KernelTestCase
     public function testJobFactory()
     {
         $storageApiClient = new Client([
-            'token' => SYRUP_SAPI_TEST_TOKEN,
+            'token' => SAPI_TOKEN,
             'userAgent' => SYRUP_APP_NAME,
-            'url' => SYRUP_SAPI_TEST_URL,
+            'url' => SAPI_URL,
         ]);
 
         /** @var ObjectEncryptor $encryptor */

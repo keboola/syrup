@@ -22,7 +22,7 @@ class SyrupControllerListenerTest extends WebTestCase
         $client = static::createClient();
 
         $request = Request::create('/syrup/run', 'POST');
-        $request->headers->set('X-StorageApi-Token', SYRUP_SAPI_TEST_TOKEN);
+        $request->headers->set('X-StorageApi-Token', SAPI_TOKEN);
 
         /** @var RequestStack $requestStack */
         $requestStack = $client->getContainer()->get('request_stack');

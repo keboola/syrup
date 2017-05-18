@@ -248,6 +248,7 @@ class JobCommand extends ContainerAwareCommand
             $status = self::STATUS_SUCCESS;
         } catch (\Exception $e) {
             // make sure that the job is recorded as failed
+            var_dump("general exception");
             $jobStatus = Job::STATUS_ERROR;
             $jobResult = [
                 'message' => 'Internal error occurred, evaluating details'

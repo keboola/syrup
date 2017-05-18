@@ -19,7 +19,7 @@ class ComponentIndexTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', new Client(['hosts' => [SYRUP_ELASTICSEARCH_HOST]]));
+        self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', new Client(['hosts' => [ELASTICSEARCH_HOST]]));
     }
 
     public function testGetIndexPrefix()
