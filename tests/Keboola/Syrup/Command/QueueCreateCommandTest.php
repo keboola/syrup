@@ -61,5 +61,6 @@ class QueueCreateCommandTest extends CommandTestCase
         $sqsClient->deleteQueue([
             'QueueUrl' => $dbQueue->getUrl()
         ]);
+        sleep(60);
     }
 }

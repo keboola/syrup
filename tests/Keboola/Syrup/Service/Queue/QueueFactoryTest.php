@@ -39,5 +39,6 @@ class QueueFactoryTest extends \PHPUnit_Framework_TestCase
         $sqsClient->deleteQueue([
             'QueueUrl' => $sqsQueue->get('QueueUrl')
         ]);
+        sleep(60);
     }
 }
