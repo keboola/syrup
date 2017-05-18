@@ -29,7 +29,7 @@ services:
     build: .
     tty: true
     stdin_open: true
-    entrypoint: /code/test.sh
+    entrypoint: /code/tests.sh
     environment:
       - SYRUP_APP_NAME
       - DATABASE_HOST
