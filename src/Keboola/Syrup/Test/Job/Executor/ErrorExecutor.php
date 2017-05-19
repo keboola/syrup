@@ -10,6 +10,7 @@ class ErrorExecutor extends \Keboola\Syrup\Job\Executor
     {
         $e = new JobException(500, 'One of orchestration tasks failed');
         $e
+            ->setData(array('key' => 'value'))
             ->setStatus(Job::STATUS_ERROR)
             ->setResult(array('testing' => 'value'));
 

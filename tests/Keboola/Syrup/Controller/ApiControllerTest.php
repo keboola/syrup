@@ -171,6 +171,7 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('exceptionId', $result);
         $this->assertArrayHasKey('message', $result);
         $this->assertArrayHasKey('runId', $result);
+        $this->assertArrayNotHasKey('context', $result);
     }
 
     public function testRunActionInvalidToken()
@@ -202,5 +203,6 @@ class ApiControllerTest extends WebTestCase
         $this->assertArrayHasKey('exceptionId', $result);
         $this->assertArrayHasKey('message', $result);
         $this->assertArrayHasKey('runId', $result);
+        $this->assertArrayNotHasKey('context', $result);
     }
 }
