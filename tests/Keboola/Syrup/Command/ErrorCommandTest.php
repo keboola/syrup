@@ -8,9 +8,6 @@
 
 namespace Keboola\Syrup\Tests\Command;
 
-use Symfony\Component\Console\Application;
-use Keboola\Syrup\Test\Command\ErrorCommand;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Process\Process;
 
 class ErrorCommandTest extends \PHPUnit_Framework_TestCase
