@@ -41,7 +41,7 @@ class ErrorCommand extends ContainerAwareCommand
             case 'memory':
                 $str = "something";
                 while (true) {
-                    $str .= "something else";
+                    $str .= str_repeat("abcdeABCDE", 1000*1000*20);
                 }
                 break;
             default:
