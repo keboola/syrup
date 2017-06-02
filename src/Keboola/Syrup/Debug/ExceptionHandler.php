@@ -57,10 +57,6 @@ class ExceptionHandler extends BaseExceptionHandler
      */
     public function sendPhpResponse($exception)
     {
-        if (!$exception instanceof FlattenException) {
-            $exception = FlattenException::create($exception);
-        }
-
         $yaml = new Parser();
         $parameters = $yaml->parse(file_get_contents(__DIR__.'/../../../../app/config/parameters.yml'));
 
@@ -223,18 +219,17 @@ EOF;
         return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', $path, $file, $line);
     }
 
-    private function getTrace(FlattenException $exception)
+    private function getTrace(\Exception $exception)
     {
-        $all = $exception->toArray();
-
-        $str = '';
-        foreach ($all as $e) {
-            $traces = $e['trace'];
-            foreach ($traces as $trace) {
-                $str .= "in file " . $trace['file'] . " on line " . $trace['line'] . PHP_EOL;
+        $getStackTrace = function (\Exception $exception) use (&$getStackTrace) {
+            $trace = "";
+            if ($exception->getPrevious()) {
+                $trace = $getStackTrace($exception->getPrevious());
             }
-        }
-        return $str;
+            $trace .= $exception->getTraceAsString();
+            return $trace . "\n\n";
+        };
+        return $getStackTrace($exception);
     }
 
     private function formatArgs(array $args)
