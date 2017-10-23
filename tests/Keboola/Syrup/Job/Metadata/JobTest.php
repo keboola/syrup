@@ -63,6 +63,6 @@ class JobTest extends KernelTestCase
 
         $job = $jobFactory->create($command, $objectEncryptor->encrypt($param), $lock);
         $job->setResult(["message" => "SQLSTATE[XX000]: " . chr(0x00000080) . " abcd"]);
-        $this->assertEquals(["message" => "SQLSTATE[XX000]: ? abcd"], $job->getResult());
+        $this->assertEquals(["message" => "SQLSTATE[XX000]:  abcd"], $job->getResult());
     }
 }

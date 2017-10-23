@@ -230,7 +230,7 @@ class StorageApiHandlerTest extends TestCase
         $storageClientStub->expects($this->once())
             ->method("createEvent")
             ->with($this->callback(function ($event) {
-                if ($event->getMessage() == 'SQLSTATE[XX000]: ? abcd') {
+                if ($event->getMessage() == 'SQLSTATE[XX000]:  abcd') {
                     return true;
                 }
                 return false;
