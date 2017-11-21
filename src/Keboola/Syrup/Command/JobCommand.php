@@ -226,6 +226,15 @@ class JobCommand extends ContainerAwareCommand
             $jobStatus = Job::STATUS_ERROR;
             $this->job->setError(Job::ERROR_USER);
             $status = self::STATUS_SUCCESS;
+        } catch (\Keboola\ObjectEncryptor\Exception\UserException $e) {
+            $exceptionId = $this->logException('error', $e);
+            $jobResult = [
+                'message'       => $e->getMessage(),
+                'exceptionId'   => $exceptionId,
+            ];
+            $jobStatus = Job::STATUS_ERROR;
+            $this->job->setError(Job::ERROR_USER);
+            $status = self::STATUS_SUCCESS;
         } catch (JobException $e) {
             $logLevel = 'error';
             if ($e->getStatus() === Job::STATUS_WARNING) {

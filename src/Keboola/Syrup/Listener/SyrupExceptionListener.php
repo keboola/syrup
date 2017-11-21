@@ -36,6 +36,7 @@ class SyrupExceptionListener
             $this->runId = $storageApiClient->getRunId();
         } catch (NoRequestException $e) {
         } catch (UserException $e) {
+        } catch (\Keboola\ObjectEncryptor\Exception\UserException $e) {
         } catch (SimpleException $e) {
         }
         $this->logger = $logger;

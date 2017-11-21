@@ -6,7 +6,7 @@
  */
 namespace Keboola\Syrup\Tests\Job\Metadata;
 
-use Keboola\ObjectEncryptor\ObjectEncryptor;
+use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
 use Keboola\StorageApi\Client;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
@@ -27,8 +27,8 @@ class JobFactoryTest extends KernelTestCase
             'url' => SAPI_URL,
         ]);
 
-        /** @var ObjectEncryptor $encryptor */
-        $encryptor = self::$kernel->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        /** @var ObjectEncryptorFactory $encryptor */
+        $encryptor = self::$kernel->getContainer()->get('syrup.object_encryptor_factory');
         /** @var StorageApiService $storageApiService */
         $storageApiService = self::$kernel->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient($storageApiClient);
@@ -53,6 +53,6 @@ class JobFactoryTest extends KernelTestCase
         $this->assertArrayHasKey('description', $job->getToken());
         $this->assertEquals($tokenData['description'], $job->getToken()['description']);
         $this->assertArrayHasKey('token', $job->getToken());
-        $this->assertEquals($tokenData['token'], $encryptor->decrypt($job->getToken()['token']));
+        $this->assertEquals($tokenData['token'], $encryptor->getEncryptor()->decrypt($job->getToken()['token']));
     }
 }
