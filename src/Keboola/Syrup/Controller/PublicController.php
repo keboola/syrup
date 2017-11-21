@@ -8,6 +8,7 @@
 
 namespace Keboola\Syrup\Controller;
 
+use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\Syrup\Exception\SyrupComponentException;
 use Keboola\Syrup\Exception\UserException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -74,7 +75,8 @@ class PublicController extends BaseController
      */
     public function encryptAction(Request $request)
     {
-        $encryptor = $this->container->get("syrup.object_encryptor");
+        /** @var ObjectEncryptor $encryptor */
+        $encryptor = $this->container->get('syrup.object_encryptor_factory')->getEncryptor();
         $contentType = $request->headers->get('Content-type');
         $contentType = strtolower(trim(explode(';', $contentType)[0]));
         if ($contentType == "text/plain") {

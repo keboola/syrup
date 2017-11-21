@@ -7,10 +7,10 @@
 namespace Keboola\Syrup\Tests\Elasticsearch;
 
 use Elasticsearch\Client as ElasticClient;
+use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\StorageApi\Client as SapiClient;
 use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Elasticsearch\Search;
-use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Elasticsearch\JobMapper;
@@ -72,7 +72,7 @@ class SearchTest extends WebTestCase
     {
         $tokenData = self::$sapiClient->verifyToken();
         /** @var ObjectEncryptor $configEncryptor */
-        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
+        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
         return new Job($configEncryptor, [
                 'id'        => self::$sapiClient->generateId(),
                 'runId'     => self::$sapiClient->generateId(),

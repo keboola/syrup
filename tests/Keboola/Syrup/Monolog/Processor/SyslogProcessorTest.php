@@ -8,11 +8,11 @@
 namespace Keboola\Syrup\Tests\Monolog\Processor;
 
 use Keboola\DebugLogUploader\UploaderS3;
-use Keboola\Syrup\Encryption\BaseWrapper;
+use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
+use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Monolog\Processor\JobProcessor;
 use Keboola\Syrup\Monolog\Processor\RequestProcessor;
-use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Keboola\Syrup\Monolog\Processor\SyslogProcessor;
@@ -193,7 +193,9 @@ class SyslogProcessorTest extends TestCase
     {
         $processor = new JobProcessor();
         $configEncryptor = new ObjectEncryptor();
-        $configEncryptor->pushWrapper(new BaseWrapper(uniqid('foobar')));
+        $wrapper = new BaseWrapper();
+        $wrapper->setKey(uniqid('foobar'));
+        $configEncryptor->pushWrapper($wrapper);
         $jobId = intval(uniqid());
         $processor->setJob(new Job($configEncryptor, [
             'id' => $jobId,

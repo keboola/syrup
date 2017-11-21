@@ -2,9 +2,7 @@
 
 namespace Keboola\Syrup\Test;
 
-use Doctrine\ORM\Query\Expr\Base;
-use Keboola\Syrup\Encryption\BaseWrapper;
-use Keboola\Syrup\Encryption\CryptoWrapperInterface;
+use Keboola\ObjectEncryptor\Legacy\Wrapper\BaseWrapper;
 
 class AnotherCryptoWrapper extends BaseWrapper
 {

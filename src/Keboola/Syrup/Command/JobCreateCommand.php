@@ -25,9 +25,6 @@ class JobCreateCommand extends ContainerAwareCommand
     /** @var SapiClient */
     private $storageApi;
 
-    /** @var EncryptorInterface $encryptor */
-    private $encryptor;
-
     protected function configure()
     {
         $this
@@ -52,8 +49,6 @@ class JobCreateCommand extends ContainerAwareCommand
         /** @var StorageApiService $storageApiService */
         $storageApiService = $this->getContainer()->get('syrup.storage_api');
         $storageApiService->setClient($this->storageApi);
-
-        $this->encryptor = $this->getContainer()->get('syrup.encryptor');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

@@ -8,13 +8,13 @@
 namespace Keboola\Syrup\Tests\Elasticsearch;
 
 use Elasticsearch\Client;
+use Keboola\ObjectEncryptor\ObjectEncryptor;
+use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
 use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Elasticsearch\JobMapper;
-use Keboola\Syrup\Encryption\Encryptor;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobFactory;
 use Keboola\Syrup\Job\Metadata\JobInterface;
-use Keboola\Syrup\Service\ObjectEncryptor;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -40,8 +40,8 @@ class JobMapperTest extends KernelTestCase
     public static function setUpBeforeClass()
     {
         static::bootKernel();
-        /** @var ObjectEncryptor $configEncryptor */
-        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
+        /** @var ObjectEncryptorFactory $configEncryptorFactory */
+        $configEncryptorFactory = self::$kernel->getContainer()->get('syrup.object_encryptor_factory');
         self::$client = new Client(['hosts' => [ELASTICSEARCH_HOST]]);
         self::$index = new ComponentIndex(SYRUP_APP_NAME, 'devel', self::$client);
         /** @var StorageApiService $storageApiService */
@@ -50,8 +50,14 @@ class JobMapperTest extends KernelTestCase
             'token' => SAPI_TOKEN,
             'url' => SAPI_URL,
         ]));
-        self::$jobFactory = new JobFactory(SYRUP_APP_NAME, $configEncryptor, $storageApiService);
-        self::$jobMapper = new JobMapper(self::$client, self::$index, $configEncryptor, null, realpath(__DIR__ . '/../../../../app'));
+        self::$jobFactory = new JobFactory(SYRUP_APP_NAME, $configEncryptorFactory, $storageApiService);
+        self::$jobMapper = new JobMapper(
+            self::$client,
+            self::$index,
+            $configEncryptorFactory,
+            null,
+            realpath(__DIR__ . '/../../../../app')
+        );
     }
 
     private function assertJob(JobInterface $job, $resJob)

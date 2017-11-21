@@ -7,10 +7,10 @@
 
 namespace Keboola\Syrup\Test;
 
+use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobFactory;
-use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Keboola\StorageApi\Client as StorageApiClient;
 
@@ -70,7 +70,7 @@ class CommandTestCase extends WebTestCase
             ->encrypt($this->storageApiToken);
 
         /** @var ObjectEncryptor $configEncryptor */
-        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
+        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
         return new Job($configEncryptor, [
                 'id' => $this->storageApiClient->generateId(),
                 'runId' => $this->storageApiClient->generateId(),

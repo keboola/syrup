@@ -66,14 +66,8 @@ services:
         arguments: ["@request_stack", "%storage_api.url%"]
 
     syrup.encryptor:
-        class: Keboola\Syrup\Encryption\Encryptor
+        class: Keboola\ObjectEncryptor\Legacy\Encryptor
         arguments: ["%encryption_key%"]
-
-    syrup.encryption.base_wrapper:
-        class: Keboola\Syrup\Encryption\BaseWrapper
-        arguments: ["%encryption_key%"]
-        tags:
-            - { name: syrup.encryption.wrapper }
 
     syrup.elasticsearch.client:
         class: Elasticsearch\Client
@@ -88,13 +82,13 @@ services:
         arguments:
           - "@syrup.elasticsearch.client"
           - "@syrup.elasticsearch.current_component_index"
-          - "@syrup.object_encryptor"
+          - "@syrup.object_encryptor_factory"
           - "@logger"
           - "%kernel.root_dir%"
 
     syrup.elasticsearch.search:
         class: Keboola\Syrup\Elasticsearch\Search
-        arguments: ["@syrup.elasticsearch.client", "%elasticsearch.index_prefix%", "@syrup.object_encryptor", "@logger"]
+        arguments: ["@syrup.elasticsearch.client", "%elasticsearch.index_prefix%", "@syrup.object_encryptor_factory", "@logger"]
 
     syrup.queue_factory:
         class: Keboola\Syrup\Service\Queue\QueueFactory
@@ -102,7 +96,7 @@ services:
 
     syrup.job_factory:
         class: Keboola\Syrup\Job\Metadata\JobFactory
-        arguments: ["%app_name%", "@syrup.object_encryptor", "@syrup.storage_api"]
+        arguments: ["%app_name%", "@syrup.object_encryptor_factory", "@syrup.storage_api"]
 
     syrup.job_executor:
         class: Keboola\Syrup\Job\Executor
@@ -114,3 +108,7 @@ services:
     syrup.object_encryptor:
         class: Keboola\Syrup\Service\ObjectEncryptor
         arguments: ["@syrup.encryptor"]
+
+    syrup.object_encryptor_factory:
+        class: Keboola\ObjectEncryptor\ObjectEncryptorFactory
+        arguments: [null, "%encryption_key%", "%encryption_key%", null, null, null, null, null]

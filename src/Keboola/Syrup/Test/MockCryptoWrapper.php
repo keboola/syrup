@@ -2,7 +2,7 @@
 
 namespace Keboola\Syrup\Test;
 
-use Keboola\Syrup\Encryption\CryptoWrapperInterface;
+use Keboola\ObjectEncryptor\Wrapper\CryptoWrapperInterface;
 
 class MockCryptoWrapper implements CryptoWrapperInterface
 {

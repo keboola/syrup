@@ -8,12 +8,12 @@
 namespace Keboola\Syrup\Command;
 
 use Doctrine\DBAL\Connection;
+use Keboola\ObjectEncryptor\ObjectEncryptor;
 use Keboola\Syrup\Elasticsearch\JobMapper;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Job\ExecutorInterface;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Service\Db\Lock;
-use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,7 +56,7 @@ class JobCleanupCommand extends ContainerAwareCommand
 
         // SAPI init
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $this->getContainer()->get('syrup.object_encryptor');
+        $encryptor = $this->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
 
         $this->sapiClient = new SapiClient([
             'token' => $encryptor->decrypt($this->job->getToken()['token']),
