@@ -33,6 +33,7 @@ class ErrorCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testFatalErrorMemoryToExceptionCommand()
     {
+        $this->markTestSkipped("Unstable");
         $process = $this->runErrorCommand('memory');
         $this->assertContains('Allowed memory size of', $process->getErrorOutput());
         $this->assertContains('exceptionId', (string) $process->getOutput());
