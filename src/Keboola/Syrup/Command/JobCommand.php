@@ -229,7 +229,7 @@ class JobCommand extends ContainerAwareCommand
         } catch (\Keboola\ObjectEncryptor\Exception\UserException $e) {
             $exceptionId = $this->logException('error', $e);
             $jobResult = [
-                'message'       => $e->getMessage(),
+                'message'       => 'Encryption error: ' . $e->getMessage(),
                 'exceptionId'   => $exceptionId,
             ];
             $jobStatus = Job::STATUS_ERROR;

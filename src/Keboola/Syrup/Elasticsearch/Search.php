@@ -28,11 +28,11 @@ class Search
      */
     protected $configEncryptor;
 
-    public function __construct(Client $client, $indexPrefix, ObjectEncryptorFactory $configEncryptor, $logger = null)
+    public function __construct(Client $client, $indexPrefix, ObjectEncryptorFactory $objectEncryptorFactory, $logger = null)
     {
         $this->client = $client;
         $this->indexPrefix = $indexPrefix;
-        $this->configEncryptor = $configEncryptor->getEncryptor();
+        $this->configEncryptor = $objectEncryptorFactory->getEncryptor();
         $this->logger = $logger;
     }
 
