@@ -14,7 +14,6 @@ before_script:
 script: docker-compose run --rm tests
 after_success:
   - docker images
-after_script:
   - docker-compose run --rm --entrypoint=/code/codeclimate.sh tests
 notifications:
   slack:
