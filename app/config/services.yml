@@ -107,4 +107,4 @@ services:
 
     syrup.object_encryptor_factory:
         class: Keboola\ObjectEncryptor\ObjectEncryptorFactory
-        arguments: [null, "%encryption_key%", "%encryption_key%", null]
+        arguments: [null, null, "%encryption_key%", "%encryption_key%"]
