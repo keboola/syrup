@@ -9,11 +9,11 @@ defined('DATABASE_HOST') || define('DATABASE_HOST', getenv('DATABASE_HOST')? get
 defined('DATABASE_USER') || define('DATABASE_USER', getenv('DATABASE_USER')? getenv('DATABASE_USER') : 'syrup');
 defined('DATABASE_PASSWORD') || define('DATABASE_PASSWORD', getenv('DATABASE_PASSWORD')? getenv('DATABASE_PASSWORD') : null);
 defined('DATABASE_NAME') || define('DATABASE_NAME', getenv('DATABASE_NAME')? getenv('DATABASE_NAME') : 'syrup');
-defined('AWS_ACCESS_KEY_ID') || define('AWS_ACCESS_KEY_ID', getenv('AWS_ACCESS_KEY_ID')? getenv('AWS_ACCESS_KEY_ID') : 'AKIAJMFLGHTG2BI3WNEQ');
-defined('AWS_SECRET_ACCESS_KEY') || define('AWS_SECRET_ACCESS_KEY', getenv('AWS_SECRET_ACCESS_KEY')? getenv('AWS_SECRET_ACCESS_KEY') : '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');
+defined('AWS_ACCESS_KEY_ID') || define('AWS_ACCESS_KEY_ID', getenv('AWS_ACCESS_KEY_ID')? getenv('AWS_ACCESS_KEY_ID') : null);
+defined('AWS_SECRET_ACCESS_KEY') || define('AWS_SECRET_ACCESS_KEY', getenv('AWS_SECRET_ACCESS_KEY')? getenv('AWS_SECRET_ACCESS_KEY') : null);
 defined('AWS_REGION') || define('AWS_REGION', getenv('AWS_REGION')? getenv('AWS_REGION') : 'us-east-1');
 defined('SAPI_URL') || define('SAPI_URL', getenv('SAPI_URL')? getenv('SAPI_URL') : null);
-defined('SAPI_TOKEN') || define('SAPI_TOKEN', getenv('SAPI_TOKEN')? getenv('SAPI_TOKEN') : '572-30505-7c2f2a3a53ff2b96b6c1aaa12d128e0b4c3d53c7');
+defined('SAPI_TOKEN') || define('SAPI_TOKEN', getenv('SAPI_TOKEN')? getenv('SAPI_TOKEN') : null);
 defined('ELASTICSEARCH_HOST') || define('ELASTICSEARCH_HOST', getenv('ELASTICSEARCH_HOST')? getenv('ELASTICSEARCH_HOST') : 'http://127.0.0.1:9200');
 defined('AWS_SQS_DEFAULT_QUEUE') || define('AWS_SQS_DEFAULT_QUEUE', getenv('AWS_SQS_DEFAULT_QUEUE')? getenv('AWS_SQS_DEFAULT_QUEUE') : 'https://sqs.us-east-1.amazonaws.com/[id]/[name]');
 defined('AWS_S3_BUCKET') || define('AWS_S3_BUCKET', getenv('AWS_S3_BUCKET')? getenv('AWS_S3_BUCKET') : 'keboola-logs');
