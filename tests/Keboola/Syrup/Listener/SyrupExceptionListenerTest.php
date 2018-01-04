@@ -39,6 +39,8 @@ class SyrupExceptionListenerTest extends KernelTestCase
 
     public function setUp()
     {
+        static::bootKernel();
+
         $request = new Request();
         $request->headers->add(['X-StorageApi-Token' => SAPI_TOKEN]);
 
