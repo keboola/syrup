@@ -3,8 +3,8 @@ namespace Keboola\Syrup\Debug;
 
 class ServerApi
 {
-    static $sapi = 'cli-server';
-    static $headers = array();
+    public static $sapi = 'cli-server';
+    public static $headers = array();
 
     public static function testHeader()
     {

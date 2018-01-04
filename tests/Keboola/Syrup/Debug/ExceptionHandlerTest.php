@@ -94,7 +94,7 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, ServerApi::$headers);
 
         $httpHeaders = array_filter(ServerApi::$headers, function (array $header) {
-           return preg_match('/^http\/1\.0/ui', $header[0]);
+            return preg_match('/^http\/1\.0/ui', $header[0]);
         });
 
         $this->assertCount(1, $httpHeaders);
