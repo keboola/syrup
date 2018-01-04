@@ -93,9 +93,11 @@ class SyrupExceptionListener
         // holds status code and header details
         if ($exception instanceof HttpExceptionInterface) {
             $code = $exception->getStatusCode();
+            $content['code'] = $exception->getStatusCode();
+
             $response->headers->replace($exception->getHeaders());
 
-            if ($code < 500) {
+            if ($exception->getStatusCode() < 500) {
                 $method = 'error';
                 $content['error'] = 'User error';
                 $content['message'] = $exception->getMessage();
