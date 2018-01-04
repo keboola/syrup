@@ -39,11 +39,14 @@ class SyrupExceptionListenerTest extends KernelTestCase
 
     public function setUp()
     {
-        $storageApiService = new StorageApiService(new RequestStack());
-        $storageApiService->setClient(new Client([
-            'token' => SAPI_TOKEN,
-            'url' => SAPI_URL,
-        ]));
+        $request = new Request();
+        $request->headers->add(['X-StorageApi-Token' => SAPI_TOKEN]);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $storageApiService = new StorageApiService($requestStack, SAPI_URL);
+
         $uploader = new UploaderS3([
             'aws-access-key' => AWS_ACCESS_KEY_ID,
             'aws-secret-key' => AWS_SECRET_ACCESS_KEY,
