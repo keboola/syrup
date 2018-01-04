@@ -7,6 +7,7 @@
  */
 namespace Keboola\Syrup\Listener;
 
+use Keboola\StorageApi\MaintenanceException;
 use Keboola\Syrup\Exception\SimpleException;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -32,11 +33,11 @@ class SyrupExceptionListener
     {
         $this->appName = $appName;
         try {
-            $storageApiClient = $storageApiService->getClient();
-            $this->runId = $storageApiClient->getRunId();
+            $this->runId = $storageApiService->getClient()->getRunId();
         } catch (NoRequestException $e) {
         } catch (UserException $e) {
         } catch (SimpleException $e) {
+        } catch (MaintenanceException $e) {
         }
         $this->logger = $logger;
     }
