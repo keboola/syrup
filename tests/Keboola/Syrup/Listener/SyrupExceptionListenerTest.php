@@ -87,6 +87,12 @@ class SyrupExceptionListenerTest extends KernelTestCase
 
         $listener = new SyrupExceptionListener(SYRUP_APP_NAME, $storageApiService, $logger);
         $this->assertTrue($listener instanceof SyrupExceptionListener);
+
+        try {
+            $storageApiService->getClient();
+            $this->fail('Create of sapi client should produce MaintenanceException');
+        } catch (MaintenanceException $e) {
+        }
     }
 
     public function testConsoleException()
