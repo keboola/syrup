@@ -8,7 +8,6 @@
 namespace Keboola\Syrup\Tests\Listener;
 
 use Keboola\DebugLogUploader\UploaderS3;
-use Keboola\StorageApi\Client;
 use Keboola\StorageApi\ClientException;
 use Keboola\StorageApi\MaintenanceException;
 use Monolog\Handler\TestHandler;
@@ -62,6 +61,32 @@ class SyrupExceptionListenerTest extends KernelTestCase
         $this->testLogHandler->pushProcessor(new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $uploader));
         $logger = new \Monolog\Logger('test', [$this->testLogHandler]);
         $this->listener = new SyrupExceptionListener(SYRUP_APP_NAME, $storageApiService, $logger);
+    }
+
+    public function testMaintenance()
+    {
+        $request = new Request();
+        $request->headers->add(['X-StorageApi-Token' => SAPI_TOKEN]);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $storageApiService = new StorageApiService($requestStack, 'https://maintenance-testing.us-east-1.keboola.com');
+
+        $uploader = new UploaderS3([
+            'aws-access-key' => AWS_ACCESS_KEY_ID,
+            'aws-secret-key' => AWS_SECRET_ACCESS_KEY,
+            's3-upload-path' => AWS_S3_BUCKET . AWS_S3_BUCKET_LOGS_PATH,
+            'aws-region' => AWS_REGION,
+            'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
+        ]);
+        $testLogHandler = new TestHandler();
+        $testLogHandler->setFormatter(new JsonFormatter());
+        $testLogHandler->pushProcessor(new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $uploader));
+        $logger = new \Monolog\Logger('test', [$testLogHandler]);
+
+        $listener = new SyrupExceptionListener(SYRUP_APP_NAME, $storageApiService, $logger);
+        $this->assertTrue($listener instanceof SyrupExceptionListener);
     }
 
     public function testConsoleException()
