@@ -1,4 +1,5 @@
 UPGRADE FROM 7.0 to 8.0
+=======================
 
 ObjectEncryptor was moved to a separate library. Namespace changes from 
 `Keboola\Syrup\Service\ObjectEncryptor` to `Keboola\ObjectEncryptor\ObjectEncryptor`.
