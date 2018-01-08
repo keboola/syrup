@@ -7,6 +7,8 @@
  */
 namespace Keboola\Syrup\Listener;
 
+use Keboola\StorageApi\Exception as SapiException;
+use Keboola\StorageApi\MaintenanceException;
 use Keboola\Syrup\Exception\SimpleException;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -32,12 +34,12 @@ class SyrupExceptionListener
     {
         $this->appName = $appName;
         try {
-            $storageApiClient = $storageApiService->getClient();
-            $this->runId = $storageApiClient->getRunId();
+            $this->runId = $storageApiService->getClient()->getRunId();
         } catch (NoRequestException $e) {
         } catch (UserException $e) {
         } catch (\Keboola\ObjectEncryptor\Exception\UserException $e) {
         } catch (SimpleException $e) {
+        } catch (SapiException $e) {
         }
         $this->logger = $logger;
     }
@@ -77,19 +79,6 @@ class SyrupExceptionListener
         $code = ($exception->getCode() < 300 || $exception->getCode() >= 600) ? 500 : $exception->getCode();
 
         // exception is by default Application Exception
-        $isUserException = false;
-
-        // HttpExceptionInterface is a special type of exception that
-        // holds status code and header details
-        if ($exception instanceof HttpExceptionInterface) {
-            $code = $exception->getStatusCode();
-            $response->headers->replace($exception->getHeaders());
-
-            if ($code < 500) {
-                $isUserException = true;
-            }
-        }
-
         $content = array(
             'status'  => 'error',
             'error'  => 'Application error',
@@ -100,10 +89,27 @@ class SyrupExceptionListener
         );
 
         $method = 'critical';
-        if ($isUserException) {
+
+        // HttpExceptionInterface is a special type of exception that
+        // holds status code and header details
+        if ($exception instanceof HttpExceptionInterface) {
+            $code = $exception->getStatusCode();
+            $content['code'] = $exception->getStatusCode();
+
+            $response->headers->replace($exception->getHeaders());
+
+            if ($exception->getStatusCode() < 500) {
+                $method = 'error';
+                $content['error'] = 'User error';
+                $content['message'] = $exception->getMessage();
+            }
+        }
+
+        // MaintenanceException from SAPI client
+        if ($exception instanceof MaintenanceException) {
             $method = 'error';
-            $content['error'] = 'User error';
-            $content['message'] = $exception->getMessage();
+            $content['error'] = 'Project is disabled';
+            $content['message'] = 'Project is disabled - ' . $exception->getMessage();
         }
 
         $logData = array(

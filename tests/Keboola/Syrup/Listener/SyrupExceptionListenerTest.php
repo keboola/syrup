@@ -8,8 +8,8 @@
 namespace Keboola\Syrup\Tests\Listener;
 
 use Keboola\DebugLogUploader\UploaderS3;
-use Keboola\StorageApi\Client;
 use Keboola\StorageApi\ClientException;
+use Keboola\StorageApi\MaintenanceException;
 use Monolog\Handler\TestHandler;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
@@ -39,11 +39,16 @@ class SyrupExceptionListenerTest extends KernelTestCase
 
     public function setUp()
     {
-        $storageApiService = new StorageApiService(new RequestStack());
-        $storageApiService->setClient(new Client([
-            'token' => SAPI_TOKEN,
-            'url' => SAPI_URL,
-        ]));
+        static::bootKernel();
+
+        $request = new Request();
+        $request->headers->add(['X-StorageApi-Token' => SAPI_TOKEN]);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $storageApiService = new StorageApiService($requestStack, SAPI_URL);
+
         $uploader = new UploaderS3([
             'aws-access-key' => AWS_ACCESS_KEY_ID,
             'aws-secret-key' => AWS_SECRET_ACCESS_KEY,
@@ -56,6 +61,38 @@ class SyrupExceptionListenerTest extends KernelTestCase
         $this->testLogHandler->pushProcessor(new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $uploader));
         $logger = new \Monolog\Logger('test', [$this->testLogHandler]);
         $this->listener = new SyrupExceptionListener(SYRUP_APP_NAME, $storageApiService, $logger);
+    }
+
+    public function testMaintenance()
+    {
+        $request = new Request();
+        $request->headers->add(['X-StorageApi-Token' => SAPI_TOKEN]);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $storageApiService = new StorageApiService($requestStack, 'https://maintenance-testing.us-east-1.keboola.com');
+
+        $uploader = new UploaderS3([
+            'aws-access-key' => AWS_ACCESS_KEY_ID,
+            'aws-secret-key' => AWS_SECRET_ACCESS_KEY,
+            's3-upload-path' => AWS_S3_BUCKET . AWS_S3_BUCKET_LOGS_PATH,
+            'aws-region' => AWS_REGION,
+            'url-prefix' => 'https://connection.keboola.com/admin/utils/logs?file=',
+        ]);
+        $testLogHandler = new TestHandler();
+        $testLogHandler->setFormatter(new JsonFormatter());
+        $testLogHandler->pushProcessor(new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $uploader));
+        $logger = new \Monolog\Logger('test', [$testLogHandler]);
+
+        $listener = new SyrupExceptionListener(SYRUP_APP_NAME, $storageApiService, $logger);
+        $this->assertTrue($listener instanceof SyrupExceptionListener);
+
+        try {
+            $storageApiService->getClient();
+            $this->fail('Create of sapi client should produce MaintenanceException');
+        } catch (MaintenanceException $e) {
+        }
     }
 
     public function testConsoleException()
@@ -109,11 +146,36 @@ class SyrupExceptionListenerTest extends KernelTestCase
         $request = Request::create('/syrup/run', 'POST');
         $request->headers->set('X-StorageApi-Token', SAPI_TOKEN);
 
+        $message = 'Disabled for tests';
+        $event = new GetResponseForExceptionEvent(self::$kernel, $request, HttpKernelInterface::MASTER_REQUEST, new MaintenanceException($message, 60, []));
+        $this->listener->onKernelException($event);
+        $records = $this->testLogHandler->getRecords();
+        $this->assertCount(1, $records);
+        $record = array_pop($records);
+        $this->assertArrayHasKey('priority', $record);
+        $this->assertEquals('ERROR', $record['priority']);
+        $this->assertArrayHasKey('exception', $record);
+        $this->assertArrayHasKey('class', $record['exception']);
+        $this->assertEquals('Keboola\StorageApi\MaintenanceException', $record['exception']['class']);
+        $response = $event->getResponse();
+        $this->assertEquals(503, $response->getStatusCode());
+        $jsonResponse = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('status', $jsonResponse);
+        $this->assertArrayHasKey('error', $jsonResponse);
+        $this->assertContains('Project is disabled', $jsonResponse['error']);
+        $this->assertArrayHasKey('message', $jsonResponse);
+        $this->assertContains('Project is disabled', $jsonResponse['message']);
+        $this->assertEquals('error', $jsonResponse['status']);
+        $this->assertArrayHasKey('code', $jsonResponse);
+        $this->assertEquals(503, $jsonResponse['code']);
+        $this->assertArrayHasKey('exceptionId', $jsonResponse);
+        $this->assertArrayHasKey('runId', $jsonResponse);
+
         $message = uniqid();
         $event = new GetResponseForExceptionEvent(self::$kernel, $request, HttpKernelInterface::MASTER_REQUEST, new UserException($message));
         $this->listener->onKernelException($event);
         $records = $this->testLogHandler->getRecords();
-        $this->assertCount(1, $records);
+        $this->assertCount(2, $records);
         $record = array_pop($records);
         $this->assertArrayHasKey('priority', $record);
         $this->assertEquals('ERROR', $record['priority']);
@@ -134,7 +196,7 @@ class SyrupExceptionListenerTest extends KernelTestCase
         $event = new GetResponseForExceptionEvent(self::$kernel, $request, HttpKernelInterface::MASTER_REQUEST, new ClientException($message));
         $this->listener->onKernelException($event);
         $records = $this->testLogHandler->getRecords();
-        $this->assertCount(2, $records);
+        $this->assertCount(3, $records);
         $record = array_pop($records);
         $this->assertArrayHasKey('priority', $record);
         $this->assertEquals('CRITICAL', $record['priority']);
@@ -156,7 +218,7 @@ class SyrupExceptionListenerTest extends KernelTestCase
         $event = new GetResponseForExceptionEvent(self::$kernel, $request, HttpKernelInterface::MASTER_REQUEST, $exception);
         $this->listener->onKernelException($event);
         $records = $this->testLogHandler->getRecords();
-        $this->assertCount(3, $records);
+        $this->assertCount(4, $records);
         $record = array_pop($records);
         $this->assertArrayHasKey('context', $record);
         $this->assertArrayHasKey('data', $record['context']);

@@ -12,6 +12,7 @@ use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\ExceptionHandler as BaseExceptionHandler;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Yaml\Parser;
 
 class ExceptionHandler extends BaseExceptionHandler
@@ -108,9 +109,13 @@ class ExceptionHandler extends BaseExceptionHandler
 
         if (!headers_sent()) {
             header(sprintf('HTTP/1.0 %s', $code));
-            foreach ($exception->getHeaders() as $name => $value) {
-                header($name.': '.$value, false);
+
+            if ($exception instanceof HttpExceptionInterface) {
+                foreach ($exception->getHeaders() as $name => $value) {
+                    header($name.': '.$value, false);
+                }
             }
+
             header('Content-Type: application/json; charset=utf-8');
         }
 
