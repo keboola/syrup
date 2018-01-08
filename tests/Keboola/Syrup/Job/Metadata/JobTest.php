@@ -6,9 +6,9 @@
  */
 namespace Keboola\Syrup\Tests\Job\Metadata;
 
+use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
 use Keboola\StorageApi\Client;
 use Keboola\Syrup\Job\Metadata\JobFactory;
-use Keboola\Syrup\Service\ObjectEncryptor;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class JobTest extends KernelTestCase
@@ -27,15 +27,15 @@ class JobTest extends KernelTestCase
             'url' => SAPI_URL,
         ]));
 
-        /** @var ObjectEncryptor $objectEncryptor */
-        $objectEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
-        $jobFactory = new JobFactory(SYRUP_APP_NAME, $objectEncryptor, $storageApiService);
+        /** @var ObjectEncryptorFactory $objectEncryptorFactory */
+        $objectEncryptorFactory = self::$kernel->getContainer()->get('syrup.object_encryptor_factory');
+        $jobFactory = new JobFactory(SYRUP_APP_NAME, $objectEncryptorFactory, $storageApiService);
 
         $command = uniqid();
         $param = ["key1" => "value1", "#key2" => "value2"];
         $lock = uniqid();
 
-        $job = $jobFactory->create($command, $objectEncryptor->encrypt($param), $lock);
+        $job = $jobFactory->create($command, $objectEncryptorFactory->getEncryptor()->encrypt($param), $lock);
         $job->setEncrypted(true);
 
         $this->assertEquals($command, $job->getCommand());
@@ -53,15 +53,15 @@ class JobTest extends KernelTestCase
             'url' => SAPI_URL,
         ]));
 
-        /** @var ObjectEncryptor $objectEncryptor */
-        $objectEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor');
-        $jobFactory = new JobFactory(SYRUP_APP_NAME, $objectEncryptor, $storageApiService);
+        /** @var ObjectEncryptorFactory $objectEncryptorFactory */
+        $objectEncryptorFactory = self::$kernel->getContainer()->get('syrup.object_encryptor_factory');
+        $jobFactory = new JobFactory(SYRUP_APP_NAME, $objectEncryptorFactory, $storageApiService);
 
         $command = uniqid();
         $param = ["key1" => "value1", "#key2" => "value2"];
         $lock = uniqid();
 
-        $job = $jobFactory->create($command, $objectEncryptor->encrypt($param), $lock);
+        $job = $jobFactory->create($command, $objectEncryptorFactory->getEncryptor()->encrypt($param), $lock);
         $job->setResult(["message" => "SQLSTATE[XX000]: " . chr(0x00000080) . " abcd"]);
         $this->assertEquals(["message" => "SQLSTATE[XX000]:  abcd"], $job->getResult());
     }

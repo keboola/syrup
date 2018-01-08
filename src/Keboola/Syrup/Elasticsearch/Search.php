@@ -8,8 +8,9 @@ namespace Keboola\Syrup\Elasticsearch;
 
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
+use Keboola\ObjectEncryptor\ObjectEncryptor;
+use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
 use Keboola\Syrup\Job\Metadata\Job;
-use Keboola\Syrup\Service\ObjectEncryptor;
 use Monolog\Logger;
 
 class Search
@@ -27,11 +28,11 @@ class Search
      */
     protected $configEncryptor;
 
-    public function __construct(Client $client, $indexPrefix, ObjectEncryptor $configEncryptor, $logger = null)
+    public function __construct(Client $client, $indexPrefix, ObjectEncryptorFactory $objectEncryptorFactory, $logger = null)
     {
         $this->client = $client;
         $this->indexPrefix = $indexPrefix;
-        $this->configEncryptor = $configEncryptor;
+        $this->configEncryptor = $objectEncryptorFactory->getEncryptor();
         $this->logger = $logger;
     }
 

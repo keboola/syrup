@@ -1,3 +1,18 @@
+UPGRADE FROM 7.0 to 8.0
+=======================
+
+ObjectEncryptor was moved to a separate library. Namespace changes from 
+`Keboola\Syrup\Service\ObjectEncryptor` to `Keboola\ObjectEncryptor\ObjectEncryptor`.
+To get the encryptor use:
+
+```php
+$encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+$encryptedToken = $encryptor->encrypt(TOKEN);
+```
+
+Service `syrup.object_encryptor` was removed and is replaced by `syrup.object_encryptor_factory`. 
+Use `getEncryptor()` method of the factory to obtain actual encryptor.
+
 UPGRADE FROM 2.x to 3.0
 =======================
 

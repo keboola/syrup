@@ -9,10 +9,11 @@ namespace Keboola\Syrup\Elasticsearch;
 
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\ServerErrorResponseException;
+use Keboola\ObjectEncryptor\ObjectEncryptor;
+use Keboola\ObjectEncryptor\ObjectEncryptorFactory;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Job\Metadata\Job;
 use Keboola\Syrup\Job\Metadata\JobInterface;
-use Keboola\Syrup\Service\ObjectEncryptor;
 use Monolog\Logger;
 
 class JobMapper
@@ -32,11 +33,11 @@ class JobMapper
 
     protected $rootDir;
 
-    public function __construct(Client $client, ComponentIndex $index, ObjectEncryptor $configEncryptor, $logger = null, $rootDir = null)
+    public function __construct(Client $client, ComponentIndex $index, ObjectEncryptorFactory $configEncryptor, $logger = null, $rootDir = null)
     {
         $this->client = $client;
         $this->index = $index;
-        $this->configEncryptor = $configEncryptor;
+        $this->configEncryptor = $configEncryptor->getEncryptor();
         $this->logger = $logger;
         $this->rootDir = $rootDir;
     }

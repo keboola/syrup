@@ -154,6 +154,7 @@ class ApiController extends BaseController
 
     /**
      * @return EncryptorInterface
+     * @deprecated Use ObjectEncryptor instead
      */
     protected function getEncryptor()
     {
