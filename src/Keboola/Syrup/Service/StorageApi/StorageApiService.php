@@ -92,6 +92,10 @@ class StorageApiService
 
             $this->setClient(new Client($clientOptions));
 
+            if ($this->hasDelayOverrideFeature()) {
+                $this->client->setJobPollDelayMethoc(self::getStepPollDelayMethod());
+            }
+
             if ($request->headers->has('X-KBC-RunId')) {
                 $this->client->setRunId($request->headers->get('X-KBC-RunId'));
             }
@@ -106,5 +110,32 @@ class StorageApiService
             throw new ApplicationException('StorageApi Client was not initialized');
         }
         return $this->tokenData;
+    }
+
+    private function hasDelayOverrideFeature()
+    {
+        $data = $this->tokenData;
+        if (!empty($data['owner']['features'])) {
+            foreach ($data['owner']['features'] as $feature) {
+                if ($feature === 'storage-jobs-delay-override') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static function getStepPollDelayMethod()
+    {
+        return function ($tries) {
+            switch ($tries) {
+                case ($tries < 15) :
+                    return 1;
+                case ($tries < 30) :
+                    return 2;
+                default:
+                    return 5;
+            }
+        };
     }
 }
