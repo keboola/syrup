@@ -129,9 +129,9 @@ class StorageApiService
     {
         return function ($tries) {
             switch ($tries) {
-                case ($tries < 15) :
+                case ($tries < 15):
                     return 1;
-                case ($tries < 30) :
+                case ($tries < 30):
                     return 2;
                 default:
                     return 5;
