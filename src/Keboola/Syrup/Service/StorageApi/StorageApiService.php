@@ -93,14 +93,13 @@ class StorageApiService
             $this->setClient(new Client($clientOptions));
 
             if ($this->hasDelayOverrideFeature()) {
-                $this->client->setJobPollDelayMethoc(self::getStepPollDelayMethod());
+                $this->client->setJobPollDelayMethod(self::getStepPollDelayMethod());
             }
 
             if ($request->headers->has('X-KBC-RunId')) {
                 $this->client->setRunId($request->headers->get('X-KBC-RunId'));
             }
         }
-
         return $this->client;
     }
 
@@ -116,10 +115,8 @@ class StorageApiService
     {
         $data = $this->tokenData;
         if (!empty($data['owner']['features'])) {
-            foreach ($data['owner']['features'] as $feature) {
-                if ($feature === 'storage-jobs-delay-override') {
-                    return true;
-                }
+            if (in_array('storage-jobs-delay-override', $data['owner']['features'])) {
+                return true;
             }
         }
         return false;
