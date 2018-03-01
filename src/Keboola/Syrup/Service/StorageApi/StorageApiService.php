@@ -87,7 +87,7 @@ class StorageApiService
                         'token' => $request->headers->get('X-StorageApi-Token'),
                         'url' => $this->storageApiUrl,
                         'userAgent' => explode('/', $request->getPathInfo())[1],
-                        'jobPollRetryDelay' => createSimpleJobPollDelay($this->getBackoffTries(gethostname()))
+                        'backoffMaxTries' => $this->getBackoffTries(gethostname())
                     ]
                 )
             );
