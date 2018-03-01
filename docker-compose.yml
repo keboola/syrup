@@ -43,6 +43,7 @@ services:
       - AWS_S3_BUCKET
       - AWS_S3_BUCKET_LOGS_PATH
       - ELASTICSEARCH_HOST
+      - SAPI_URL
       - SAPI_TOKEN
       - AWS_SQS_DEFAULT_QUEUE
       - AWS_SQS_TEST_QUEUE_NAME
