@@ -1,5 +1,4 @@
 FROM php:5.6
-MAINTAINER Ondrej Hlavacek <ondrej.hlavacek@keboola.com>
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update -q \
@@ -8,7 +7,7 @@ RUN apt-get update -q \
 
 RUN docker-php-ext-install mcrypt pdo_mysql
 
-RUN pecl install xdebug \
+RUN pecl install xdebug-2.5.5 \
   && docker-php-ext-enable xdebug
 
 WORKDIR /root
