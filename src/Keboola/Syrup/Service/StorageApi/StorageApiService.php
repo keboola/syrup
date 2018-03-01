@@ -9,6 +9,7 @@ namespace Keboola\Syrup\Service\StorageApi;
 
 use Keboola\StorageApi\ClientException;
 use Keboola\StorageApi\Client;
+use function Keboola\StorageApi\createSimpleJobPollDelay;
 use Keboola\Syrup\Exception\ApplicationException;
 use Keboola\Syrup\Exception\SimpleException;
 use Symfony\Component\HttpFoundation\Request;
@@ -80,12 +81,16 @@ class StorageApiService
                 throw new UserException('Missing StorageAPI token');
             }
 
-            $this->setClient(new Client([
-                'token' => $request->headers->get('X-StorageApi-Token'),
-                'url' => $this->storageApiUrl,
-                'userAgent' => explode('/', $request->getPathInfo())[1],
-                'backoffMaxTries' => $this->getBackoffTries(gethostname())
-            ]));
+            $this->setClient(
+                new Client(
+                    [
+                        'token' => $request->headers->get('X-StorageApi-Token'),
+                        'url' => $this->storageApiUrl,
+                        'userAgent' => explode('/', $request->getPathInfo())[1],
+                        'jobPollRetryDelay' => createSimpleJobPollDelay($this->getBackoffTries(gethostname()))
+                    ]
+                )
+            );
 
             if ($request->headers->has('X-KBC-RunId')) {
                 $this->client->setRunId($request->headers->get('X-KBC-RunId'));
