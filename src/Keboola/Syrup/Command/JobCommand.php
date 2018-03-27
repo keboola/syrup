@@ -154,10 +154,12 @@ class JobCommand extends ContainerAwareCommand
                 );
 
                 if (!$validationLock->lock(self::PARALLEL_LIMIT_LOCK_TIMEOUT)) {
+                    $this->logger->info('Could not lock for parallel validation');
                     throw new \RuntimeException('Could not lock for parallel validation');
                 }
 
                 if ($this->isParallelLimitExceeded()) {
+                    $this->logger->info('Exceeded parallel processing limit');
                     throw new \RuntimeException('Exceeded parallel processing limit');
                 }
             } catch (\RuntimeException $e) {
