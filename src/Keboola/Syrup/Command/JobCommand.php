@@ -151,7 +151,7 @@ class JobCommand extends ContainerAwareCommand
         $checkConn = null;
         /** @var Lock $validationLock */
         $validationLock = null;
-        if ($this->job->getStatus != Job::STATUS_PROCESSING && StorageApiLimits::hasParallelLimit($this->storageApiService->getTokenData())) {
+        if (StorageApiLimits::hasParallelLimit($this->storageApiService->getTokenData())) {
             try {
                 $checkConn = $this->getContainer()->get('doctrine.dbal.limit_lock_connection');
                 $checkConn->exec('SET wait_timeout = 31536000;');
@@ -161,14 +161,16 @@ class JobCommand extends ContainerAwareCommand
                     sprintf('syrup-%s-job-limit-check', $this->job->getProject()['id'])
                 );
 
-                if (!$validationLock->lock(self::PARALLEL_LIMIT_LOCK_TIMEOUT)) {
-                    $this->logger->info('Could not lock for parallel validation');
-                    throw new \RuntimeException('Could not lock for parallel validation');
-                }
+                if ($this->job->getStatus != Job::STATUS_PROCESSING) {
+                    if (!$validationLock->lock(self::PARALLEL_LIMIT_LOCK_TIMEOUT)) {
+                        $this->logger->info('Could not lock for parallel validation');
+                        throw new \RuntimeException('Could not lock for parallel validation');
+                    }
 
-                if ($this->isParallelLimitExceeded()) {
-                    $this->logger->info('Exceeded parallel processing limit');
-                    throw new \RuntimeException('Exceeded parallel processing limit');
+                    if ($this->isParallelLimitExceeded()) {
+                        $this->logger->info('Exceeded parallel processing limit');
+                        throw new \RuntimeException('Exceeded parallel processing limit');
+                    }
                 }
             } catch (\RuntimeException $e) {
                 return self::STATUS_LOCK;
