@@ -139,6 +139,14 @@ class JobCommand extends ContainerAwareCommand
             return self::STATUS_LOCK;
         }
 
+        // check job status
+        $this->job = $this->jobMapper->get($jobId);
+
+        if (!in_array($this->job->getStatus(), [Job::STATUS_WAITING, Job::STATUS_PROCESSING])) {
+            // job is not waiting or processing
+            return self::STATUS_LOCK;
+        }        
+        
         /** @var Connection $checkConn */
         $checkConn = null;
         /** @var Lock $validationLock */
@@ -165,15 +173,6 @@ class JobCommand extends ContainerAwareCommand
             } catch (\RuntimeException $e) {
                 return self::STATUS_LOCK;
             }
-        }
-
-
-        // check job status
-        $this->job = $this->jobMapper->get($jobId);
-
-        if (!in_array($this->job->getStatus(), [Job::STATUS_WAITING, Job::STATUS_PROCESSING])) {
-            // job is not waiting or processing
-            return self::STATUS_LOCK;
         }
 
         $startTime = time();
