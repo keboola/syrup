@@ -145,8 +145,8 @@ class JobCommand extends ContainerAwareCommand
         if (!in_array($this->job->getStatus(), [Job::STATUS_WAITING, Job::STATUS_PROCESSING])) {
             // job is not waiting or processing
             return self::STATUS_LOCK;
-        }        
-        
+        }
+
         /** @var Connection $checkConn */
         $checkConn = null;
         /** @var Lock $validationLock */
