@@ -161,7 +161,7 @@ class JobCommand extends ContainerAwareCommand
                     sprintf('syrup-%s-job-limit-check', $this->job->getProject()['id'])
                 );
 
-                if ($this->job->getStatus != Job::STATUS_PROCESSING) {
+                if ($this->job->getStatus() != Job::STATUS_PROCESSING) {
                     if (!$validationLock->lock(self::PARALLEL_LIMIT_LOCK_TIMEOUT)) {
                         $this->logger->info('Could not lock for parallel validation');
                         throw new \RuntimeException('Could not lock for parallel validation');
