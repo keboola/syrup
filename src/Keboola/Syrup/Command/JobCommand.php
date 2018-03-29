@@ -139,6 +139,14 @@ class JobCommand extends ContainerAwareCommand
             return self::STATUS_LOCK;
         }
 
+        // check job status
+        $this->job = $this->jobMapper->get($jobId);
+
+        if (!in_array($this->job->getStatus(), [Job::STATUS_WAITING, Job::STATUS_PROCESSING])) {
+            // job is not waiting or processing
+            return self::STATUS_LOCK;
+        }
+
         /** @var Connection $checkConn */
         $checkConn = null;
         /** @var Lock $validationLock */
@@ -153,25 +161,20 @@ class JobCommand extends ContainerAwareCommand
                     sprintf('syrup-%s-job-limit-check', $this->job->getProject()['id'])
                 );
 
-                if (!$validationLock->lock(self::PARALLEL_LIMIT_LOCK_TIMEOUT)) {
-                    throw new \RuntimeException('Could not lock for parallel validation');
-                }
+                if ($this->job->getStatus != Job::STATUS_PROCESSING) {
+                    if (!$validationLock->lock(self::PARALLEL_LIMIT_LOCK_TIMEOUT)) {
+                        $this->logger->info('Could not lock for parallel validation');
+                        throw new \RuntimeException('Could not lock for parallel validation');
+                    }
 
-                if ($this->isParallelLimitExceeded()) {
-                    throw new \RuntimeException('Exceeded parallel processing limit');
+                    if ($this->isParallelLimitExceeded()) {
+                        $this->logger->info('Exceeded parallel processing limit');
+                        throw new \RuntimeException('Exceeded parallel processing limit');
+                    }
                 }
             } catch (\RuntimeException $e) {
                 return self::STATUS_LOCK;
             }
-        }
-
-
-        // check job status
-        $this->job = $this->jobMapper->get($jobId);
-
-        if (!in_array($this->job->getStatus(), [Job::STATUS_WAITING, Job::STATUS_PROCESSING])) {
-            // job is not waiting or processing
-            return self::STATUS_LOCK;
         }
 
         $startTime = time();
