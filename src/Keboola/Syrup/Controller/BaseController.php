@@ -73,9 +73,8 @@ class BaseController extends Controller
 
         if (!empty($body) && !is_null($body) && $body != 'null') {
             $return = json_decode($body, $assoc);
-
-            if (null === $return || ($assoc && !is_array($return) || !$assoc && !is_object($return))) {
-                throw new UserException("Bad JSON format of request body");
+            if (json_last_error() != JSON_ERROR_NONE) {
+                throw new UserException("Bad JSON format of request body: " . json_last_error_msg());
             }
         }
 
