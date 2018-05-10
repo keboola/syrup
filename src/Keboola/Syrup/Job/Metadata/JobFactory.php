@@ -69,26 +69,6 @@ class JobFactory
             $job->setLockName($lockName);
         }
 
-        $componentConfiguration = $this->getComponentConfiguration();
-        if (isset($componentConfiguration['flags']) && in_array('encrypt', $componentConfiguration['flags'])) {
-            $job->setEncrypted(true);
-        }
-
         return $job;
-    }
-
-    protected function getComponentConfiguration()
-    {
-        // Check list of components
-        $components = $this->storageApiClient->indexAction();
-
-        foreach ($components["components"] as $c) {
-            if ($c["id"] == $this->componentName) {
-                return $c;
-            }
-        }
-
-        // no component configuration found
-        return [];
     }
 }
