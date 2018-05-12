@@ -36,7 +36,6 @@ class JobTest extends KernelTestCase
         $lock = uniqid();
 
         $job = $jobFactory->create($command, $objectEncryptorFactory->getEncryptor()->encrypt($param), $lock);
-        $job->setEncrypted(true);
 
         $this->assertEquals($command, $job->getCommand());
         $this->assertEquals($lock, $job->getLockName());

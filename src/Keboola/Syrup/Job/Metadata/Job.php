@@ -117,16 +117,6 @@ class Job implements JobInterface
         return $this->getProperty('project');
     }
 
-    public function setEncrypted($bool)
-    {
-        $this->data['encrypted'] = $bool;
-    }
-
-    public function isEncrypted()
-    {
-        return (bool) $this->getProperty('encrypted');
-    }
-
     /**
      * @param array $project
      * - id
@@ -228,12 +218,7 @@ class Job implements JobInterface
     public function getParams()
     {
         $params = $this->getProperty('params');
-
-        if ($this->isEncrypted()) {
-            return $this->getEncryptor()->decrypt($params);
-        }
-
-        return $params;
+        return $this->getEncryptor()->decrypt($params);
     }
 
     public function getRawParams()
