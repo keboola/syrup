@@ -63,31 +63,4 @@ class PublicController extends BaseController
     {
         throw new SyrupComponentException(404, "Route not found");
     }
-
-    /**
-     * Run Action
-     *
-     * Creates new job, saves it to Elasticsearch and add to SQS
-     *
-     * @param Request $request
-     * @return Response
-     * @throws UserException
-     */
-    public function encryptAction(Request $request)
-    {
-        /** @var ObjectEncryptor $encryptor */
-        $encryptor = $this->container->get('syrup.object_encryptor_factory')->getEncryptor();
-        $contentType = $request->headers->get('Content-type');
-        $contentType = strtolower(trim(explode(';', $contentType)[0]));
-        if ($contentType == "text/plain") {
-            $encryptedValue = $encryptor->encrypt($request->getContent());
-            return $this->createResponse($encryptedValue, 200, ["Content-Type" => "text/plain"]);
-        } elseif ($contentType == "application/json") {
-            $params = $this->getPostJson($request, false);
-            $encryptedValue = $encryptor->encrypt($params);
-            return $this->createJsonResponse($encryptedValue, 200, ["Content-Type" => "application/json"]);
-        } else {
-            throw new UserException("Incorrect Content-Type.");
-        }
-    }
 }
