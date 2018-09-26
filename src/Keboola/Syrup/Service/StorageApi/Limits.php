@@ -44,13 +44,8 @@ class Limits
      */
     public static function getParallelLimit($tokenData)
     {
-        $data = $tokenData;
-        if (!empty($data['owner']['limits'])) {
-            foreach ($data['owner']['limits'] as $name => $limit) {
-                if ($limit['name'] === self::PARALLEL_LIMIT_NAME && !empty($limit['value'])) {
-                    return (int) $limit['value'];
-                }
-            }
+        if (!empty($tokenData['owner']['limits'][self::PARALLEL_LIMIT_NAME]['value'])) {
+            return (int) $tokenData['owner']['limits'][self::PARALLEL_LIMIT_NAME]['value'];
         }
 
         return null;
