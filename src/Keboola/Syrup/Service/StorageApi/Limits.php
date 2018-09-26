@@ -1,8 +1,6 @@
 <?php
 namespace Keboola\Syrup\Service\StorageApi;
 
-use Keboola\StorageApi\Client;
-
 /**
  * KBC project limits
  *
@@ -10,6 +8,8 @@ use Keboola\StorageApi\Client;
  */
 class Limits
 {
+    const PARALLEL_LIMIT_NAME = 'components.jobsParallelism';
+
     /**
      * List of components with unlimited parallel job processing
      *
@@ -45,11 +45,10 @@ class Limits
     public static function getParallelLimit($tokenData)
     {
         $data = $tokenData;
-        if (!empty($data['owner']['features'])) {
-            foreach ($data['owner']['features'] as $feature) {
-                $matches = array();
-                if (preg_match('/^syrup\-jobs\-limit\-([0-9]+)$/ui', $feature, $matches)) {
-                    return (int) $matches[1];
+        if (!empty($data['owner']['limits'])) {
+            foreach ($data['owner']['limits'] as $name => $limit) {
+                if ($limit['name'] === self::PARALLEL_LIMIT_NAME && !empty($limit['value'])) {
+                    return (int) $limit['value'];
                 }
             }
         }
