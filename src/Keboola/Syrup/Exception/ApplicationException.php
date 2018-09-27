@@ -11,6 +11,6 @@ class ApplicationException extends SyrupComponentException
 {
     public function __construct($message, $previous = null, array $data = [])
     {
-        parent::__construct(500, 'Application error: ' . $message, $previous, $data);
+        parent::__construct(500, $message, $previous, $data);
     }
 }
