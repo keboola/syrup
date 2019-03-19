@@ -8,6 +8,8 @@
 
 namespace Keboola\Syrup\Debug;
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\ExceptionHandler as BaseExceptionHandler;
@@ -21,12 +23,17 @@ class ExceptionHandler extends BaseExceptionHandler
     private $fileLinkFormat;
     protected $env;
 
+    private $logger;
+
     public function __construct($debug = true, $charset = 'UTF-8', $env = 'dev')
     {
         $this->env = $env;
         parent::__construct($debug);
         $this->debug = $debug;
         $this->fileLinkFormat = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+
+        $this->logger = new Logger('exception-handler');
+        $this->logger->pushHandler(new StreamHandler('php://stdout'));
     }
 
     /**
@@ -82,10 +89,12 @@ class ExceptionHandler extends BaseExceptionHandler
             'exceptionId' => $exceptionId
         ];
 
-        // log to syslog
-        openlog($appName, LOG_ODELAY, LOG_LOCAL0);
-        syslog(LOG_ERR, json_encode($logData));
-        closelog();
+        // log to stdout
+        if ($priority === 'CRITICAL') {
+            $this->logger->addCritical(json_encode($logData));
+        } else {
+            $this->logger->addError(json_encode($logData));
+        }
 
         $response = [
             "status" => "error",
