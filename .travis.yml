@@ -17,4 +17,5 @@ after_success:
   - docker-compose run --rm --entrypoint=/code/codeclimate.sh tests
 notifications:
   slack:
-    secure: IhgEyPivbdLPWsZb5mWeUwGdhxFZdmba8Zkgutk7Y02Px/fA+vqFlcZo2HSNFH2mvChQjHD/8abUZdZxvsyNCtGE25lz4t7Kc3BkSW8N48GI49RzcndE3DB1cXiNzdmmTFW9wrzkoScTrQUp6UWpWsnV3JBkIyvX2vmp2uPFa4A=
+    secure: MeAoPVdt5CkfikRn0Qb382PW3IVxTmhioiS0VuGHBumDW88CwigQVCJZGfs9xeuZvOTZQEgxiLNrGVCqT1z7qaGfW7XVA2ir2Izqz8cSStwF4b+yTbVmHC5NFjoiEun9b1738061HEJU+vJI56TTViXAOrTolucsRrAQixUyQ4o=
+  email: false
