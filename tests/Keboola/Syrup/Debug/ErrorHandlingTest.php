@@ -27,10 +27,10 @@ class ErrorHandlingTest extends WebTestCase
 
         $errorOccured = false;
 
-        $syslogProcessorMock = $this->getMockBuilder('Keboola\\Syrup\\Monolog\\Processor\\SyslogProcessor')
+        $stdoutProcessorMock = $this->getMockBuilder('Keboola\\Syrup\\Monolog\\Processor\\StdoutProcessor')
             ->disableOriginalConstructor()
             ->getMock();
-        $syslogProcessorMock->expects($this->any())
+        $stdoutProcessorMock->expects($this->any())
             ->method("processRecord")
             ->with($this->callback(function ($subject) use (&$errorOccured) {
                 if ($subject['message'] == 'Notice: Undefined offset: 3') {
@@ -45,7 +45,7 @@ class ErrorHandlingTest extends WebTestCase
             ]);
 
         $container = $this->client->getContainer();
-        $container->set('syrup.monolog.syslog_processor', $syslogProcessorMock);
+        $container->set('syrup.monolog.stdout_processor', $stdoutProcessorMock);
 
         $this->client->request('GET', '/tests/notice');
         $response = $this->client->getResponse();

@@ -23,7 +23,7 @@ use Keboola\Syrup\Command\JobCommand;
 use Keboola\Syrup\Exception\UserException;
 use Keboola\Syrup\Listener\SyrupExceptionListener;
 use Keboola\Syrup\Monolog\Formatter\JsonFormatter;
-use Keboola\Syrup\Monolog\Processor\SyslogProcessor;
+use Keboola\Syrup\Monolog\Processor\StdoutProcessor;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
 
 class SyrupExceptionListenerTest extends KernelTestCase
@@ -58,7 +58,7 @@ class SyrupExceptionListenerTest extends KernelTestCase
         ]);
         $this->testLogHandler = new TestHandler();
         $this->testLogHandler->setFormatter(new JsonFormatter());
-        $this->testLogHandler->pushProcessor(new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $uploader));
+        $this->testLogHandler->pushProcessor(new StdoutProcessor(SYRUP_APP_NAME, $storageApiService, $uploader));
         $logger = new \Monolog\Logger('test', [$this->testLogHandler]);
         $this->listener = new SyrupExceptionListener(SYRUP_APP_NAME, $storageApiService, $logger);
     }
@@ -82,7 +82,7 @@ class SyrupExceptionListenerTest extends KernelTestCase
         ]);
         $testLogHandler = new TestHandler();
         $testLogHandler->setFormatter(new JsonFormatter());
-        $testLogHandler->pushProcessor(new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $uploader));
+        $testLogHandler->pushProcessor(new StdoutProcessor(SYRUP_APP_NAME, $storageApiService, $uploader));
         $logger = new \Monolog\Logger('test', [$testLogHandler]);
 
         $listener = new SyrupExceptionListener(SYRUP_APP_NAME, $storageApiService, $logger);

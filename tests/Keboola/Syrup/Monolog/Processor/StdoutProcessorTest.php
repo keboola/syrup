@@ -15,14 +15,14 @@ use Keboola\Syrup\Monolog\Processor\JobProcessor;
 use Keboola\Syrup\Monolog\Processor\RequestProcessor;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
-use Keboola\Syrup\Monolog\Processor\SyslogProcessor;
+use Keboola\Syrup\Monolog\Processor\StdoutProcessor;
 use Keboola\Syrup\Service\StorageApi\StorageApiService;
 use Keboola\Syrup\Test\Monolog\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class SyslogProcessorTest extends TestCase
+class StdoutProcessorTest extends TestCase
 {
-    private function getSysLogProcessor()
+    private function getStdoutProcessor()
     {
         $s3Uploader = new UploaderS3([
             'aws-access-key' => AWS_ACCESS_KEY_ID,
@@ -38,12 +38,12 @@ class SyslogProcessorTest extends TestCase
         $requestStack->push($request);
         $storageApiService = new StorageApiService($requestStack, SAPI_URL);
 
-        return new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
+        return new StdoutProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
     }
 
     public function testProcessorTokenLong()
     {
-        $processor = $this->getSysLogProcessor();
+        $processor = $this->getStdoutProcessor();
         $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000));
         $newRecord = $processor($record);
 
@@ -73,7 +73,7 @@ class SyslogProcessorTest extends TestCase
 
     public function testProcessorTokenShort()
     {
-        $processor = $this->getSysLogProcessor();
+        $processor = $this->getStdoutProcessor();
         $record = $this->getRecord(Logger::WARNING, 'batman');
         $newRecord = $processor($record);
 
@@ -120,7 +120,7 @@ class SyslogProcessorTest extends TestCase
 
         $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000));
         // instantiation must not fail
-        $processor = new SyslogProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
+        $processor = new StdoutProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
         $newRecord = $processor($record);
 
         $this->assertEquals(7, count($newRecord));
@@ -165,7 +165,7 @@ class SyslogProcessorTest extends TestCase
         $processor = new RequestProcessor($requestStack, $s3Uploader);
         $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000));
         $record = $processor($record);
-        $processor = $this->getSysLogProcessor();
+        $processor = $this->getStdoutProcessor();
         $newRecord = $processor($record);
 
         $this->assertEquals(10, count($newRecord));
@@ -204,7 +204,7 @@ class SyslogProcessorTest extends TestCase
         ], null, null, null));
         $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000));
         $record = $processor($record);
-        $processor = $this->getSysLogProcessor();
+        $processor = $this->getStdoutProcessor();
         $newRecord = $processor($record);
 
         $this->assertEquals(9, count($newRecord));
@@ -226,7 +226,7 @@ class SyslogProcessorTest extends TestCase
 
     public function testProcessorExceptionLong()
     {
-        $processor = $this->getSysLogProcessor();
+        $processor = $this->getStdoutProcessor();
         $record = $this->getRecord(
             Logger::WARNING,
             str_repeat('batman', 1000),
@@ -261,7 +261,7 @@ class SyslogProcessorTest extends TestCase
         $record = $this->getRecord();
         $record['component'] = 'fooBar';
         $record['app'] = 'baz';
-        $processor = $this->getSysLogProcessor();
+        $processor = $this->getStdoutProcessor();
         $newRecord = $processor($record);
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('app', $newRecord);
@@ -274,7 +274,7 @@ class SyslogProcessorTest extends TestCase
         $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000));
         $record['component'] = 'fooBar';
         $record['app'] = 'baz';
-        $processor = $this->getSysLogProcessor();
+        $processor = $this->getStdoutProcessor();
         $newRecord = $processor($record);
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('app', $newRecord);

@@ -13,7 +13,7 @@ use Keboola\Syrup\Service\StorageApi\StorageApiService;
 /**
  * Injects info about component and used Storage Api token
  */
-class SyslogProcessor
+class StdoutProcessor
 {
 
     private $componentName;

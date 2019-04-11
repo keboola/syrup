@@ -73,8 +73,8 @@ class JobCleanupCommand extends ContainerAwareCommand
         $logProcessor = $this->getContainer()->get('syrup.monolog.job_processor');
         $logProcessor->setJob($this->job);
 
-        /** @var \Keboola\Syrup\Monolog\Processor\SyslogProcessor $logProcessor */
-        $logProcessor = $this->getContainer()->get('syrup.monolog.syslog_processor');
+        /** @var \Keboola\Syrup\Monolog\Processor\StdoutProcessor $logProcessor */
+        $logProcessor = $this->getContainer()->get('syrup.monolog.stdout_processor');
         $logProcessor->setRunId($this->job->getRunId());
         $logProcessor->setTokenData($storageApiService->getTokenData());
 

@@ -31,11 +31,11 @@ services:
     syrup.monolog.signal_handler:
         class: Keboola\Syrup\Monolog\Handler\SignalHandler
 
-    syrup.monolog.syslog_processor:
-        class: Keboola\Syrup\Monolog\Processor\SyslogProcessor
+    syrup.monolog.stdout_processor:
+        class: Keboola\Syrup\Monolog\Processor\StdoutProcessor
         arguments: ["%app_name%", "@syrup.storage_api", "@syrup.s3_uploader"]
         tags:
-            - { name: monolog.processor, method: processRecord, handler: syrup_syslog }
+            - { name: monolog.processor, method: processRecord, handler: syrup_stdout }
 
     syrup.monolog.request_processor:
         class: Keboola\Syrup\Monolog\Processor\RequestProcessor

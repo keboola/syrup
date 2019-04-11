@@ -11,9 +11,9 @@ monolog:
             type: console
             verbosity_levels:
                 VERBOSITY_NORMAL: EMERGENCY
-        syrup_syslog:
-            type: syslog
-            ident: %app_name%
+        syrup_stdout:
+            type: stream
+            path: "php://stdout"
             level: debug
             channels: ["!request", "!event", "!doctrine"]
             formatter: syrup.monolog.formatter

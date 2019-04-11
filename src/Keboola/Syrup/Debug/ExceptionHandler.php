@@ -8,6 +8,8 @@
 
 namespace Keboola\Syrup\Debug;
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\ExceptionHandler as BaseExceptionHandler;
@@ -82,10 +84,14 @@ class ExceptionHandler extends BaseExceptionHandler
             'exceptionId' => $exceptionId
         ];
 
-        // log to syslog
-        openlog($appName, LOG_ODELAY, LOG_LOCAL0);
-        syslog(LOG_ERR, json_encode($logData));
-        closelog();
+        // log to stdout
+        $logger = new Logger($appName);
+        $logger->pushHandler(new StreamHandler('php://stdout'));
+        if ($priority === 'CRITICAL') {
+            $logger->addCritical(json_encode($logData));
+        } else {
+            $logger->addError(json_encode($logData));
+        }
 
         $response = [
             "status" => "error",
