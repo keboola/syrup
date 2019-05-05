@@ -234,4 +234,14 @@ class Utility
         $s = trim($s, '_');
         return $s;
     }
+
+    /**
+     * Generates kill queue name form provided hostname
+     * @param $hostname
+     * @return string
+     */
+    public static function generateKillQueueName($hostname)
+    {
+        return 'syrup_kill_' . self::webalize(str_replace('.keboola.com', '', $hostname));
+    }
 }

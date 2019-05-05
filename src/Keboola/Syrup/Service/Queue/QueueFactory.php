@@ -10,6 +10,7 @@ namespace Keboola\Syrup\Service\Queue;
 use Aws\Sqs\SqsClient;
 use Doctrine\DBAL\Connection;
 use Keboola\Syrup\Exception\ApplicationException;
+use Keboola\Syrup\Utility\Utility;
 
 class QueueFactory
 {
@@ -29,8 +30,7 @@ class QueueFactory
     public function get($name = 'default')
     {
         if ($name == 'kill') {
-            $hostnameArr = explode('.', gethostname());
-            $name = 'syrup_kill_' . array_shift($hostnameArr);
+            $name = Utility::generateKillQueueName(gethostname());
         }
 
         $sql = "SELECT access_key, secret_key, region, url FROM {$this->dbTable} WHERE id = '{$name}'";
