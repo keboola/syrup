@@ -55,6 +55,10 @@ class StorageApiService
 
     public function getBackoffTries($hostname)
     {
+        if (getenv('STORAGE_API_CLIENT_BACKOFF_MAX_TRIES')) {
+            return getenv('STORAGE_API_CLIENT_BACKOFF_MAX_TRIES');
+        }
+
         // keep the backoff settings minimal for API servers
         if (false === strstr($hostname, 'worker')) {
             return 3;
