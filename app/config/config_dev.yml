@@ -23,3 +23,7 @@ monolog:
             ident: %app_name%
             level: info
             channels: ["!request", "!event", "!doctrine"]
+
+swiftmailer:
+    disable_delivery: true
+
