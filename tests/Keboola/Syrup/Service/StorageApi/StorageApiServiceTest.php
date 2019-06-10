@@ -80,6 +80,11 @@ class StorageApiServiceTest extends WebTestCase
         /** @var StorageApiService $storageApiService */
         $storageApiService = $container->get('syrup.storage_api');
 
+        putenv('STORAGE_API_CLIENT_BACKOFF_MAX_TRIES=7');
+        $backoffTries = $storageApiService->getBackoffTries(gethostname());
+        $this->assertEquals(7, $backoffTries);
+        putenv('STORAGE_API_CLIENT_BACKOFF_MAX_TRIES');
+
         $backoffTries = $storageApiService->getBackoffTries('syrup-worker.keboola.com');
         $this->assertEquals(11, $backoffTries);
 
