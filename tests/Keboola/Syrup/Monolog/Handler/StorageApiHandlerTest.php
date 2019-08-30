@@ -107,11 +107,7 @@ class StorageApiHandlerTest extends TestCase
         // wait for elastic search to update
         sleep(2);
         $events = $client->listEvents(['q' => 'message: noticeMessage + runId:' . $client->getRunId()]);
-        $this->assertEquals(1, count($events));
-        $event = $events[0];
-        $this->assertEquals(Event::TYPE_WARN, $event['type']);
-        $this->assertEquals('noticeMessage', $event['message']);
-        $this->assertEquals('', $event['description']);
+        $this->assertCount(0, $events);
     }
 
     public function testHandlerMessageWarning()

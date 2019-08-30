@@ -53,7 +53,7 @@ class StorageApiHandler extends \Monolog\Handler\AbstractHandler
     {
         $this->initStorageApiClient();
 
-        if (!$this->storageApiClient || $record['level'] == Logger::DEBUG) {
+        if (!$this->storageApiClient || $record['level'] == Logger::DEBUG || $record['level'] == Logger::NOTICE) {
             return false;
         }
 
