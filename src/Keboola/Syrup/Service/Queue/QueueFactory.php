@@ -49,7 +49,11 @@ class QueueFactory
         $data = [
             'region' => $region,
             'version' => '2012-11-05',
-            'retries' => 40
+            'retries' => 40,
+            'http' => [
+                'connect_timeout' => 10,
+                'timeout' => 120,
+            ],
         ];
 
         if ($key != null && $secret != null) {
