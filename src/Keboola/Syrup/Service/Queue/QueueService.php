@@ -24,7 +24,13 @@ class QueueService
         $data = [
             'region' => $config['region'],
             'version' => '2012-11-05',
-            'retries' => 40
+            'retries' => 40,
+            'debug' => [
+                'http' => true,
+                'scrub_auth' => true,
+                'retries' => true,
+                'stream_size' => 0
+            ]
         ];
 
         if (isset($config['access_key'])

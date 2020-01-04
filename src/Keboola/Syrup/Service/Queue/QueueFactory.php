@@ -58,8 +58,7 @@ class QueueFactory
                 'http' => true,
                 'scrub_auth' => true,
                 'retries' => true,
-                'stream_size' => 0,
-                'timer' => true
+                'stream_size' => 0
             ]
         ];
 
