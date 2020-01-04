@@ -54,6 +54,13 @@ class QueueFactory
                 'connect_timeout' => 10,
                 'timeout' => 120,
             ],
+            'debug' => [
+                'http' => true,
+                'scrub_auth' => true,
+                'retries' => true,
+                'stream_size' => 0,
+                'timer' => true
+            ]
         ];
 
         if ($key != null && $secret != null) {
