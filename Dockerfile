@@ -1,6 +1,6 @@
 FROM php:5.6
 ENV DEBIAN_FRONTEND noninteractive
-ENV COMPOSER_MEMORY_LIMIT 5900m
+ENV COMPOSER_MEMORY_LIMIT 5g
 
 RUN apt-get update -q \
   && apt-get install unzip git libmcrypt-dev -y --no-install-recommends \
@@ -8,8 +8,7 @@ RUN apt-get update -q \
 
 RUN docker-php-ext-install mcrypt pdo_mysql
 
-RUN pecl install xdebug-2.5.5 \
-  && docker-php-ext-enable xdebug
+RUN pecl install xdebug-2.5.5
 
 WORKDIR /root
 
