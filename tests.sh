@@ -3,6 +3,6 @@
 echo "Starting tests" >&1
 php --version \
     && composer --version \
-    && php -d memory_limit=2g /usr/local/bin/composer install \
+    && php -d memory_limit=3g /usr/local/bin/composer install \
     && /code/bin/phpcs --standard=psr2 -n src tests \
     && /code/bin/phpunit --debug $@
