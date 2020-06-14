@@ -1,6 +1,6 @@
 FROM php:5.6
 ENV DEBIAN_FRONTEND noninteractive
-ENV COMPOSER_MEMORY_LIMIT -1
+ENV COMPOSER_MEMORY_LIMIT 512M
 
 RUN apt-get update -q \
   && apt-get install unzip git libmcrypt-dev -y --no-install-recommends \
