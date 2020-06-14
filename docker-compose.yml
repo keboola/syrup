@@ -30,10 +30,8 @@ services:
     tty: true
     stdin_open: true
     entrypoint: /code/tests.sh
-    mem_limit: 500m
-    memswap_limit: 1g
-    oom-kill-disable: false
-    mem_reservation: 500m
+    mem_limit: 1g
+    memswap_limit: -1
     environment:
       - SYRUP_APP_NAME
       - DATABASE_HOST
