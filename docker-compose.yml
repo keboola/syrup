@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 
 services:
 
@@ -33,6 +33,7 @@ services:
     mem_limit: 500m
     memswap_limit: 1g
     oom-kill-disable: false
+    mem_reservation: 500m
     environment:
       - SYRUP_APP_NAME
       - DATABASE_HOST
