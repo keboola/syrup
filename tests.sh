@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 echo "Starting tests" >&1
 php --version \
     && composer --version \
