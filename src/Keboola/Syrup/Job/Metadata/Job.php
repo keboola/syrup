@@ -218,7 +218,7 @@ class Job implements JobInterface
     public function getParams()
     {
         $params = $this->getProperty('params');
-        return $this->getEncryptor()->decrypt($params);
+        return $this->getEncryptor(true)->decrypt($params);
     }
 
     public function getRawParams()

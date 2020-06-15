@@ -70,7 +70,7 @@ class CommandTestCase extends WebTestCase
             ->encrypt($this->storageApiToken);
 
         /** @var ObjectEncryptor $configEncryptor */
-        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $configEncryptor = self::$kernel->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
         return new Job($configEncryptor, [
                 'id' => $this->storageApiClient->generateId(),
                 'runId' => $this->storageApiClient->generateId(),

@@ -32,7 +32,7 @@ class Search
     {
         $this->client = $client;
         $this->indexPrefix = $indexPrefix;
-        $this->configEncryptor = $objectEncryptorFactory->getEncryptor();
+        $this->configEncryptor = $objectEncryptorFactory->getEncryptor(true);
         $this->logger = $logger;
     }
 

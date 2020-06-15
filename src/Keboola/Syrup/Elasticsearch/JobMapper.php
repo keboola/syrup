@@ -37,7 +37,7 @@ class JobMapper
     {
         $this->client = $client;
         $this->index = $index;
-        $this->configEncryptor = $configEncryptor->getEncryptor();
+        $this->configEncryptor = $configEncryptor->getEncryptor(true);
         $this->logger = $logger;
         $this->rootDir = $rootDir;
     }
