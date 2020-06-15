@@ -8,7 +8,8 @@ RUN apt-get update -q \
 
 RUN docker-php-ext-install mcrypt pdo_mysql
 
-RUN pecl install xdebug-2.5.5
+RUN pecl install xdebug-2.5.5 \
+  && docker-php-ext-enable xdebug
 
 WORKDIR /root
 
