@@ -19,7 +19,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $originalText = 'secret';
         $encrypted = $encryptor->encrypt($originalText);
@@ -31,7 +31,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
         try {
             $encryptor->encrypt('secret', 'fooBar');
             $this->fail("Invalid crypto wrapper must throw exception");
@@ -48,7 +48,7 @@ class ObjectEncryptorTest extends WebTestCase
 
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $unsupportedInput = $invalidClass;
         try {
@@ -86,7 +86,7 @@ class ObjectEncryptorTest extends WebTestCase
 
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $unsupportedInput = $invalidClass;
         try {
@@ -120,7 +120,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $encrypted = 'KBC::Encrypted==yI0sawothis is not a valid cipher but it looks like one N2Jg==';
         try {
@@ -136,7 +136,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $encrypted = 'this does not even look like a cipher text';
         try {
@@ -152,7 +152,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $encrypted = [
             'key1' => 'somevalue',
@@ -174,7 +174,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $encrypted = [
             'key1' => 'somevalue',
@@ -196,7 +196,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $encryptedValue = $encryptor->encrypt("test");
 
@@ -210,7 +210,7 @@ class ObjectEncryptorTest extends WebTestCase
         $client = static::createClient();
 
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
         $wrapper = new MockCryptoWrapper();
         $encryptor->pushWrapper($wrapper);
 
@@ -228,7 +228,7 @@ class ObjectEncryptorTest extends WebTestCase
         $client = static::createClient();
 
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
         $wrapper = new MockCryptoWrapper();
         $client->getContainer()->set('mock.crypto.wrapper', $wrapper);
         $encryptor->pushWrapper($wrapper);
@@ -243,7 +243,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $array = [
             "key1" => "value1",
@@ -266,7 +266,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $object = new \stdClass();
         $object->key1 = "value1";
@@ -289,7 +289,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $array = [
             "key1" => "value1",
@@ -326,7 +326,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $object = new \stdClass();
         $object->key1= "value1";
@@ -363,7 +363,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $encryptedValue = $encryptor->encrypt("test");
         $array = [
@@ -387,7 +387,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $encryptedValue = $encryptor->encrypt("test");
         $object = new \stdClass();
@@ -412,7 +412,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $array = [
             "key1" => "value1",
@@ -448,7 +448,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $object = new \stdClass();
         $nested1 = new \stdClass();
@@ -484,7 +484,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $array = [
             "key1" => "value1",
@@ -532,7 +532,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $object = new \stdClass();
         $nested1 = new \stdClass();
@@ -580,7 +580,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $encryptedValue = $encryptor->encrypt("test");
         $array = [
@@ -624,7 +624,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $encryptedValue = $encryptor->encrypt("test");
 
@@ -667,7 +667,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $array = [
             "key1" => "value1",
@@ -703,7 +703,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $object = new \stdClass();
         $object->key1 = "value1";
@@ -745,7 +745,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
         $wrapper = new AnotherCryptoWrapper();
         $wrapper->setKey(md5(uniqid()));
         $encryptor->pushWrapper($wrapper);
@@ -769,7 +769,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
         $wrapper = new AnotherCryptoWrapper();
         $wrapper->setKey(md5(uniqid()));
         $client->getContainer()->set('another.crypto.wrapper', $wrapper);
@@ -793,7 +793,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
         $array = [];
         $encrypted = $encryptor->encrypt($array);
         $this->assertEquals([], $encrypted);
@@ -804,7 +804,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
         $object = new \stdClass();
         $encrypted = $encryptor->encrypt($object);
         $this->assertEquals('stdClass', get_class($encrypted));
@@ -825,7 +825,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $json = str_replace([" ", "\n"], ['', ''], '{
             "key1": "value1",
@@ -898,7 +898,7 @@ class ObjectEncryptorTest extends WebTestCase
         $client = static::createClient();
         $legacyEncryptor = $client->getContainer()->get('syrup.encryptor');
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $originalText = 'secret';
         $encrypted = $legacyEncryptor->encrypt($originalText);
@@ -910,7 +910,7 @@ class ObjectEncryptorTest extends WebTestCase
     {
         $client = static::createClient();
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $client->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $originalText = 'test';
         try {

@@ -35,7 +35,7 @@ class JobTest extends KernelTestCase
         $param = ["key1" => "value1", "#key2" => "value2"];
         $lock = uniqid();
 
-        $job = $jobFactory->create($command, $objectEncryptorFactory->getEncryptor()->encrypt($param), $lock);
+        $job = $jobFactory->create($command, $objectEncryptorFactory->getEncryptor(true)->encrypt($param), $lock);
 
         $this->assertEquals($command, $job->getCommand());
         $this->assertEquals($lock, $job->getLockName());
@@ -60,7 +60,7 @@ class JobTest extends KernelTestCase
         $param = ["key1" => "value1", "#key2" => "value2"];
         $lock = uniqid();
 
-        $job = $jobFactory->create($command, $objectEncryptorFactory->getEncryptor()->encrypt($param), $lock);
+        $job = $jobFactory->create($command, $objectEncryptorFactory->getEncryptor(true)->encrypt($param), $lock);
         $job->setResult(["message" => "SQLSTATE[XX000]: " . chr(0x00000080) . " abcd"]);
         $this->assertEquals(["message" => "SQLSTATE[XX000]:  abcd"], $job->getResult());
     }

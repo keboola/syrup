@@ -32,7 +32,7 @@ class JobFactory
         ObjectEncryptorFactory $objectEncryptor,
         StorageApiService $storageApiService = null
     ) {
-        $this->objectEncryptor = $objectEncryptor->getEncryptor();
+        $this->objectEncryptor = $objectEncryptor->getEncryptor(true);
         $this->componentName = $componentName;
         $this->storageApiService = $storageApiService;
     }

@@ -41,7 +41,8 @@ class ErrorHandlingTest extends WebTestCase
                 return true;
             }))
             ->willReturn([
-                'level' => 100
+                'level' => 100,
+                'message' => 'dummy',
             ]);
 
         $container = $this->client->getContainer();

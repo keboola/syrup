@@ -76,7 +76,7 @@ class PublicController extends BaseController
     public function encryptAction(Request $request)
     {
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $this->container->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $this->container->get('syrup.object_encryptor_factory')->getEncryptor(true);
         $contentType = $request->headers->get('Content-type');
         $contentType = strtolower(trim(explode(';', $contentType)[0]));
         if ($contentType == "text/plain") {

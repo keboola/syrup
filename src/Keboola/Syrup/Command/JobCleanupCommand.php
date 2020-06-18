@@ -56,7 +56,7 @@ class JobCleanupCommand extends ContainerAwareCommand
 
         // SAPI init
         /** @var ObjectEncryptor $encryptor */
-        $encryptor = $this->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor();
+        $encryptor = $this->getContainer()->get('syrup.object_encryptor_factory')->getEncryptor(true);
 
         $this->sapiClient = new SapiClient([
             'token' => $encryptor->decrypt($this->job->getToken()['token']),
