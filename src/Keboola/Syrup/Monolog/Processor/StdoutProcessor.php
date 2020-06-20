@@ -106,8 +106,11 @@ class StdoutProcessor
             if (mb_strlen($record['message']) > 256) {
                 $record['message'] = mb_substr($record['message'], 0, 256);
             }
-            $allowedFields = ['message', 'component', 'runId', 'pid', 'priority', 'level', 'attachment',
-                'exception', 'exceptionId', 'token', 'cliCommand', 'http', 'job', 'app'];
+            // includes fields required by the spec https://github.com/Seldaek/monolog/blob/master/doc/message-structure.md
+            $allowedFields = ['message', 'component', 'runId', 'pid', 'priority', 'level', 'level_name', 'attachment',
+                'exception', 'exceptionId', 'token', 'cliCommand', 'http', 'job', 'app',
+                'context', 'channel', 'extra', 'datetime'
+            ];
             foreach (array_keys($record) as $fieldName) {
                 if (!in_array($fieldName, $allowedFields)) {
                     unset($record[$fieldName]);
