@@ -47,13 +47,20 @@ class StdoutProcessorTest extends TestCase
         $record = $this->getRecord(Logger::WARNING, str_repeat('batman', 1000));
         $newRecord = $processor($record);
 
-        $this->assertEquals(8, count($newRecord));
+        $this->assertEquals(13, count($newRecord));
+        // Fields required by the spec: https://github.com/Seldaek/monolog/blob/master/doc/message-structure.md
         $this->assertArrayHasKey('message', $newRecord);
+        $this->assertArrayHasKey('level', $newRecord);
+        $this->assertArrayHasKey('level_name', $newRecord);
+        $this->assertArrayHasKey('context', $newRecord);
+        $this->assertArrayHasKey('channel', $newRecord);
+        $this->assertArrayHasKey('datetime', $newRecord);
+        $this->assertArrayHasKey('extra', $newRecord);
+
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('runId', $newRecord);
         $this->assertArrayHasKey('pid', $newRecord);
         $this->assertArrayHasKey('priority', $newRecord);
-        $this->assertArrayHasKey('level', $newRecord);
         $this->assertArrayHasKey('token', $newRecord);
         $this->assertArrayHasKey('attachment', $newRecord);
 
@@ -78,12 +85,19 @@ class StdoutProcessorTest extends TestCase
         $newRecord = $processor($record);
 
         $this->assertGreaterThan(7, count($newRecord));
+        // Fields required by the spec: https://github.com/Seldaek/monolog/blob/master/doc/message-structure.md
         $this->assertArrayHasKey('message', $newRecord);
+        $this->assertArrayHasKey('level', $newRecord);
+        $this->assertArrayHasKey('level_name', $newRecord);
+        $this->assertArrayHasKey('context', $newRecord);
+        $this->assertArrayHasKey('channel', $newRecord);
+        $this->assertArrayHasKey('datetime', $newRecord);
+        $this->assertArrayHasKey('extra', $newRecord);
+
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('runId', $newRecord);
         $this->assertArrayHasKey('pid', $newRecord);
         $this->assertArrayHasKey('priority', $newRecord);
-        $this->assertArrayHasKey('level', $newRecord);
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('token', $newRecord);
         $this->assertArrayNotHasKey('attachment', $newRecord);
@@ -123,13 +137,20 @@ class StdoutProcessorTest extends TestCase
         $processor = new StdoutProcessor(SYRUP_APP_NAME, $storageApiService, $s3Uploader);
         $newRecord = $processor($record);
 
-        $this->assertEquals(7, count($newRecord));
+        $this->assertEquals(12, count($newRecord));
+        // Fields required by the spec: https://github.com/Seldaek/monolog/blob/master/doc/message-structure.md
         $this->assertArrayHasKey('message', $newRecord);
+        $this->assertArrayHasKey('level', $newRecord);
+        $this->assertArrayHasKey('level_name', $newRecord);
+        $this->assertArrayHasKey('context', $newRecord);
+        $this->assertArrayHasKey('channel', $newRecord);
+        $this->assertArrayHasKey('datetime', $newRecord);
+        $this->assertArrayHasKey('extra', $newRecord);
+
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('runId', $newRecord);
         $this->assertArrayHasKey('pid', $newRecord);
         $this->assertArrayHasKey('priority', $newRecord);
-        $this->assertArrayHasKey('level', $newRecord);
         $this->assertArrayHasKey('attachment', $newRecord);
 
         $this->assertArrayNotHasKey('token', $newRecord);
@@ -168,13 +189,20 @@ class StdoutProcessorTest extends TestCase
         $processor = $this->getStdoutProcessor();
         $newRecord = $processor($record);
 
-        $this->assertEquals(10, count($newRecord));
+        $this->assertEquals(15, count($newRecord));
+        // Fields required by the spec: https://github.com/Seldaek/monolog/blob/master/doc/message-structure.md
         $this->assertArrayHasKey('message', $newRecord);
+        $this->assertArrayHasKey('level', $newRecord);
+        $this->assertArrayHasKey('level_name', $newRecord);
+        $this->assertArrayHasKey('context', $newRecord);
+        $this->assertArrayHasKey('channel', $newRecord);
+        $this->assertArrayHasKey('datetime', $newRecord);
+        $this->assertArrayHasKey('extra', $newRecord);
+
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('runId', $newRecord);
         $this->assertArrayHasKey('pid', $newRecord);
         $this->assertArrayHasKey('priority', $newRecord);
-        $this->assertArrayHasKey('level', $newRecord);
         $this->assertArrayHasKey('cliCommand', $newRecord);
         $this->assertArrayHasKey('attachment', $newRecord);
 
@@ -207,13 +235,20 @@ class StdoutProcessorTest extends TestCase
         $processor = $this->getStdoutProcessor();
         $newRecord = $processor($record);
 
-        $this->assertEquals(9, count($newRecord));
+        $this->assertEquals(14, count($newRecord));
+        // Fields required by the spec: https://github.com/Seldaek/monolog/blob/master/doc/message-structure.md
         $this->assertArrayHasKey('message', $newRecord);
+        $this->assertArrayHasKey('level', $newRecord);
+        $this->assertArrayHasKey('level_name', $newRecord);
+        $this->assertArrayHasKey('context', $newRecord);
+        $this->assertArrayHasKey('channel', $newRecord);
+        $this->assertArrayHasKey('datetime', $newRecord);
+        $this->assertArrayHasKey('extra', $newRecord);
+
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('runId', $newRecord);
         $this->assertArrayHasKey('pid', $newRecord);
         $this->assertArrayHasKey('priority', $newRecord);
-        $this->assertArrayHasKey('level', $newRecord);
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('attachment', $newRecord);
 
@@ -234,13 +269,20 @@ class StdoutProcessorTest extends TestCase
         );
         $newRecord = $processor($record);
 
-        $this->assertEquals(10, count($newRecord));
+        $this->assertEquals(15, count($newRecord));
+        // Fields required by the spec: https://github.com/Seldaek/monolog/blob/master/doc/message-structure.md
         $this->assertArrayHasKey('message', $newRecord);
+        $this->assertArrayHasKey('level', $newRecord);
+        $this->assertArrayHasKey('level_name', $newRecord);
+        $this->assertArrayHasKey('context', $newRecord);
+        $this->assertArrayHasKey('channel', $newRecord);
+        $this->assertArrayHasKey('datetime', $newRecord);
+        $this->assertArrayHasKey('extra', $newRecord);
+
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('runId', $newRecord);
         $this->assertArrayHasKey('pid', $newRecord);
         $this->assertArrayHasKey('priority', $newRecord);
-        $this->assertArrayHasKey('level', $newRecord);
         $this->assertArrayHasKey('component', $newRecord);
         $this->assertArrayHasKey('attachment', $newRecord);
 
