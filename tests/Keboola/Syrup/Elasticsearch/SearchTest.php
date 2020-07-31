@@ -170,6 +170,50 @@ class SearchTest extends WebTestCase
         $this->assertTrue($job2Asserted);
     }
 
+
+    public function testGetJobsSorting()
+    {
+        $job1 = $this->createJob();
+        $job1->setDurationSeconds(120);
+        self::$jobMapper->create($job1);
+
+        $job2 = $this->createJob();
+        $job2->setDurationSeconds(240);
+        self::$jobMapper->create($job2);
+
+        $job3 = $this->createJob();
+        $job3->setDurationSeconds(120);
+        self::$jobMapper->create($job3);
+
+        $retries = 0;
+
+        $res = [];
+        while ($retries < 7) {
+            $delaySecs = 2 * pow(2, $retries);
+            sleep($delaySecs);
+            $retries++;
+
+            $projectId = $job1->getProject()['id'];
+
+            $res = self::$search->getJobs([
+                'projectId' => $projectId,
+                'component' => SYRUP_APP_NAME,
+                'since' => '-1 day',
+                'until' => 'now',
+                'sortField' => 'durationSeconds',
+                'sortDirection' => 'asc',
+            ]);
+
+            if (count($res) >= 3) {
+                break;
+            }
+        }
+
+        $this->assertEquals($res[0]['id'], $job3->getId());
+        $this->assertEquals($res[1]['id'], $job1->getId());
+        $this->assertEquals($res[2]['id'], $job2->getId());
+    }
+
     public function testGetIndices()
     {
         $indices = self::$search->getIndices();

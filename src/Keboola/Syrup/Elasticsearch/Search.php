@@ -91,6 +91,8 @@ class Search
      * - offset
      * - limit
      * - status
+     * - sortField
+     * - sortDirection
      * @return array
      */
     public function getJobs(array $params)
@@ -104,6 +106,8 @@ class Search
         $offset = 0;
         $limit = 100;
         $status = null;
+        $sortField = null;
+        $sortDirection = 'asc';
         extract($params);
 
         $filter = [];
@@ -170,13 +174,12 @@ class Search
                         'query' => $queryParam
                     ]
                 ],
-                'sort' => [
-                    'id' => [
-                        'order' => 'desc'
-                    ]
-                ]
-            ]
+            ],
         ];
+        if ($sortField) {
+            $params['body']['sort'][$sortField] = ['order' => $sortDirection];
+        }
+        $params['body']['sort']['id'] = ['order' => 'desc'];
 
         $results = [];
         $i = 0;
