@@ -35,12 +35,12 @@ class PublicControllerTest extends WebTestCase
 
     public function testIndex()
     {
-        static::$client->request('GET', '/syrup', [], []);
+        static::$client->request('GET', '', [], []);
         $result = json_decode(static::$client->getResponse()->getContent(), true);
-        var_dump(static::$client->getResponse()->getContent());
         $this->assertArrayHasKey('host', $result);
         $this->assertArrayHasKey('components', $result);
         $this->assertArrayHasKey('documentation', $result);
+        $this->assertEquals(200, static::$client->getResponse()->getStatusCode());
     }
 
     public function testEncryptActionSimpleText()
