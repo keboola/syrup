@@ -5,7 +5,6 @@ namespace Keboola\Syrup\Controller;
 use Keboola\Encryption\EncryptorInterface;
 use Keboola\Syrup\Elasticsearch\ComponentIndex;
 use Keboola\Syrup\Elasticsearch\JobMapper;
-use Keboola\Syrup\Job\Metadata\JobFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Keboola\StorageApi\Client;
