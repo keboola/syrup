@@ -44,7 +44,14 @@ class PublicController extends BaseController
         $installedArr = $jsonDecoder->decode($installedJson, JsonEncoder::FORMAT);
 
         $syrupComponents = array();
-        foreach ($installedArr as $package) {
+        if (isset($installedArr['packages'])) {
+            // composer 2.x
+            $packages = $installedArr['packages'];
+        } else {
+            // composer 1.x
+            $packages = $installedArr;
+        }
+        foreach ($packages as $package) {
             $nameArr = explode("/", $package['name']);
 
             if ($nameArr[0] == 'syrup' || $nameArr[0] == 'keboola') {

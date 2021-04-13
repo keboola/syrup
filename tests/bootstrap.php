@@ -68,6 +68,7 @@ $paramsYaml = \Symfony\Component\Yaml\Yaml::dump([
 ]);
 file_put_contents(__DIR__ . '/../app/config/parameters.yml', $paramsYaml);
 touch(__DIR__ . '/../app/config/parameters_shared.yml');
+define('ROOT_PATH', __DIR__.'/../');
 
 $db = \Doctrine\DBAL\DriverManager::getConnection([
     'driver' => 'pdo_mysql',
