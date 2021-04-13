@@ -37,6 +37,7 @@ class PublicControllerTest extends WebTestCase
     {
         static::$client->request('GET', '/syrup', [], []);
         $result = json_decode(static::$client->getResponse()->getContent(), true);
+        var_dump(static::$client->getResponse()->getContent());
         $this->assertArrayHasKey('host', $result);
         $this->assertArrayHasKey('components', $result);
         $this->assertArrayHasKey('documentation', $result);
