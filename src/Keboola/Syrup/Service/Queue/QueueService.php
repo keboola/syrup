@@ -28,7 +28,7 @@ class QueueService
             'http' => [
                 'connect_timeout' => 10,
                 'timeout' => 120,
-            ],            
+            ],
         ];
 
         if (isset($config['access_key'])
