@@ -57,3 +57,7 @@ docker-compose up elastic mysql
 ```bash
 docker-compose run --rm tests
 ```
+
+## License
+
+MIT licensed, see [LICENSE](./LICENSE) file.
